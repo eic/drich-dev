@@ -1,11 +1,16 @@
 # irt-juggler-dev
 
-## setup
-- symlink Juggler repo to `juggler`
-- symlink simulation output directory to `sim`
-- symlink `detectors/athena` DD4hep repo to `athena`; you must have a build of this
-- edit `environ.sh` if you want; this is sourced by many scripts
+## dependencies
+- symlink or clone IRT repo to `./irt`
+- symlink or clone Juggler repo to `./juggler`
+- symlink simulation output directory to `./sim`
+- if you want to use your own `athena` build, symlink or clone
+  `detectors/athena` DD4hep repo to `./athena`; otherwise follow benchmarks setup
+  directions below, which will install `athena` to a local prefix
+- edit `environ.sh` if you want; this is needed by many scripts
 
+## build irt
+- follow `irt/README.md` (TL;DR: `irt/bin/buildIRT.sh`)
 
 ## build juggler
 ```
