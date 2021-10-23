@@ -1,10 +1,9 @@
 #!/bin/bash
 # run juggler
 
-option=JugPID/options/testIRT.py
-#option=JugPID/options/rich_reco.py
+option=benchmarks/rich/options/testIRT.py
+#option=benchmarks/rich/options/rich_reco.py
 
-source environ.sh
-pushd juggler
+pushd benchmarks
 xenv -x $JUGGLER_INSTALL_PREFIX/Juggler.xenv gaudirun.py $option
 popd

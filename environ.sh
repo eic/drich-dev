@@ -1,16 +1,30 @@
 # paths
-# note: juggler and athena share the same install prefix ...bad idea? We shall see...
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ATHENA_PREFIX/lib
-export JUGGLER_DETECTOR=athena
-export BEAMLINE_CONFIG=ip6
-export BEAMLINE_CONFIG_VERSION=master
-export JUGGLER_DETECTOR_VERSION=master
-export DETECTOR_PATH=$(pwd)/athena
-export DETECTOR_VERSION=master
-export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
+export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
+#export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
+export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
 
-# default settings 
+# juggler config 
+export JUGGLER_DETECTOR="athena"
+export BEAMLINE_CONFIG="ip6"
 export JUGGLER_SIM_FILE=$(pwd)/sim/sim_run.root
 export JUGGLER_REC_FILE=test.root
 export JUGGLER_N_EVENTS=100
 export JUGGLER_RNG_SEED=1
+export JUGGLER_N_THREADS=6
+
+# vars overwritten by `benchmarks/.local/bin/env.sh`:
+#export BEAMLINE_CONFIG_VERSION=master
+#export JUGGLER_DETECTOR_VERSION=master
+#export DETECTOR_PATH=$(pwd)/athena
+#export DETECTOR_VERSION=master
+
+# environment from reconstruction benchmarks
+if [ -f "benchmarks/.local/bin/env.sh" ]; then
+  pushd benchmarks
+  source .local/bin/env.sh
+  popd
+fi
+
+# results
+echo "--------------"
+print_env.sh
