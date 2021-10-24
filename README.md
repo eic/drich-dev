@@ -9,14 +9,16 @@
   directions below, which will install `athena` to a local prefix
 - edit `environ.sh` if you want; this is needed by many scripts
 
+
 ## build irt
 - follow `irt/README.md` (TL;DR: `irt/bin/buildIRT.sh`)
+
 
 ## build juggler
 ```
 eic-shell
 source environ.sh
-buildJuggler.sh
+./buildJuggler.sh
 ```
 
 
@@ -37,5 +39,5 @@ mkdir -p results config
 ```
 eicshell
 source environ.sh
-runJuggler.sh
+./runJuggler.sh
 ```
