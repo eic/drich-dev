@@ -14,14 +14,6 @@
 - follow `irt/README.md` (TL;DR: `irt/bin/buildIRT.sh`)
 
 
-## build juggler
-```
-eic-shell
-source environ.sh
-./buildJuggler.sh
-```
-
-
 ## benchmarks setup
 ```
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git benchmarks
@@ -33,6 +25,16 @@ mkdir_local_data_link sim_output
 mkdir -p results config
 ```
 - cf. their associated readmes
+
+
+## build juggler
+```
+eic-shell
+source environ.sh
+./buildJuggler.sh
+```
+- note: if you symlinked the `juggler` repo, `kluge.sh` (called by
+  `buildJuggler.sh`) might not work (FIXME)
 
 
 ## execution
