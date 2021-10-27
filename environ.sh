@@ -4,7 +4,8 @@ export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
 export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
 
 # cmake packages
-export IRT_ROOT=$ATHENA_PREFIX # overrides container version
+export IRT_ROOT=$ATHENA_PREFIX # overrides container version with local version
+export EICD_ROOT=$ATHENA_PREFIX # overrides container version with local version
 
 # juggler config vars
 export JUGGLER_DETECTOR="athena"

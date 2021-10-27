@@ -1,8 +1,9 @@
 # irt-juggler-dev
 
 ## dependencies
-- symlink or clone IRT repo to `./irt`
-- symlink or clone Juggler repo to `./juggler`
+- symlink or clone IRT repo to `./irt`; should be on `main` branch
+- symlink or clone Juggler repo to `./juggler`; should be on `irt-init` branch (or your own)
+- symlink or clone EICD repo to `./eicd`; should be on `ayk-00` branch
 - symlink simulation output directory to `./sim`
 - if you want to use your own `athena` build, symlink or clone
   `detectors/athena` DD4hep repo to `./athena`; otherwise follow benchmarks setup
@@ -25,6 +26,7 @@ mkdir_local_data_link sim_output
 mkdir -p results config
 ```
 - cf. their associated readmes
+- make sure you checkout the correct development branch!
 
 
 ## build juggler
