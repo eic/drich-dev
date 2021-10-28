@@ -5,13 +5,15 @@
 # - don't run too many parallel jobs
 # - WARNING: nasty kluge (see kluge.sh)
 #
+cp -v kluge.sh juggler/
 pushd juggler
 cmake -B build -S . \
   -DCMAKE_INSTALL_PREFIX=$JUGGLER_INSTALL_PREFIX \
   -DCMAKE_FIND_DEBUG_MODE=OFF \
   && \
-../kluge.sh && \
+./kluge.sh && \
 cmake --build build -j2 -- install && \
+rm -v kluge.sh && \
 popd && exit 0
 popd
 exit 1

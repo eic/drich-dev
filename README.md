@@ -9,10 +9,15 @@
   `detectors/athena` DD4hep repo to `./athena`; otherwise follow benchmarks setup
   directions below, which will install `athena` to a local prefix
 - edit `environ.sh` if you want; this is needed by many scripts
+- most commands below need to be executed in the EIC container (`eic-shell`)
 
 
 ## build irt
 - follow `irt/README.md` (TL;DR: `irt/bin/buildIRT.sh`)
+
+
+## build EICD
+- `./buildEICD.sh`
 
 
 ## benchmarks setup
@@ -25,23 +30,22 @@ source .local/bin/env.sh && build_detector.sh
 mkdir_local_data_link sim_output
 mkdir -p results config
 ```
-- cf. their associated readmes
-- make sure you checkout the correct development branch!
+- checkout the correct development branch (currently `irt-benchmark`) of
+  `reconstruction_benchmarks`
+- cf. their readmes for further documentation
 
 
 ## build juggler
 ```
-eic-shell
 source environ.sh
 ./buildJuggler.sh
 ```
-- note: if you symlinked the `juggler` repo, `kluge.sh` (called by
-  `buildJuggler.sh`) might not work (FIXME)
+- note: `buildJuggler.sh` will run `kluge.sh` to correct an issue with
+  component finding (see comments in the script)
 
 
 ## execution
 ```
-eicshell
 source environ.sh
 ./runJuggler.sh
 ```
