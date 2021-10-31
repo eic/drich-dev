@@ -47,5 +47,6 @@ source environ.sh
 ## execution
 ```
 source environ.sh
-./runJuggler.sh
+./runJuggler.sh  #OR#  ./runBenchmark.sh
+# use ./rebuildAll.sh to quickly build all repos
 ```
