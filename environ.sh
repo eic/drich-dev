@@ -21,16 +21,14 @@ if [ -f "benchmarks/.local/bin/env.sh" ]; then
   pushd benchmarks
   source .local/bin/env.sh
   echo "--------------"
-  print_env.sh
   popd
 fi
 
 # juggler config vars which would have been overwritten by 
 # `benchmarks/.local/bin/env.sh`:
-# - maybe these could be used to ensure we use preferred
-#   detector build, rather than the one built with the
-#   `benchmarks` repo
+export DETECTOR_PATH=$(pwd)/athena
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
-#export DETECTOR_PATH=$(pwd)/athena
 #export DETECTOR_VERSION=master
+
+if [ -f "benchmarks/.local/bin/env.sh" ]; then print_env.sh; fi
