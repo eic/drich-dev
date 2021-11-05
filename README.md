@@ -20,6 +20,7 @@
 ## build detectors (optional)
 - `./buildATHENA.sh`
 - `./buildIP6.sh`
+- check geometry with `./runDDwebDisplay.sh` and open `$(ls -t *.root|head -n1)` in `jsroot`
 
 
 ## build EICD
