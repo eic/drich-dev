@@ -14,13 +14,16 @@ pushd $opt
 
 # update `eic_container` repo
 if [ -d "eic_container" ]; then
+  echo "[+] update eic_container repo..."
   pushd eic_container
   git pull
   popd
 else
+  echo "[+] clone eic_container repo..."
   git clone https://eicweb.phy.anl.gov/containers/eic_container.git
 fi
 
 # pull the container
+echo "[+] execute install.sh..."
 eic_container/install.sh $*
 popd
