@@ -7,11 +7,10 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ## dependencies
 - install EIC Software container:
   - `opt/update.sh` will install or update the EIC Software container automatically
-    - the `opt` directory will contain your prefix, `ATHENA_PREFIX=opt/local`
     - execute `opt/eic-shell` will start the container
     - execute `echo $ATHENA_PREFIX`
       - it should be `./opt/local` unless you changed it
-      - this prefix will be used for builds of ATHENA Software modules
+      - this is the prefix that will be used for builds of ATHENA Software modules (edit `environ.sh` to change prefixes)
   - alternatively, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
     - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 
 - obtain ATHENA Software modules, either clone or symlink the repositories to the specified paths
