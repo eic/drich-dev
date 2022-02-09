@@ -5,8 +5,6 @@ FLAGS = -g -Wno-deprecated -fPIC -m64 -fno-inline -Wno-write-strings
 DEPS += $(shell root-config --cflags)
 LIBS += $(shell root-config --glibs)
 LIBS += -L/usr/local/lib -lDD4pod
-#LIBS += -lMinuit -lRooFitCore -lRooFit
-
 
 #--------------------------------------------
 

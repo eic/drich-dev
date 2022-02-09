@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # paths
 #export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
 export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
@@ -10,7 +12,7 @@ export EICD_ROOT=$ATHENA_PREFIX # overrides container version with local version
 # juggler config vars
 export JUGGLER_DETECTOR="athena"
 export BEAMLINE_CONFIG="ip6"
-export JUGGLER_SIM_FILE=$(pwd)/sim/sim_run.root
+export JUGGLER_SIM_FILE=$(pwd)/out/sim_run.root
 export JUGGLER_REC_FILE=test.root
 export JUGGLER_N_EVENTS=100
 export JUGGLER_RNG_SEED=1

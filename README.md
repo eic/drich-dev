@@ -1,16 +1,21 @@
 # irt-juggler-dev
 
 ## dependencies
-- symlink or clone IRT repo to `./irt`; should be on `main` branch
-- symlink or clone Juggler repo to `./juggler`; should be on `irt-init` branch (or your own)
-- symlink or clone EICD repo to `./eicd`; should be on `ayk-00` branch
-- symlink simulation output directory to `./sim`
-- if you want to use your own `athena` build, symlink or clone
-  `detectors/athena` DD4hep repo to `./athena` and `detectors/ip6` to `./ip6`;
-  otherwise follow benchmarks setup directions below, which will install
-  `athena` to a local prefix
-- edit `environ.sh` if you want; this is needed by many scripts
-- most commands below need to be executed in the EIC container (`eic-shell`)
+- clone or symlink [athena](https://eicweb.phy.anl.gov/EIC/detectors/athena) to `./athena`
+- clone or symlink [ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
+- clone or symlink [IRT](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
+- clone or symlink [Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
+- clone or symlink [EICD](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
+- install EIC Software container
+  - `opt/update.sh` will install or update the EIC Software container automatically
+  - the `opt` directory will contain your prefix, `ATHENA_PREFIX=opt/local`
+  - if you prefer, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
+
+## environment
+- edit `environ.sh` if you want; this contains several env vars needed by many scripts
+  - you can find documentation for many variables in the corresponding repositories
+
+**HERE**
 
 
 ## build irt
