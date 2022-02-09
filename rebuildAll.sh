@@ -1,8 +1,9 @@
 #!/bin/bash
-# rebuild all repos
+# rebuild all modules, in order of dependence
+# pass an argument to rebuild everything cleanly
 set -e
-./buildIP6.sh
-./buildATHENA.sh
-irt/bin/buildIRT.sh
-./buildEICD.sh
-./buildJuggler.sh
+./buildEICD.sh $*
+./buildIRT.sh $*
+./buildIP6.sh $*
+./buildATHENA.sh $*
+./buildJuggler.sh $*

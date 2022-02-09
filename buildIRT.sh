@@ -5,7 +5,7 @@ set -e
 [[ $# -gt 0 ]] && clean=1 || clean=0 # clean build if any args
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 
-pushd eicd
+pushd irt
 
 if [ $clean -eq 1 ]; then
   echo "clean build dir..."
@@ -15,7 +15,7 @@ fi
 
 cmake -B build -S . \
   -DCMAKE_INSTALL_PREFIX=$ATHENA_PREFIX \
-  -DBUILD_DATA_MODEL=ON
+  -DEVALUATION=yes
 cmake --build build -j$BUILD_NPROC -- install
 
 popd

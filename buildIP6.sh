@@ -1,22 +1,21 @@
 #!/bin/bash
 
-if [ $# -ge 1 ]; then clean=1; else clean=0; fi
+set -e
+
+[[ $# -gt 0 ]] && clean=1 || clean=0 # clean build if any args
+if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 
 pushd ip6
 
 if [ $clean -eq 1 ]; then
-  echo "clean build dir... done"
+  echo "clean build dir..."
   mkdir -p build
   rm -rv build
 fi
 
 cmake -B build -S . \
   -DCMAKE_INSTALL_PREFIX=$ATHENA_PREFIX \
-  -DCMAKE_CXX_STANDARD=17 \
-  &&\
-cmake --build build -j$(grep -c processor /proc/cpuinfo) -- install &&\
-popd &&\
-exit 0
+  -DCMAKE_CXX_STANDARD=17
+cmake --build build -j$BUILD_NPROC -- install
 
 popd
-exit 1

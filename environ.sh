@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# obtain number of CPUs, needed only for multi-threaded building
+# - set it manually, if you prefer, or if auto detection fails
+export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
+if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
+echo "detected $BUILD_NPROC cpus"
+
 # paths
 #export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
 export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
