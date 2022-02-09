@@ -9,3 +9,5 @@ eicd
 *.root
 calibrations
 fieldmaps
+tmp.mac
+*.exe
