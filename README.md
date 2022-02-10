@@ -1,7 +1,7 @@
 # dRICH-dev
 Scripts for ATHENA dRICH and IRT development 
 
-ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules and their connections of calls and data flow
+ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules relevant for RICH development. It shows their dependences, calls, and data flow.
 
 ## Dependencies
 - install EIC Software container:
@@ -46,6 +46,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 - you must be in the EIC container (`opt/eic-shell`) and have environment variables set (`source environ.sh`)
 - build each repository, one-by-one, in order of dependences (see [flowchart](docDiagram.pdf) dependency graph)
 - instructions for the `reconstructions_benchmarks` repository are below
+- build scripts, in recommended order:
 ```
 ./buildEICD.sh
 ./buildIRT.sh
@@ -55,7 +56,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ```
 
 ### Recommendations and Troubleshooting
-- execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of they repositories
+- execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of the repositories
 - be mindful of which branch you are on in each repository, especially if you have several active merge requests
   - for example, `IRT` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
 - for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
@@ -82,16 +83,54 @@ mkdir -p results config
 
 ## Execution
 
-## view athena detector
-- check geometry with `./runDDwebDisplay.sh` and open `$(ls -t *.root|head -n1)` in `jsroot`
+### Geometry
+- execute `./runDDwebDisplay.sh` to produce the geometry `root` file
+  - by default, it will use the compact file for the full ATHENA detector
+  - run `./runDDwebDisplay.sh d` to run on dRICH only
+  - run `./runDDwebDisplay.sh p` to run on pfRICH only
+- open the resulting ROOT file in `jsroot` geoviewer, using either:
+  - [ANL hosted instance](https://eic.phy.anl.gov/geoviewer/)
+  - [CERN hosted instance](https://root.cern/js/)
+  - a locally hosted instance
+- browse the ROOT file geometry tree in the sidebar on the left:
+  ```
+  detector_geometry.root
+  └── default
+      └── world_volume
+          ├── ...
+          ├── DRICH
+          ├── PfRICH
+          └── ...
+  ```
+  - right click on desired component, then click `Draw`
+  - default projection is perspective, but if you need to check alignment, change to orthographic projection
+    - right click -> show controls -> advanced -> orthographic camera
+    - square your browser window aspect ratio, since the default aspect ratio is whatever your browser window is
+  - more documentation found on [jsroot website](https://root.cern/js/)
+- check for overlaps
+  - typically more efficient to let the CI do this
+  - call `./overlapCheck.sh` to run a local check
+    - one check faster and less accurate, the other is slower and more accurate
+- use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any parameter in the compact files
+  - for example, `./searchCompactParams.sh RICH` to get all RICH variables
+  - the search pattern is case sensitive
+  - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for further usage
 
-
-
-
-
-## execution
+### Simulation
+TODO: document these
 ```
-source environ.sh
+simulate.py
+drawHits.cpp
+drawSegmentation.cpp
+```
+
+### Reconstruction
+TODO: document these
+```
 ./runJuggler.sh  #OR#  ./runBenchmark.sh
-# use ./rebuildAll.sh to quickly build all repos
 ```
+
+### Miscellaneous
+- `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
+- `deprecated/` contains some old scripts which may be helpful
+

@@ -62,8 +62,8 @@ int main(int argc, char** argv) {
   auto df1 = dfIn
     .Define("thrownParticles",isThrown,{"mcparticles"})
     .Define("thrownP",momentum,{"thrownParticles"})
-    .Define("numHits",numHits,{"ERICHHits"})
-    .Define("hitPos",hitPos,{"ERICHHits"})
+    .Define("numHits",numHits,{"PFRICHHits"})
+    .Define("hitPos",hitPos,{"PFRICHHits"})
     .Define("hitX",hitPosX,{"hitPos"})
     .Define("hitY",hitPosY,{"hitPos"})
     ;
@@ -72,12 +72,12 @@ int main(int argc, char** argv) {
 
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
-      { "hitPositions","eRICh hit positions (units=cm)",
+      { "hitPositions","pfRICH hit positions (units=cm)",
       1000,-100,100, 1000,-100,100 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
-      { "numHitsVsThrownP","number of eRICh hits vs. thrown momentum", 
+      { "numHitsVsThrownP","number of pfRICH hits vs. thrown momentum", 
       65,0,65, 100,0,200 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)

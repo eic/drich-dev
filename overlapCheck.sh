@@ -9,12 +9,10 @@ if [ $# -ne 1 ]; then
       2 = Geant4
     ideally you want to run both the checks
   """
-  exit 1
+  exit 2
 fi
 
-source environ.sh
-
-xmlfile=${DRICH_DD4_ATHENA}/athena.xml
+xmlfile=athena/athena.xml
 wdir=$(pwd)
 
 case $1 in
@@ -22,7 +20,7 @@ case $1 in
     checkOverlaps -c $xmlfile
     ;;
   2)
-    python ${DRICH_DD4_ATHENA}/scripts/checkOverlaps.py -c $xmlfile 2>&1 | tee tempo.log
+    python athena/scripts/checkOverlaps.py -c $xmlfile 2>&1 | tee tempo.log
     grep -E 'Overlap.is.detected.for' tempo.log -A1 |\
       sed 's/^.*for volume //g;s/^.* with //g' |\
       sed 's/ volume.s//g' |\

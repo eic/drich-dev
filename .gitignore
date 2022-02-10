@@ -11,4 +11,5 @@ reconstruction_benchmarks
 
 calibrations
 fieldmaps
+doc/detector.md
 tmp.mac

@@ -104,9 +104,9 @@ outputName = re.sub('^.*/','',outputName)
 ### set RICH names, based on zDirection
 zDirection /= abs(zDirection)
 if(zDirection<0):
-    xrich = 'erich'
-    XRICH = 'ERICH'
-    xRICH = 'eRICH'
+    xrich = 'pfrich'
+    XRICH = 'PFRICH'
+    xRICH = 'pfRICH'
 else:
     xrich = 'drich'
     XRICH = 'DRICH'
@@ -195,10 +195,10 @@ for paramLine in open(paramListFileN,'r'):
 ### set envelope limits
 envBuffer = 5
 if(zDirection<0):
-    rMin = params['ERICH_rmin1'] + envBuffer
-    rMax = params['ERICH_rmax']  - envBuffer
-    zMax = params['ERICH_zmax']  * -1  - 20 # must be positive; subtract 20 since sensors are not at `zmax`
-    # TODO: use instead `params['ERICH_sensor_dist']` `when https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/290` is merged
+    rMin = params['PFRICH_rmin1'] + envBuffer
+    rMax = params['PFRICH_rmax']  - envBuffer
+    zMax = params['PFRICH_zmax']  * -1  - 20 # must be positive; subtract 20 since sensors are not at `zmax`
+    # TODO: use instead `params['PFRICH_sensor_dist']` `when https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/290` is merged
 else:
     rMin = params['DRICH_rmin1'] + envBuffer
     rMax = params['DRICH_rmax2'] - envBuffer

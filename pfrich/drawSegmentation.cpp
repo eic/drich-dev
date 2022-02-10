@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 
   // decode cellID
   auto dfDecoded = dfIn
-      .Alias("id","ERICHHits.cellID")
+      .Alias("id","PFRICHHits.cellID")
       .Define("det", detDecode, {"id"})
       .Define("mod", modDecode, {"id"})
       .Define("segX", xDecode, {"id"})

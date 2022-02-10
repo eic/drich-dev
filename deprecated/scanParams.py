@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 # scan through detector parameter space, and run npsim
+# this was used to try to brute force optics optimization
 
 import numpy as np 
 import math as m
 import sys, os, json, subprocess, shlex, re
 
 # get original compact file
-athenaDir = os.environ['DRICH_DD4_ATHENA']
+athenaDir = 'athena'
 compactInName = 'compact/drich_orig.xml'
 compactInFile = open(athenaDir+'/'+compactInName,'r')
 
