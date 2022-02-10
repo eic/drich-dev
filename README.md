@@ -14,12 +14,12 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
     - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 
 - obtain ATHENA Software modules, either clone or symlink the repositories to the specified paths
   - modules:
-    - [ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
-    - [athena](https://eicweb.phy.anl.gov/EIC/detectors/athena) to `./athena`
-    - [IRT](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
-    - [EICD](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-    - [Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
-    - [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
+    - [detectors/ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
+    - [detectors/athena](https://eicweb.phy.anl.gov/EIC/detectors/athena) to `./athena`
+    - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
+    - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
+    - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
+    - [benchmarks/reconstruction_benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
     - suggestion: clone with SSH:
     ```
     git clone git@eicweb.phy.anl.gov:EIC/detectors/ip6.git
@@ -45,7 +45,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ## Building Modules
 - you must be in the EIC container (`opt/eic-shell`) and have environment variables set (`source environ.sh`)
 - build each repository, one-by-one, in order of dependences (see [flowchart](docDiagram.pdf) dependency graph)
-- instructions for the `reconstructions_benchmarks` repository are below
+- instructions for the `reconstruction_benchmarks` repository are below
 - build scripts, in recommended order:
 ```
 ./buildEICD.sh
@@ -58,7 +58,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ### Recommendations and Troubleshooting
 - execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of the repositories
 - be mindful of which branch you are on in each repository, especially if you have several active merge requests
-  - for example, `IRT` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
+  - for example, `irt` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
 - for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NCPUS` environment variable should be set to the number of CPUs you want to build with (see `environ.sh`)
@@ -99,7 +99,7 @@ mkdir -p results config
       └── world_volume
           ├── ...
           ├── DRICH
-          ├── PfRICH
+          ├── PFRICH
           └── ...
   ```
   - right click on desired component, then click `Draw`
@@ -133,4 +133,3 @@ TODO: document these
 ### Miscellaneous
 - `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
 - `deprecated/` contains some old scripts which may be helpful
-
