@@ -8,22 +8,7 @@
 ### BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
 - TODO: discuss with SW WG if this approach is okay; if it is not, we will need to extract geometry/material changes and make a new MR
 - TODO: review this MR carefully; CI will *not work* until `irt` is in upstream
-- cloned and rebased from branch `irt-init-v01`
-  - validate the rebase was successful:
-    - first, use the following command to check what changes `irt-init-v01` was originally introducing; this is useful to know which files are changing; commit `18003ba` is where `irt-init-v01` branched from `master` 
-      ```
-      git diff 18003ba..origin/irt-init-v01
-      ```
-    - then, for each file we changed, use `git diff` to check the relevant differences between `irt-init-v01` and `144-irt-geometry`. It is not practical to `git diff` the full branches, since you would pick up a lot of irrelevant changes in other detectors, etc.
-      ```
-      git diff origin/irt-init-v01:src/DRich_geo.cpp origin/144-irt-geometry:src/DRICH_geo.cpp
-      git diff origin/irt-init-v01:src/ERich_geo.cpp origin/144-irt-geometry:src/PFRICH_geo.cpp
-      git diff origin/irt-init-v01:compact/drich.xml origin/144-irt-geometry:compact/drich.xml
-      git diff origin/irt-init-v01:compact/erich.xml origin/144-irt-geometry:compact/pfrich.xml
-      git diff origin/irt-init-v01:compact/optical_materials.xml origin/144-irt-geometry:compact/optical_materials.xml
-      git diff origin/irt-init-v01:CMakeLists.txt origin/144-irt-geometry:CMakeLists.txt
-      ```
-    - I have confirmed that these diffs are only the name change eRICH to pfRICH, along with the introduction of "lores" pfRICH sensor sizes, which are only used in CI visualization
+- cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
 ### BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
 ### BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
 
@@ -37,8 +22,29 @@
 
 ## `benchmarks/reconstruction_benchmarks`
 
+
+
 # Miscellaneous Notes:
-- how to clone and rebase a branch
+
+<a name="rebasenotes"></a>
+### validation of athena rebase
+- validate the rebase of `144-irt-geometry` in `detectors/athena` was successful. This rebase was somewhat nontrivial, given that I decided to also change the name "eRICH" to "pfRICH" beforehand. It is thus very important to compare the new, rebased branch with the old one, to make sure the *only* differences are name changes.
+  - first, use the following command to check what changes `irt-init-v01` was originally introducing; this is useful to know which files are changing; commit `18003ba` is where `irt-init-v01` branched from `master` 
+    ```
+    git diff 18003ba..origin/irt-init-v01
+    ```
+  - then, for each file we changed, use `git diff` to check the relevant differences between `irt-init-v01` and `144-irt-geometry`. It is not practical to `git diff` the full branches, since you would pick up a lot of irrelevant changes in other detectors, etc.
+    ```
+    git diff origin/irt-init-v01:src/DRich_geo.cpp origin/144-irt-geometry:src/DRICH_geo.cpp
+    git diff origin/irt-init-v01:src/ERich_geo.cpp origin/144-irt-geometry:src/PFRICH_geo.cpp
+    git diff origin/irt-init-v01:compact/drich.xml origin/144-irt-geometry:compact/drich.xml
+    git diff origin/irt-init-v01:compact/erich.xml origin/144-irt-geometry:compact/pfrich.xml
+    git diff origin/irt-init-v01:compact/optical_materials.xml origin/144-irt-geometry:compact/optical_materials.xml
+    git diff origin/irt-init-v01:CMakeLists.txt origin/144-irt-geometry:CMakeLists.txt
+    ```
+  - I have confirmed that these diffs are only the name change eRICH to pfRICH, along with the introduction of "lores" pfRICH sensor sizes, which are only used in CI visualization
+
+### how to clone and rebase a branch
   - it is dangerous to rebase a shared branch, thus a reasonable approach is to make a "clone" of a branch, and rebase the clone. The original branch will remain intact.
   - example procedure: clone and rebase `irt-init-v01` on `eicd`
     - check the [commit DAG](https://eicweb.phy.anl.gov/EIC/eicd/-/network/master) to get a sense of the history; if it is kind of messy (e.g., contains merge commits), you may consider an interactive rebase (`rebase -i`) instead of the non-interactive rebase described below. In this example, the history looks clean.
