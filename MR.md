@@ -8,9 +8,7 @@ These are the most up-to-date branches, along with those we used for the proposa
 | `athena`                    | `144-irt-geometry`          | `irt-init-v01`      |
 | `eicd`                      | `irt-data-model`            | `irt-init-v01`      |
 | `juggler`                   | `73-add-rich-irt-algorithm` | `irt-init-v01`      |
-| `reconstruction_benchmarks` | `TODO`                      | `TODO`              |
-
-TODO: keep this up to date
+| `reconstruction_benchmarks` | `irt-benchmark`             | `irt-benchmark`     |
 
 # Active Merge Requests and Issues
 
@@ -35,7 +33,8 @@ TODO: keep this up to date
   - cloned and rebased from `irt-init-v01`
 
 ### `reconstruction_benchmarks`
-
+- BRANCH `irt-benchmark` - [MR](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)
+- TODO: sync options file with the one in `irt`
 
 
 # Miscellaneous Notes:
