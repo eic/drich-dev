@@ -2,7 +2,7 @@
 These are the most up-to-date branches, along with those we used for the proposal:
 
 | Repository                  | New Branch                  | Old Proposal Branch |
-| ---                         | ---                         | ---                 |
+| --:                         | ---                         | ---                 |
 | `irt`                       | `irt-init-v01`              | `irt-init-v01`      |
 | `ip6`                       | `master`                    | `master`            |
 | `athena`                    | `144-irt-geometry`          | `irt-init-v01`      |
