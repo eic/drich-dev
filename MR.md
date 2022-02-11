@@ -38,12 +38,12 @@
 - how to clone and rebase a branch
   - it is dangerous to rebase a shared branch, thus a reasonable approach is to make a "clone" of a branch, and rebase the clone. The original branch will remain intact.
   - example procedure: clone and rebase `irt-init-v01` on `eicd`
-    1. check the [commit DAG](https://eicweb.phy.anl.gov/EIC/eicd/-/network/master) to get a sense of the history; if it is kind of messy (e.g., contains merge commits), you may consider an interactive rebase (`rebase -i`) instead of the non-interactive rebase described below. In this example, the history looks clean.
-    1. at any point, check your local DAG with `git log --decorate --oneline --graph`; it's useful to do this often
-    1. be sure you are on `master` and are up to date: `git checkout master && git fetch origin && git pull`
-    1. checkout the branch you want to clone, and update: `git checkout irt-init-v01 && git fetch origin && git pull`
-    1. make a new branch, called `irt-data-model`: `git checkout -b irt-data-model` (make sure this branch name is not already in use on gitlab)
-    1. rebase `irt-data-model` to `master`: `git rebase origin/master`
+    - check the [commit DAG](https://eicweb.phy.anl.gov/EIC/eicd/-/network/master) to get a sense of the history; if it is kind of messy (e.g., contains merge commits), you may consider an interactive rebase (`rebase -i`) instead of the non-interactive rebase described below. In this example, the history looks clean.
+    - at any point, check your local DAG with `git log --decorate --oneline --graph`; it's useful to do this often
+    - be sure you are on `master` and are up to date: `git checkout master && git fetch origin && git pull`
+    - checkout the branch you want to clone, and update: `git checkout irt-init-v01 && git fetch origin && git pull`
+    - make a new branch, called `irt-data-model`: `git checkout -b irt-data-model` (make sure this branch name is not already in use on gitlab)
+    - rebase `irt-data-model` to `master`: `git rebase origin/master`
       - in my case, I got conflicts: `git status` reveals `eic_data.yaml` has conflicts, which you can find by opening the file and searching for the word `HEAD`:
         ```
         <<<<<<< HEAD
@@ -84,7 +84,6 @@
         - every conflict is different and takes some thought to resolve. In this case, it seems we want both versions, so I just deleted the lines that start with `<<<<`, `====`, and `>>>>`.
       - `git add eic_data.yaml` marks the conflict resolved
       - `git rebase --continue` to continue with the rebase, and resolve more conflicts as need. In this example, there were no more conflicts.
-    1. once the rebase no longer complains, check your local DAG, and use the `--all` option to see the entire DAG, to verify you made a clone of the original branch, rebased to the current `origin/master`
-    1. push the new branch: since it does not exist on gitlab, you must do `git push -u origin irt-data-model`
-    1. finish by opening a new merge request
-
+    - once the rebase no longer complains, check your local DAG, and use the `--all` option to see the entire DAG, to verify you made a clone of the original branch, rebased to the current `origin/master`
+    - push the new branch: since it does not exist on gitlab, you must do `git push -u origin irt-data-model`
+    - finish by opening a new merge request
