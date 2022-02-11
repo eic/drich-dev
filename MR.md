@@ -19,20 +19,20 @@ TODO: keep this up to date
 - TODO: merge `irt-init-v01` to `master`
 
 ### `athena`
-#### BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
-- TODO: discuss with SW WG if this approach is okay; if it is not, we will need to extract geometry/material changes and make a new MR
-- TODO: review this MR carefully; CI will *not work* until `irt` is in upstream
-- cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
-#### BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
-#### BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
+- BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
+  - TODO: discuss with SW WG if this approach is okay; if it is not, we will need to extract geometry/material changes and make a new MR
+  - TODO: review this MR carefully; CI will *not work* until `irt` is in upstream
+  - cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
+- BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
+- BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
 
 ### `eicd`
-#### BRANCH `irt-data-model` - [MR](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)
-- cloned and rebased from `irt-init-v01`
+- BRANCH `irt-data-model` - [MR](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)
+  - cloned and rebased from `irt-init-v01`
 
 ### `juggler`
-#### BRANCH `73-add-rich-irt-algorithm` - [MR](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)
-- cloned and rebased from `irt-init-v01`
+- BRANCH `73-add-rich-irt-algorithm` - [MR](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)
+  - cloned and rebased from `irt-init-v01`
 
 ### `reconstruction_benchmarks`
 
