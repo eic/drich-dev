@@ -3,7 +3,7 @@ These are the most up-to-date branches, along with those we used for the proposa
 
 | Repository                  | New Branch                  | Old Proposal Branch |
 | --:                         | ---                         | ---                 |
-| `irt`                       | `TODO`                      | `irt-init-v01`      |
+| `irt`                       | `irt-init-v02`              | `irt-init-v01`      |
 | `ip6`                       | `master`                    | `master`            |
 | `athena`                    | `144-irt-geometry`          | `irt-init-v01`      |
 | `eicd`                      | `irt-data-model`            | `irt-init-v01`      |
@@ -13,16 +13,17 @@ These are the most up-to-date branches, along with those we used for the proposa
 # Active Merge Requests and Issues
 
 ### `irt`
-- TODO: [rename eRICH to pfRICH](https://eicweb.phy.anl.gov/EIC/irt/-/issues/6)
-- TODO: merge `irt-init-v01` to `master`
+- BRANCH `irt-init-v02` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/8)
+  - this is `irt-init-v01`, plus the name change eRICH to pfRICH
+- BRANCH `erich-2-pfrich` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/7) (merged into `irt-init-v02`)
 
 ### `athena`
 - BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
   - TODO: discuss with SW WG if this approach is okay; if it is not, we will need to extract geometry/material changes and make a new MR
   - TODO: review this MR carefully; CI will *not work* until `irt` is in upstream
   - cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
-- BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
 - BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
+- BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
 
 ### `eicd`
 - BRANCH `irt-data-model` - [MR](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)
