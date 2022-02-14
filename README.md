@@ -58,6 +58,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ### Recommendations and Troubleshooting
 - execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of the repositories
 - be mindful of which branch you are on in each repository, especially if you have several active merge requests
+  - use `./checkBranches.sh` to quickly check which branches you are on in all repositories
   - for example, `irt` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
 - for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
 - most build scripts will run `cmake --build` multi-threaded
