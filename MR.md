@@ -10,6 +10,15 @@ These are the most up-to-date branches, along with those we used for the proposa
 | `juggler`                   | `73-add-rich-irt-algorithm` | `irt-init-v01`      |
 | `reconstruction_benchmarks` | `irt-benchmark`             | `irt-benchmark`     |
 
+### Commit DAGs
+It is useful to watch the commit graphs (DAGs), for a visualization of the commits and branches:
+- [`irt`](https://eicweb.phy.anl.gov/EIC/irt/-/network/main)
+- [`ip6`](https://eicweb.phy.anl.gov/EIC/detectors/ip6/-/network/master)
+- [`athena`](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/network/master)
+- [`eicd`](https://eicweb.phy.anl.gov/EIC/eicd/-/network/master)
+- [`juggler`](https://eicweb.phy.anl.gov/EIC/juggler/-/network/master)
+- [`reconstruction_benchmarks`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/network/master)
+
 # Active Merge Requests and Issues
 
 ### `irt`
