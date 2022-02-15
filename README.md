@@ -135,10 +135,11 @@ There are some local scripts to aid in simulation development; some of them have
   - specific for dRICH; for pfRICH version, see `pfrich/`
 
 ### Reconstruction
-TODO: document these
-```
-./runJuggler.sh  #OR#  ./runBenchmark.sh
-```
+- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
+  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, which is executed by the CI
+    - this script runs `npsim` and `juggler`
+  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the commands used by the CI
+  - it is practical to edit this wrapper script during development, for testing purposes; this is why several lines are commented out
 
 ### Miscellaneous
 - `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`

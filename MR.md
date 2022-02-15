@@ -44,7 +44,11 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
 
 ### `reconstruction_benchmarks`
 - BRANCH `irt-benchmark` - [MR](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)
-- TODO: sync options file with the one in `irt`
+  - the options files from `irt` have been copied to this branch
+  - TODO: currently fails in CI with error:
+  ```
+  # WARNING: : Configurable Jug__PID__IRTAlgorithm not found in module JugPID.JugPIDPluginsConf
+  ```
 
 
 # Miscellaneous Notes:
