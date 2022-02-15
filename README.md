@@ -6,9 +6,10 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 See [MR.md](MR.md) for information about the current development branches and active merge requests
 
 ## Dependencies
+- before anything, clone this `drich-dev` repository; if you follow the directions below as is, everything will be installed in subdirectories of this repository
 - install EIC Software container:
   - `opt/update.sh` will install or update the EIC Software container automatically
-    - execute `opt/eic-shell` to start the container
+    - execute `opt/eic-shell` to start the container; practically everything below must be executed within this container
     - execute `echo $ATHENA_PREFIX`
       - it should be `./opt/local` unless you changed it
       - this is the prefix that will be used for builds of ATHENA Software modules (edit `environ.sh` to change prefixes)
