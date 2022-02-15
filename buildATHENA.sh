@@ -11,6 +11,8 @@ popd
 
 pushd athena
 
+touch ip6
+rm ip6
 ln -svf $beamDir ip6
 
 if [ $clean -eq 1 ]; then
