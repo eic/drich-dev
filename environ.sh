@@ -6,10 +6,11 @@ export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 echo "detected $BUILD_NPROC cpus"
 
-# paths
+# juggler paths
 #export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
 export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
 export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=${JUGGLER_INSTALL_PREFIX}/python:${PYTHONPATH} # make sure gaudirun.py prioritizes local juggler installation
 
 # cmake packages
 export IRT_ROOT=$ATHENA_PREFIX # overrides container version with local version
