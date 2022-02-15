@@ -118,8 +118,15 @@ source environ.sh
   - the search pattern is case sensitive
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for further usage
 
-### Simulation
-There are some local scripts to aid in simulation development; some of them have been copied to the `reconstruction_benchmarks` repository, and may be more up-to-date there
+### Simulation and Reconstruction Benchmarks
+- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
+  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, which is executed by the CI
+    - this script runs `npsim` and `juggler`
+  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the commands used by the CI
+  - it is practical to edit this wrapper script during development, for testing purposes; this is why several lines are commented out
+
+#### Local Scripts
+There are some local scripts to aid in simulation development; some of them have been copied to the `reconstruction_benchmarks` repository, and may be more up-to-date there.
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage
   - basically copied to `reconstruction_benchmarks`, but stored here as well for backup
@@ -134,13 +141,6 @@ There are some local scripts to aid in simulation development; some of them have
     - you can produce a new version of this file by uncommenting relevant lines in `athena/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
-
-### Reconstruction
-- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
-  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, which is executed by the CI
-    - this script runs `npsim` and `juggler`
-  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the commands used by the CI
-  - it is practical to edit this wrapper script during development, for testing purposes; this is why several lines are commented out
 
 ### Miscellaneous
 - `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
