@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
-  Long64_t dilation = 4;
+  Long64_t dilation = 8;
 
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
