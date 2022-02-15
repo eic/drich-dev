@@ -3,6 +3,8 @@ Scripts for ATHENA dRICH and IRT development
 
 ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules relevant for RICH development. It shows their dependences, calls, and data flow.
 
+See [MR.md](MR.md) for information about the current development branches and active merge requests
+
 ## Dependencies
 - install EIC Software container:
   - `opt/update.sh` will install or update the EIC Software container automatically
@@ -37,7 +39,7 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 - execute `source environ.sh`
   - this file contains several env vars needed by many scripts
   - make sure `$BUILD_NCPUS` is set correctly
-    - this will be the number of CPUs used for multi-threaded building
+    - this will be the number of CPUs used for multi-threaded building, and running Juggler multi-threaded
     - reduce it, if you prefer
     - memory-hungry builds will be built single-threaded
   - edit other variables if you want, e.g., for specifying alternate prefixes; you can find documentation for many variables in the corresponding module repositories
@@ -58,29 +60,27 @@ ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for gen
 ### Recommendations and Troubleshooting
 - execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of the repositories
 - be mindful of which branch you are on in each repository, especially if you have several active merge requests
-  - use `./checkBranches.sh` to quickly check which branches you are on in all repositories
   - for example, `irt` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
+  - use `./checkBranches.sh` to quickly check which branches you are on in all repositories
+  - use `./checkStatus.sh` to run `git status` in each repository, which is useful during active development
 - for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NCPUS` environment variable should be set to the number of CPUs you want to build with (see `environ.sh`)
   - careful, some module builds consume a lot of memory (Juggler); the build scripts will force single-threaded building for such cases
 
 ### Benchmarks Setup
-TODO: UPDATE THIS
+before running benchmarks, you must setup the common benchmarks:
 ```
-pushd !$
+pushd reconstruction_benchmarks
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/common_bench.git setup
-source setup/bin/env.sh && ./setup/bin/install_common.sh
-source .local/bin/env.sh
-build_detector.sh # if you want to
-mkdir_local_data_link sim_output
-mkdir -p results config
+source setup/bin/env.sh
+./setup/bin/install_common.sh
+popd
+source environ.sh
 ```
-- checkout the correct development branch (currently `irt-benchmark`) of
-  `reconstruction_benchmarks`
-- cf. their readmes for further documentation
-- files will be installed in a `.local` directory; you may not want to install a build of `athena` 
-  if you are using your own build somewhere else
+- these directions are similar to those in the [reconstruction_benchmarks Readme](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/blob/master/README.md), but with some minor differences for our current setup (e.g., there is no need to build another detector in `reconstruction_benchmarks/.local`)
+- the `source environ.sh` step will now set additional environment variables, since you now have common benchmarks installed
+- there is no need to repeat this setup procedure, unless you want to start from a clean slate or update the common benchmarks
 
 ## Execution
 
@@ -118,12 +118,21 @@ mkdir -p results config
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for further usage
 
 ### Simulation
-TODO: document these
-```
-simulate.py
-drawHits.cpp
-drawSegmentation.cpp
-```
+There are some local scripts to aid in simulation development; some of them have been copied to the `reconstruction_benchmarks` repository, and may be more up-to-date there
+- `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
+  - run with no arguments for usage
+  - basically copied to `reconstruction_benchmarks`, but stored here as well for backup
+- `drawHits.cpp`
+  - reads simulation output and draws raw hit positions and number of hits vs. momentum
+  - build with `make`, execute with `./drawHits.exe [simulation_output_file]`
+  - bacially copied to `reconstruction_benchmarks`
+  - specific for dRICH; for pfRICH version, see `pfrich/`
+- `drawSegmentation.cpp`
+  - reads simulation output and draws the hits within sensor pixels, which is useful for checking mapping
+  - relies on `text/sensorLUT.dat`, which must be up-to-date
+    - you can produce a new version of this file by uncommenting relevant lines in `athena/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
+  - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
+  - specific for dRICH; for pfRICH version, see `pfrich/`
 
 ### Reconstruction
 TODO: document these

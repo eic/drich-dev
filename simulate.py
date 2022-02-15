@@ -28,7 +28,7 @@ helpStr = f'''
 <REQUIRED ARGUMENTS>:
 
     TESTNUM:    -t <testnum>: specify which test to run
-            acceptance tests:
+            >> acceptance tests:
                 1: aim pions at center of aerogel sector
                 2: inner edge test
                 3: outer edge test
@@ -37,7 +37,7 @@ helpStr = f'''
                 6: spray pions in one sector
                 7: momentum scan
                 8: azimuthal+polar scan test (cf. test 5)
-            optics tests:
+            >> optics tests:
                 10:   focal point, in RICH acceptance
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=1 )
                 11:   focal point, broad range test
@@ -185,7 +185,11 @@ m.write(f'/gps/position 0 0 0 cm\n')
 ### call `npdet_info` to obtain RICH attributes and values
 paramListFileN=f'{localDir}/params_{outputName}.txt'
 with open(paramListFileN,'w') as paramListFile:
-    subprocess.call(shlex.split(f'npdet_info search {XRICH} --value {compactFileFull}'),stdout=paramListFile)
+    cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
+    print(sep)
+    print('EXECUTE: '+cmd)
+    print(sep)
+    subprocess.call( shlex.split(cmd), stdout=paramListFile )
 params = {}
 for paramLine in open(paramListFileN,'r'):
     print(paramLine)
@@ -367,7 +371,6 @@ if(runType=="vis"):
 ### print macro and close stream
 m.seek(0,0)
 print(m.read())
-print(sep)
 m.close()
 
 
@@ -385,9 +388,10 @@ cmd += " --enableG4GPS"
 
 ### run simulation
 print(sep)
-print(cmd)
+print('EXECUTE: '+cmd)
 print(sep)
 subprocess.call( shlex.split(cmd), cwd=detPath )
 
 ### cleanup
 os.remove(m.name) # remove macro
+print("\nPRODUCED SIMULATION OUTPUT FILE: "+outputFileName)

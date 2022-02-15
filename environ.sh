@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# obtain number of CPUs, needed only for multi-threaded building
+# obtain number of CPUs
 # - set it manually, if you prefer, or if auto detection fails
 export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
@@ -22,21 +22,24 @@ export JUGGLER_SIM_FILE=$(pwd)/out/sim_run.root
 export JUGGLER_REC_FILE=test.root
 export JUGGLER_N_EVENTS=100
 export JUGGLER_RNG_SEED=1
-export JUGGLER_N_THREADS=6
+export JUGGLER_N_THREADS=$BUILD_NPROC
 
-# environment from reconstruction benchmarks
-if [ -f "benchmarks/.local/bin/env.sh" ]; then
-  pushd benchmarks
+# environment from reconstruction_benchmarks
+if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
+  pushd reconstruction_benchmarks
   source .local/bin/env.sh
-  echo "--------------"
   popd
 fi
 
-# juggler config vars which would have been overwritten by 
-# `benchmarks/.local/bin/env.sh`:
+# fix juggler config vars which would have been overwritten by 
+# `reconstruction_benchmarks/.local/bin/env.sh`:
 export DETECTOR_PATH=$(pwd)/athena
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
 #export DETECTOR_VERSION=master
 
-if [ -f "benchmarks/.local/bin/env.sh" ]; then print_env.sh; fi
+if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
+  printf "\n\n--------------------------------\n"
+  print_env.sh
+  echo "--------------------------------"
+fi
