@@ -12,6 +12,7 @@ See [MR.md](MR.md) for information about the current development branches and ac
     - execute `echo $ATHENA_PREFIX`
       - it should be `./opt/local` unless you changed it
       - this is the prefix that will be used for builds of ATHENA Software modules (edit `environ.sh` to change prefixes)
+    - depending on your setup, you may want or need to pass additional options; see for example `opt/update.arcturus.sh`
   - alternatively, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
     - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 
 - obtain ATHENA Software modules, either clone or symlink the repositories to the specified paths
