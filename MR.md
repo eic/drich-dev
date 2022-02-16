@@ -29,8 +29,7 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
 
 ### `athena`
 - BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
-  - TODO: discuss with SW WG if this approach is okay; if it is not, we will need to extract geometry/material changes and make a new MR
-  - TODO: review this MR carefully; CI will *not work* until `irt` is in upstream
+  - TODO: this is the "backdoor" in frontdoor vs. backdoor (see below)
   - cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
 - BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
 - BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
