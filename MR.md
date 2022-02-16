@@ -49,6 +49,34 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
     - CI environment variables have been added
     - verbosity level decreased (disable debugging statements)
 
+### MR Review Plan
+1. request review for `eicd` MR
+1. merge `irt-init-v02` to `master` in `irt`
+1. decide how to proceed with `athena`: frontdoor vs backdoor
+  - backdoor: add `irt` objects to `athena`, and produce an auxilliary ROOT configuration file
+    - pro: fully implemented and tested (used for proposal)
+    - pro: will be easier to maintain in the future
+    - con(?): introduces `irt->athena` dependency
+  - frondoor: use `GeoSvc` in `juggler` to access `athena` geometry and MPTs
+    - con: requires reviving and testing of `GeoSvc` code
+    - pro(?): no `irt->athena` dependency
+  - if backdoor chosen:
+    - request review for `144-irt-geometry`
+      - TODO: add `lo-res` switch for dRICH sensors
+      - TODO: may need to add `#ifdef IRT` directives, but preferably not
+  - if frontdoor chosen:
+    - TODO: port `irt` objects from `144-irt-geometry` to `Juggler` `GeoSvc`, and test *very carefully*; an older version of this port can be found in the commit DAG
+    - TODO: extract only necessary changes from `144-irt-geometry` (geometry,MPTs,etc.) and make a new MR for that on `athena`
+1. request review for `juggler` MR to merge in `IRTAlgorithm`
+  - requires `irt` `master` to be up to date
+  - requires `eic` MR merged to `master`
+  - requires `athena` frontdoor/backdoor decision made
+1. request review for `reconstruction_benchmarks` MR
+  - already approved, but there have been some minor updates since then
+1. eventually open a new MR for adding performance plots to `reconstruction_benchmarks`
+  - port any plotting code from `irt` over to `reconstruction_benchmarks`
+
+
 # Miscellaneous Notes:
 
 <a name="rebasenotes"></a>
