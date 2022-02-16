@@ -52,11 +52,11 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
 - request review for `eicd` MR
 - merge `irt-init-v02` to `master` in `irt`
 - decide how to proceed with `athena`: frontdoor vs backdoor
-  - backdoor: add `irt` objects to `athena`, and produce an auxilliary ROOT configuration file
+  - backdoor: add `irt` objects to `athena`, and produce an auxiliary ROOT configuration file
     - pro: fully implemented and tested (used for proposal)
     - pro: will be easier to maintain in the future
     - con(?): introduces `irt->athena` dependency
-  - frondoor: use `GeoSvc` in `juggler` to access `athena` geometry and MPTs
+  - frontdoor: use `GeoSvc` in `juggler` to access `athena` geometry and MPTs
     - con: requires reviving and testing of `GeoSvc` code
     - pro(?): no `irt->athena` dependency
   - if backdoor chosen:
@@ -67,6 +67,7 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
     - TODO: port `irt` objects from `144-irt-geometry` to `Juggler` `GeoSvc`, and test *very carefully*; an older version of this port can be found in the commit DAG
     - TODO: extract only necessary changes from `144-irt-geometry` (geometry,MPTs,etc.) and make a new MR for that on `athena`
 - request review for `juggler` MR to merge in `IRTAlgorithm`
+  - TODO: is `IRTAlgorithm` and its usage of `irt` thread-safe and (preferably) non-reentrant?
   - requires `irt` `master` to be up to date
   - requires `eicd` MR merged to `master`
   - requires `athena` frontdoor/backdoor decision made

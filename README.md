@@ -134,7 +134,7 @@ There are some local scripts to aid in simulation development; some of them have
 - `drawHits.cpp`
   - reads simulation output and draws raw hit positions and number of hits vs. momentum
   - build with `make`, execute with `./drawHits.exe [simulation_output_file]`
-  - bacially copied to `reconstruction_benchmarks`
+  - basically copied to `reconstruction_benchmarks`
   - specific for dRICH; for pfRICH version, see `pfrich/`
 - `drawSegmentation.cpp`
   - reads simulation output and draws the hits within sensor pixels, which is useful for checking mapping
