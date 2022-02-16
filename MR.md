@@ -69,7 +69,7 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
     - TODO: extract only necessary changes from `144-irt-geometry` (geometry,MPTs,etc.) and make a new MR for that on `athena`
 - request review for `juggler` MR to merge in `IRTAlgorithm`
   - requires `irt` `master` to be up to date
-  - requires `eic` MR merged to `master`
+  - requires `eicd` MR merged to `master`
   - requires `athena` frontdoor/backdoor decision made
 - request review for `reconstruction_benchmarks` MR
   - already approved, but there have been some minor updates since then
