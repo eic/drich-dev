@@ -19,6 +19,9 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
 - [`juggler`](https://eicweb.phy.anl.gov/EIC/juggler/-/network/master)
 - [`reconstruction_benchmarks`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/network/master)
 
+Additional upstream DAGs to keep an eye on:
+- [`NPDet`](https://eicweb.phy.anl.gov/EIC/NPDet/-/network/master) - expect more changes soon, especially in data model (`src/dd4pod`)
+
 # Active Merge Requests and Issues
 
 ### `irt`
