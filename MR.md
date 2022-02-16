@@ -23,6 +23,7 @@ It is useful to watch the commit graphs (DAGs), for a visualization of the commi
 
 ### `irt`
 - BRANCH `irt-init-v02` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/8)
+  - TODO: merge into `master`
   - this is `irt-init-v01`, plus the name change eRICH to pfRICH
 - BRANCH `erich-2-pfrich` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/7) (merged into `irt-init-v02`)
 
