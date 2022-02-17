@@ -25,6 +25,8 @@ Additional upstream DAGs to keep an eye on:
 # Active Merge Requests and Issues
 
 ### `irt`
+- BRANCH `photomultiplierhit-to-trackerhit` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/9)
+  - TODO: merge into `irt-init-v02` when things are working upstream
 - BRANCH `irt-init-v02` - [MR](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/8)
   - TODO: merge into `master`
   - this is `irt-init-v01`, plus the name change eRICH to pfRICH
