@@ -12,7 +12,7 @@ if [ $# -ne 1 ]; then
   exit 2
 fi
 
-xmlfile=athena/athena.xml
+xmlfile=ecce/ecce.xml
 wdir=$(pwd)
 
 case $1 in
@@ -20,7 +20,7 @@ case $1 in
     checkOverlaps -c $xmlfile
     ;;
   2)
-    python athena/scripts/checkOverlaps.py -c $xmlfile 2>&1 | tee tempo.log
+    python ecce/scripts/checkOverlaps.py -c $xmlfile 2>&1 | tee tempo.log
     grep -E 'Overlap.is.detected.for' tempo.log -A1 |\
       sed 's/^.*for volume //g;s/^.* with //g' |\
       sed 's/ volume.s//g' |\

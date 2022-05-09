@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #-----------------------------------------------#
-# npsim wrapper with ATHENA RICH specific tests #
+# npsim wrapper with EIC RICH specific tests    #
 # Author: C. Dilks                              #
 #-----------------------------------------------#
 
@@ -50,7 +50,7 @@ helpStr = f'''
     OPTIONS:    -d: direction to throw particles (may not be used by all tests)
                     1 = toward positive (hadron) endcap RICH
                    -1 = toward negative (electron) endcap RICH (default)
-                -s: enable standalone RICH-only simulation (default is full ATHENA)
+                -s: enable standalone RICH-only simulation (default is full detector)
                 -p [particle]: name of particle to throw; default: {particle}
                    examples:
                     - e- / e+

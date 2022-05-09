@@ -1,7 +1,7 @@
 # dRICH-dev
-Scripts for ATHENA dRICH and IRT development 
+Scripts for EIC dRICH and IRT development 
 
-ATHENA Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules relevant for RICH development. It shows their dependences, calls, and data flow.
+EIC Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules relevant for RICH development. It shows their dependences, calls, and data flow.
 
 See [MR.md](MR.md) for information about the current development branches and active merge requests
 
@@ -12,14 +12,14 @@ See [MR.md](MR.md) for information about the current development branches and ac
     - execute `opt/eic-shell` to start the container; practically everything below must be executed within this container
     - execute `echo $ATHENA_PREFIX`
       - it should be `./opt/local` unless you changed it
-      - this is the prefix that will be used for builds of ATHENA Software modules (edit `environ.sh` to change prefixes)
+      - this is the prefix that will be used for builds of EIC Software modules (edit `environ.sh` to change prefixes)
     - depending on your setup, you may want or need to pass additional options; see for example `opt/update.arcturus.sh`
   - alternatively, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
     - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 
-- obtain ATHENA Software modules, either clone or symlink the repositories to the specified paths
+- obtain EIC Software modules, either clone or symlink the repositories to the specified paths
   - modules:
     - [detectors/ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
-    - [detectors/athena](https://eicweb.phy.anl.gov/EIC/detectors/athena) to `./athena`
+    - [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) to `./ecce`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
     - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
@@ -27,7 +27,7 @@ See [MR.md](MR.md) for information about the current development branches and ac
     - suggestion: clone with SSH:
     ```
     git clone git@eicweb.phy.anl.gov:EIC/detectors/ip6.git
-    git clone git@eicweb.phy.anl.gov:EIC/detectors/athena.git
+    git clone git@eicweb.phy.anl.gov:EIC/detectors/ecce.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     git clone git@eicweb.phy.anl.gov:EIC/juggler.git
@@ -55,7 +55,7 @@ See [MR.md](MR.md) for information about the current development branches and ac
 ./buildEICD.sh
 ./buildIRT.sh
 ./buildIP6.sh
-./buildATHENA.sh
+./buildECCE.sh
 ./buildJuggler.sh
 ```
 
@@ -88,7 +88,7 @@ source environ.sh
 
 ### Geometry
 - execute `./runDDwebDisplay.sh` to produce the geometry `root` file
-  - by default, it will use the compact file for the full ATHENA detector
+  - by default, it will use the compact file for the full detector
   - run `./runDDwebDisplay.sh d` to run on dRICH only
   - run `./runDDwebDisplay.sh p` to run on pfRICH only
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
@@ -139,7 +139,7 @@ There are some local scripts to aid in simulation development; some of them have
 - `drawSegmentation.cpp`
   - reads simulation output and draws the hits within sensor pixels, which is useful for checking mapping
   - relies on `text/sensorLUT.dat`, which must be up-to-date
-    - you can produce a new version of this file by uncommenting relevant lines in `athena/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
+    - you can produce a new version of this file by uncommenting relevant lines in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
 

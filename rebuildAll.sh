@@ -5,5 +5,5 @@ set -e
 ./buildEICD.sh $*
 ./buildIRT.sh $*
 ./buildIP6.sh $*
-./buildATHENA.sh $*
+./buildECCE.sh $*
 ./buildJuggler.sh $*

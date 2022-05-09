@@ -6,7 +6,7 @@ pushd reconstruction_benchmarks
 benchmarks/rich/run_irt.sh
 echo "========================================================"
 
-### full athena
+### full detector
 ############################################################################
 # benchmarks/rich/run_irt.sh basic_pfrich 1 -t8 -d-1 -ppi+ -e20 -n3
 # benchmarks/rich/run_irt.sh basic_drich  1 -t8 -d1  -ppi+ -e20 -n3

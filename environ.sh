@@ -17,7 +17,7 @@ export IRT_ROOT=$ATHENA_PREFIX # overrides container version with local version
 export EICD_ROOT=$ATHENA_PREFIX # overrides container version with local version
 
 # juggler config vars
-export JUGGLER_DETECTOR="athena"
+export JUGGLER_DETECTOR="ecce"
 export BEAMLINE_CONFIG="ip6"
 export JUGGLER_SIM_FILE=$(pwd)/out/sim_run.root
 export JUGGLER_REC_FILE=test.root
@@ -34,7 +34,7 @@ fi
 
 # fix juggler config vars which would have been overwritten by 
 # `reconstruction_benchmarks/.local/bin/env.sh`:
-export DETECTOR_PATH=$(pwd)/athena
+export DETECTOR_PATH=$(pwd)/ecce
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
 #export DETECTOR_VERSION=master
