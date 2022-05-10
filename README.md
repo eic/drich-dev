@@ -10,9 +10,9 @@ See [MR.md](MR.md) for information about the current development branches and ac
 - install EIC Software container:
   - `opt/update.sh` will install or update the EIC Software container automatically
     - execute `opt/eic-shell` to start the container; practically everything below must be executed within this container
-    - execute `echo $ATHENA_PREFIX`
-      - it should be `./opt/local` unless you changed it
-      - this is the prefix that will be used for builds of EIC Software modules (edit `environ.sh` to change prefixes)
+    - execute `echo $PRIMARY_PREFIX`
+      - by default it should be `./opt/local`, unless you installed the EIC Software container somewhere else
+      - this is the prefix that will be used for builds of EIC Software modules; edit `environ.sh` if you want to change it
     - depending on your setup, you may want or need to pass additional options; see for example `opt/update.arcturus.sh`
   - alternatively, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
     - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 

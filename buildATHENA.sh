@@ -22,7 +22,7 @@ if [ $clean -eq 1 ]; then
 fi
 
 cmake -B build -S . \
-  -DCMAKE_INSTALL_PREFIX=$ATHENA_PREFIX \
+  -DCMAKE_INSTALL_PREFIX=$PRIMARY_PREFIX \
   -DCMAKE_CXX_STANDARD=17
 cmake --build build -j$BUILD_NPROC -- install
 
