@@ -6,6 +6,7 @@ set -e
 
 [[ $# -gt 0 ]] && clean=1 || clean=0 # clean build if any args
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
+if [ "$PRIMARY_PREFIX" = "" ]; then echo "ERROR: PRIMARY_PREFIX not set"; exit 1; fi
 
 cp -v kluge.sh juggler/
 
