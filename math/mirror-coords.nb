@@ -1,0 +1,161 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      5283,        153]
+NotebookOptionsPosition[      4680,        135]
+NotebookOutlinePosition[      5014,        150]
+CellTagsIndexPosition[      4971,        147]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"mirror", " ", "params"}], ",", " ", 
+    RowBox[{"defined", " ", 
+     RowBox[{"w", ".", "r", ".", "t", ".", " ", "IP"}]}], ",", " ", 
+    RowBox[{"from", " ", "ECCE", " ", "v5", " ", "text", " ", "file"}]}], " ",
+    "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"zM", "=", "79.19"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"xM", "=", "125"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"rM", "=", "200"}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.861463012843894*^9, 3.861463059769834*^9}},
+ CellLabel->"In[12]:=",ExpressionUUID->"c9d1d621-e864-4bdd-baef-7cc3c6d925c8"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"short", " ", "snout"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"zMin", "=", "196"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"zMax", "=", "280"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"zSxml", "=", 
+     RowBox[{
+      RowBox[{"-", "108.07"}], "-", "16"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"xSxml", "=", "124.98"}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.86146281569676*^9, 3.8614630066260023`*^9}, {
+  3.8614630713901567`*^9, 3.861463088250355*^9}},
+ CellLabel->"In[29]:=",ExpressionUUID->"cc1750a3-9903-48b7-868c-425c57eddaa7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "convert", " ", "compact", " ", "XML", " ", "file", " ", "params", " ", 
+    "to", " ", "coords", " ", "defined", " ", 
+    RowBox[{"w", ".", "r", ".", "t", ".", " ", "IP"}]}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"zS", "=", 
+     RowBox[{"zSxml", "+", "zMin"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"xS", "=", "xSxml"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"b", "=", 
+     RowBox[{"zMax", "-", "bXml"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+     RowBox[{"focal", " ", "point"}], " ", "=", " ", 
+     RowBox[{
+      RowBox[{"sensor", " ", "sphere", " ", "center"}], " ", "+", " ", 
+      RowBox[{"focus", " ", "tune"}]}]}], " ", "*)"}], "\[IndentingNewLine]", 
+   
+   RowBox[{
+    RowBox[{"zF", "=", 
+     RowBox[{"zS", "+", "zT"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"xF", "=", 
+     RowBox[{"xS", "+", "xT"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{"invert", " ", "FocusMirror", " ", "function"}], " ", "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"NSolve", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"zM", "\[Equal]", 
+       RowBox[{"b", "*", 
+        RowBox[{"zF", "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"2", "*", "b"}], "-", "zF"}], ")"}]}]}]}], " ", "&&", 
+      "\[IndentingNewLine]", 
+      RowBox[{"xM", "\[Equal]", 
+       RowBox[{"b", "*", 
+        RowBox[{"xF", "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"2", "*", "b"}], "-", "zF"}], ")"}]}]}]}], " ", "&&", 
+      "\[IndentingNewLine]", 
+      RowBox[{"rM", "\[Equal]", 
+       RowBox[{"b", "-", "zM"}]}]}], ",", "\[IndentingNewLine]", 
+     RowBox[{"{", 
+      RowBox[{"zT", ",", "xT", ",", "bXml"}], "}"}]}], "\[IndentingNewLine]", 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.86146204136735*^9, 3.861462311186831*^9}, {
+   3.8614623435312233`*^9, 3.861462464900182*^9}, {3.861462730385789*^9, 
+   3.86146275928404*^9}, {3.861462810579749*^9, 3.861462813655353*^9}, 
+   3.861463100799062*^9},
+ CellLabel->"In[39]:=",ExpressionUUID->"4ae4814c-dbe0-4e32-b2c5-d6b3f8a8c0e5"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"bXml", "\[Rule]", "0.8100000000000023`"}], ",", 
+    RowBox[{"zT", "\[Rule]", "51.453314359060215`"}], ",", 
+    RowBox[{"xT", "\[Rule]", "69.77835705117468`"}]}], "}"}], "}"}]], "Output",\
+
+ CellChangeTimes->{
+  3.861462173760985*^9, 3.861462761161839*^9, {3.861463075107874*^9, 
+   3.8614631017595654`*^9}},
+ CellLabel->"Out[44]=",ExpressionUUID->"4120bc37-ae2e-4131-90b1-763a728bf243"]
+}, Open  ]]
+},
+WindowSize->{1594, 850},
+WindowMargins->{{3, Automatic}, {Automatic, 22}},
+FrontEndVersion->"12.0 for Linux x86 (64-bit) (April 8, 2019)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 693, 17, 109, "Input",ExpressionUUID->"c9d1d621-e864-4bdd-baef-7cc3c6d925c8"],
+Cell[1254, 39, 681, 17, 134, "Input",ExpressionUUID->"cc1750a3-9903-48b7-868c-425c57eddaa7"],
+Cell[CellGroupData[{
+Cell[1960, 60, 2243, 59, 359, "Input",ExpressionUUID->"4ae4814c-dbe0-4e32-b2c5-d6b3f8a8c0e5"],
+Cell[4206, 121, 458, 11, 94, "Output",ExpressionUUID->"4120bc37-ae2e-4131-90b1-763a728bf243"]
+}, Open  ]]
+}
+]
+*)
+

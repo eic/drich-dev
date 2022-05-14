@@ -142,6 +142,9 @@ There are some local scripts to aid in simulation development; some of them have
     - you can produce a new version of this file by uncommenting relevant lines in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
+- the `math/` directory contains scripts and Mathematica notebooks used to
+  perform miscellanous calculations; many are "once and done" and don't really
+  need to be implemented in the source code
 
 ### Miscellaneous
 - `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
