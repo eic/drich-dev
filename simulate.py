@@ -15,7 +15,7 @@ from numpy import linspace
 
 testNum = -1 
 standalone = False
-zDirection = -1
+zDirection = 1
 particle = 'pi+'
 energy = '8.0 GeV'
 runType = 'run'
@@ -48,8 +48,8 @@ helpStr = f'''
 [OPTIONAL ARGUMENTS]
 
     OPTIONS:    -d: direction to throw particles (may not be used by all tests)
-                    1 = toward positive (hadron) endcap RICH
-                   -1 = toward negative (electron) endcap RICH (default)
+                    1 = toward positive (hadron) endcap RICH (default)
+                   -1 = toward negative (electron) endcap RICH
                 -s: enable standalone RICH-only simulation (default is full detector)
                 -p [particle]: name of particle to throw; default: {particle}
                    examples:
