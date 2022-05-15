@@ -12,10 +12,9 @@
 #include "TBox.h"
 #include "ROOT/RDataFrame.hxx"
 
-// NPdet
-#include "dd4pod/Geant4ParticleCollection.h"
-#include "dd4pod/TrackerHitCollection.h"
-#include "dd4pod/PhotoMultiplierHitCollection.h"
+// edm4hep
+#include "edm4hep/MCParticleCollection.h"
+#include "edm4hep/SimTrackerHitCollection.h"
 
 using std::cout;
 using std::cerr;
@@ -23,7 +22,7 @@ using std::endl;
 
 using namespace ROOT;
 using namespace ROOT::VecOps;
-using namespace dd4pod;
+using namespace edm4hep;
 
 TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0);
 
@@ -46,21 +45,31 @@ int main(int argc, char** argv) {
    * - see NPdet/src/dd4pod/dd4hep.yaml for POD syntax
    */
   // calculate number of hits
-  auto numHits = [](RVec<PhotoMultiplierHitData> hits) { return hits.size(); };
+  auto numHits = [](RVec<SimTrackerHitData> hits) { return hits.size(); };
   // calculate momentum magnitude for each particle (units=GeV)
-  auto momentum = [](RVec<Geant4ParticleData> parts){ return Map(parts,[](auto p){ return p.ps.mag(); }); };
+  // TODO: edm4hep::Vector3f really has no magnitude function!?
+  auto momentum = [](RVec<MCParticleData> parts){
+    return Map(parts,[](auto p){
+        auto mom = p.momentum;
+        return sqrt( mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2] );
+        });
+  };
   // filter for thrown particles
-  auto isThrown = [](RVec<Geant4ParticleData> parts){ return Filter(parts,[](auto p){ return p.ID==0; }); };
+  auto isThrown = [](RVec<MCParticleData> parts){
+    return Filter(parts,[](auto p){
+        return p.generatorStatus==1;
+        });
+  };
   // get positions for each hit (units=cm)
-  auto hitPos = [](RVec<PhotoMultiplierHitData> hits){ return Map(hits,[](auto h){ return h.position; }); };
-  auto hitPosX = [](RVec<VectorXYZ> v){ return Map(v,[](auto p){ return p.x/10; }); };
-  auto hitPosY = [](RVec<VectorXYZ> v){ return Map(v,[](auto p){ return p.y/10; }); };
-  auto hitPosZ = [](RVec<VectorXYZ> v){ return Map(v,[](auto p){ return p.z/10; }); };
+  auto hitPos = [](RVec<SimTrackerHitData> hits){ return Map(hits,[](auto h){ return h.position; }); };
+  auto hitPosX = [](RVec<Vector3d> v){ return Map(v,[](auto p){ return p.x/10; }); };
+  auto hitPosY = [](RVec<Vector3d> v){ return Map(v,[](auto p){ return p.y/10; }); };
+  auto hitPosZ = [](RVec<Vector3d> v){ return Map(v,[](auto p){ return p.z/10; }); };
 
 
   // transformations
   auto df1 = dfIn
-    .Define("thrownParticles",isThrown,{"mcparticles"})
+    .Define("thrownParticles",isThrown,{"MCParticles"})
     .Define("thrownP",momentum,{"thrownParticles"})
     .Define("numHits",numHits,{"DRICHHits"})
     .Define("hitPos",hitPos,{"DRICHHits"})
@@ -73,7 +82,7 @@ int main(int argc, char** argv) {
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
       { "hitPositions","dRICh hit positions (units=cm)",
-      1000,-300,300, 1000,-300,300 },
+      1000,-200,200, 1000,-200,200 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
@@ -87,7 +96,7 @@ int main(int argc, char** argv) {
   TCanvas *canv;
   canv = CreateCanvas("hits",0,0,1);
   hitPositionHist->Draw("colz");
-  hitPositionHist->GetXaxis()->SetRangeUser(125,230);
+  hitPositionHist->GetXaxis()->SetRangeUser(100,200);
   hitPositionHist->GetYaxis()->SetRangeUser(-60,60);
   canv->Print(outfileN+"hits.png");
   canv->Write();
