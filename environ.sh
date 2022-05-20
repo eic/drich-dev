@@ -48,3 +48,8 @@ if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   print_env.sh
   echo "--------------------------------"
 fi
+
+### additional comfort settings, dependent on host machine; 
+### feel free to add your own here
+if [ -d "${HOME}/bin" ]; then export PATH=${HOME}/bin:$PATH; fi   # add ~/bin to $PATH
+if [ -n "$(which rbenv)" ]; then eval "$(rbenv init - bash)"; fi  # switch to host's rbenv ruby shim (and its gems)

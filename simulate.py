@@ -13,6 +13,7 @@ from numpy import linspace
 # ARGUMENTS
 ################################################################
 
+inputFileName = ''
 testNum = -1 
 standalone = False
 zDirection = 1
@@ -23,11 +24,13 @@ numEvents = 10
 outputFileName = ''
 
 helpStr = f'''
-{sys.argv[0]} <TESTNUM> [OPTIONS]
+{sys.argv[0]} <INPUT_FILE or TEST_NUM> [OPTIONS]
 
-<REQUIRED ARGUMENTS>:
+<REQUIRED ARGUMENTS>: provide either an INPUT_FILE or a TEST_NUM
 
-    TESTNUM:    -t <testnum>: specify which test to run
+    INPUT_FILE: -i <input file>: specify an input file, e.g., hepmc
+
+    TEST_NUM:  -t <testnum>: specify which test to run
             >> acceptance tests:
                 1: aim pions at center of aerogel sector
                 2: inner edge test
@@ -58,7 +61,8 @@ helpStr = f'''
                     - kaon+ / kaon-
                     - proton / anti_proton
                     - opticalphoton
-                -n [numEvents]: number of events (usu. at each point)
+                -n [numEvents]: number of events to process (default={numEvents})
+                   (if using TEST_NUM, this is usually the number of events PER fixed momentum)
                 -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
@@ -68,23 +72,28 @@ helpStr = f'''
 if(len(sys.argv)<=1):
     print(helpStr)
     sys.exit(2)
-try: opts, args = getopt.getopt(sys.argv[1:],'t:d:sp:n:e:rvo:')
+try: opts, args = getopt.getopt(sys.argv[1:],'i:t:d:sp:n:e:rvo:')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n',helpStr)
     sys.exit(2)
 for opt, arg in opts:
-    if(opt=='-t'): testNum = int(arg)
-    if(opt=='-d'): zDirection = int(arg)
-    if(opt=='-s'): standalone = True
-    if(opt=='-p'): particle = arg
-    if(opt=='-n'): numEvents = int(arg)
-    if(opt=='-e'): energy = arg + " GeV"
-    if(opt=='-r'): runType = 'run'
-    if(opt=='-v'): runType = 'vis'
+    if(opt=='-i'): inputFileName  = arg
+    if(opt=='-t'): testNum        = int(arg)
+    if(opt=='-d'): zDirection     = int(arg)
+    if(opt=='-s'): standalone     = True
+    if(opt=='-p'): particle       = arg
+    if(opt=='-n'): numEvents      = int(arg)
+    if(opt=='-e'): energy         = arg + " GeV"
+    if(opt=='-r'): runType        = 'run'
+    if(opt=='-v'): runType        = 'vis'
     if(opt=='-o'): outputFileName = arg
-if(testNum<0):
-    print('\n\nERROR: test number required, e.g. `-t3`\n',helpStr)
+if(testNum<0 and inputFileName==''):
+    print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n',helpStr)
     sys.exit(2)
+elif(testNum>0 and inputFileName!=''):
+    print('\n\nWARNING: You specified both an input file and a test number; proceeding with the input file only.\n')
+    testNum = -1
+
 
 ### overrides
 if(testNum>=10):
@@ -95,9 +104,18 @@ if(particle=="opticalphoton"):
     energy = '3.0 eV'
     print(f'optical photons test: using energy {energy}')
 
-### set default output file name
+### configure input and output file names
+### relative paths will be made absolute here
 workDir = os.getcwd()
-if outputFileName=='': outputFileName = workDir+"/sim_rich_"+runType+".root"
+##### ensure input file name has absolute path
+if inputFileName!='':
+    if not bool(re.search('^/',inputFileName)): inputFileName = workDir+"/"+inputFileName
+##### ensure output file name has absolute path (and generate default name, if unspecified)
+if outputFileName=='':
+    outputFileName = workDir+"/sim_rich_"+runType+".root" # default name
+elif not bool(re.search('^/',outputFileName)):
+    outputFileName = workDir+"/"+outputFileName # convert relative path to absolute path
+##### get output file basename
 outputName = re.sub('\.root$','',outputFileName)
 outputName = re.sub('^.*/','',outputName)
 
@@ -126,14 +144,15 @@ compactFile = compactFileRICH if standalone else compactFileFull
 sep='-'*40
 print(sep)
 print("** simulation args **")
-print(f'testNum = {testNum}')
-print(f'particle = {particle}')
-print(f'numEvents = {numEvents}')
-print(f'runType = {runType}')
-print(f'direction = toward {xRICH}')
+print(f'inputFileName  = {inputFileName}')
+print(f'testNum        = {testNum}')
+print(f'particle       = {particle}')
+print(f'numEvents      = {numEvents}')
+print(f'runType        = {runType}')
+print(f'direction      = toward {xRICH}')
 print(f'outputFileName = {outputFileName}')
-print(f'outputName = {outputName}')
-print(f'compactFile = {compactFile}')
+print(f'outputName     = {outputName}')
+print(f'compactFile    = {compactFile}')
 print(sep)
 
 
@@ -141,7 +160,7 @@ print(sep)
 ################################################################
 
 ### start macro file
-m = open(workDir+"/macro_"+outputName+".mac",'w+')
+m = open(workDir+"/macro/macro_"+outputName+".mac",'w+')
 
 ### common settings
 m.write(f'/control/verbose 2\n')
@@ -231,7 +250,7 @@ print(sep)
 
 if( testNum == 1 ):
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    m.write(f'/gps/direction 0.25 0.0 {zDirection}\n')
+    m.write(f'/gps/direction 0.35 0.0 {zDirection}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif( testNum == 2 ):
@@ -297,8 +316,8 @@ elif( testNum == 7 ):
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif( testNum == 8 ):
-    numTheta = 3 # number of theta steps
-    numPhi = 12 # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
+    numTheta = 6 # number of theta steps
+    numPhi = 24 # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
     m.write(f'\n# demonstrate rings\n')
     if(runType=="vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
@@ -358,7 +377,7 @@ elif( testNum == 12 ):
         m.write(f'/gps/pos/halfx 16 cm\n') # parallel beam width
         m.write(f'/run/beamOn {numEvents}\n')
 
-else:
+elif( testNum > 0 ):
     print("ERROR: unknown test number\n")
     m.close()
     sys.exit(2)
@@ -370,7 +389,8 @@ if(runType=="vis"):
 
 ### print macro and close stream
 m.seek(0,0)
-print(m.read())
+if(testNum>0):
+    print(m.read())
 m.close()
 
 
@@ -382,9 +402,13 @@ cmd = "npsim"
 cmd += " --runType " + runType
 cmd += " --compactFile " + compactFile
 #cmd += " --random.seed 1 "
-cmd += " --macro " + m.name
 cmd += " --outputFile " + outputFileName
-cmd += " --enableG4GPS"
+if(testNum>0):
+    cmd += " --macro " + m.name
+    cmd += " --enableG4GPS"
+else:
+    cmd += f' -N {numEvents}'
+    cmd += " --inputFiles '" + inputFileName + "'"
 
 ### run simulation
 print(sep)
@@ -393,5 +417,5 @@ print(sep)
 subprocess.call( shlex.split(cmd), cwd=detPath )
 
 ### cleanup
-os.remove(m.name) # remove macro
+# os.remove(m.name) # remove macro
 print("\nPRODUCED SIMULATION OUTPUT FILE: "+outputFileName)

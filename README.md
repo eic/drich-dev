@@ -40,11 +40,17 @@ See [MR.md](MR.md) for information about the current development branches and ac
 ## Environment
 - execute `source environ.sh`
   - this file contains several env vars needed by many scripts
-  - make sure `$BUILD_NCPUS` is set correctly
+  - make sure `$BUILD_NPROC` is set correctly
     - this will be the number of CPUs used for multi-threaded building, and running Juggler multi-threaded
     - reduce it, if you prefer
     - memory-hungry builds will be built single-threaded
   - edit other variables if you want, e.g., for specifying alternate prefixes; you can find documentation for many variables in the corresponding module repositories
+  - there are some additional "convenience" settings, which depend on the host environment; feel free to add your own:
+    - if `~/bin` exists, it will be added to your `$PATH`
+    - if you use Ruby and `rbenv` is in your `$PATH`, it will switch to using your current Ruby shim (+ your installed gems)
+      - some miscellaneous scripts may be in Ruby; if you want to run them, run
+        `bundle install` in your host shell (not in the EIC container) to
+        install their required gems
 
 ## Building Modules
 - you must be in the EIC container (`opt/eic-shell`) and have environment variables set (`source environ.sh`)
@@ -67,7 +73,7 @@ See [MR.md](MR.md) for information about the current development branches and ac
   - use `./checkStatus.sh` to run `git status` in each repository, which is useful during active development
 - for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
 - most build scripts will run `cmake --build` multi-threaded
-  - the `$BUILD_NCPUS` environment variable should be set to the number of CPUs you want to build with (see `environ.sh`)
+  - the `$BUILD_NPROC` environment variable should be set to the number of CPUs you want to build with (see `environ.sh`)
   - careful, some module builds consume a lot of memory (Juggler); the build scripts will force single-threaded building for such cases
 
 ### Benchmarks Setup
@@ -145,6 +151,7 @@ There are some local scripts to aid in simulation development; some of them have
 - the `math/` directory contains scripts and Mathematica notebooks used to
   perform miscellanous calculations; many are "once and done" and don't really
   need to be implemented in the source code
+- the `scripts/` directory contains all other miscellaneous scripts
 
 ### Miscellaneous
 - `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
