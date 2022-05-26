@@ -1,22 +1,41 @@
 # dRICH-dev
-Scripts for EIC dRICH and IRT development 
+Scripts for EIC dRICH development 
 
-EIC Software is modular: see [the flowchart overview](docDiagram.pdf) for general guidance of the modules relevant for RICH development. It shows their dependences, calls, and data flow.
+EIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
+general guidance of the modules relevant for RICH development. It shows their
+dependences, calls, and data flow.
 
-See [MR.md](MR.md) for information about the current development branches and active merge requests
+## Notes for ATHENA
+- This repository was used for development of the ATHENA dRICH and pfRICH; it
+  has since been modified to support the Project Detector of the EIC
+- See [doc/athena-branches.md](doc/athena-branches.md) for information about the
+  development branches and merge requests that were used for the ATHENA proposal
+- It is possible that the pfRICH scripts no longer work, since we now focus on
+  the dRICH
 
-## Dependencies
-- before anything, clone this `drich-dev` repository; if you follow the directions below as is, everything will be installed in subdirectories of this repository
-- install EIC Software container:
-  - `opt/update.sh` will install or update the EIC Software container automatically
-    - execute `opt/eic-shell` to start the container; practically everything below must be executed within this container
-    - execute `echo $PRIMARY_PREFIX`
-      - by default it should be `./opt/local`, unless you installed the EIC Software container somewhere else
-      - this is the prefix that will be used for builds of EIC Software modules; edit `environ.sh` if you want to change it
-    - depending on your setup, you may want or need to pass additional options; see for example `opt/update.arcturus.sh`
-  - alternatively, follow the [eic_container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
-    - `opt/update.sh` is a wrapper for this procedure for storing the image and prefix locally in `opt/` 
-- obtain EIC Software modules, either clone or symlink the repositories to the specified paths
+---
+
+
+## Setup
+- First, clone this `drich-dev` repository
+  - If you follow the directions below as is, everything will be installed in
+    subdirectories of this repository; you will need a few GB of disk space
+  - If you have experience with the ATHENA software stack, you may prefer your
+    own set up; in that case, make symlinks to your local `git` repository
+    clones, so you can use the scripts in this directory
+- Obtain the EIC Software image (`jug_xl`):
+  - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
+    - this is just a wrapper of the commonly-used `install.sh` script;
+      alternatively, use that script directly by following
+      [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
+    - depending on your setup, you may want or need to pass additional options;
+      see for example `opt/update.arcturus.sh` (especially if you are low on
+      disk space on your `/` partition)
+    - the image and builds will be stored in `./opt`
+  - execute `opt/eic-shell` to start the container; practically everything below
+    must be executed within this container
+- obtain EIC Software modules, either clone or symlink the repositories to the
+  specified paths:
   - modules:
     - [detectors/ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
     - [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) to `./ecce`
@@ -24,7 +43,8 @@ See [MR.md](MR.md) for information about the current development branches and ac
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
     - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
     - [benchmarks/reconstruction_benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
-    - suggestion: clone with SSH:
+  - suggestion: clone with SSH, especially if you will be contributing to
+    them:
     ```
     git clone git@eicweb.phy.anl.gov:EIC/detectors/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/detectors/ecce.git
@@ -34,50 +54,86 @@ See [MR.md](MR.md) for information about the current development branches and ac
     git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
     ```
   - follow directions below to build each module
-  - alternatively, follow the [IRT Readme](https://eicweb.phy.anl.gov/EIC/irt) for module setup and building
-    - the IRT Readme describes a setup that was based off the setup in this repository, but with some minor differences such as prefix paths
+
+---
+
 
 ## Environment
 - execute `source environ.sh`
-  - this file contains several env vars needed by many scripts
-  - make sure `$BUILD_NPROC` is set correctly
-    - this will be the number of CPUs used for multi-threaded building, and running Juggler multi-threaded
-    - reduce it, if you prefer
+  - this file contains several environment variables needed by many scripts;
+    it is recommended to read through `environ.sh` and make any changes as
+    needed
+  - `$BUILD_NPROC` is the number of parallel threads used for multi-threaded
+    building and running Juggler multi-threaded
+    - change it, if you prefer
     - memory-hungry builds will be built single-threaded
-  - edit other variables if you want, e.g., for specifying alternate prefixes; you can find documentation for many variables in the corresponding module repositories
-  - there are some additional "convenience" settings, which depend on the host environment; feel free to add your own:
+  - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
+    - by default, it should be `./opt/local`
+    - change it, if you prefer
+  - you can find documentation for many other variables in the corresponding
+    module repositories
+  - there are some additional "comfort" settings, which depend on your host
+    environment; feel free to add your own
     - if `~/bin` exists, it will be added to your `$PATH`
-    - if you use Ruby and `rbenv` is in your `$PATH`, it will switch to using your current Ruby shim (+ your installed gems)
-      - some miscellaneous scripts may be in Ruby; if you want to run them, run
-        `bundle install` in your host shell (not in the EIC container) to
-        install their required gems
+    - if you use Ruby shims via `rbenv`, it will make sure the container will
+      use those, plus any corresponding gems
+      - note: some miscellaneous scripts are in Ruby (extension `.rb`); if you
+        want to run them, ask their developer for assistance
+
+---
+
 
 ## Building Modules
-- you must be in the EIC container (`opt/eic-shell`) and have environment variables set (`source environ.sh`)
-- build each repository, one-by-one, in order of dependences (see [flowchart](docDiagram.pdf) dependency graph)
+- you must be in the EIC container (`opt/eic-shell`) and have environment
+  variables set (`source environ.sh`)
+- build each repository, one-by-one, in order of dependences (see
+  [flowchart](doc/docDiagram.pdf) dependency graph)
+  - build scripts, in recommended order:
+  ```
+  ./buildEICD.sh
+  ./buildIRT.sh  # TODO: we need to update this for ECCE, you can ignore it for now...
+  ./buildIP6.sh
+  ./buildECCE.sh
+  ./buildJuggler.sh # TODO: we need to also update this
+  ```
+  - you could also run `./rebuildAll.sh` to (re)build all of the modules in the
+    recommended order
 - instructions for the `reconstruction_benchmarks` repository are below
-- build scripts, in recommended order:
-```
-./buildEICD.sh
-./buildIRT.sh
-./buildIP6.sh
-./buildECCE.sh
-./buildJuggler.sh
-```
+
 
 ### Recommendations and Troubleshooting
-- execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of dependences; this is useful when you switch branches in any of the repositories
-- be mindful of which branch you are on in each repository, especially if you have several active merge requests
-  - for example, `irt` requires the new `eicd` components and datatypes, which at the time of writing this have not been merged to `eicd` `master`
-  - use `./checkBranches.sh` to quickly check which branches you are on in all repositories
-  - use `./checkStatus.sh` to run `git status` in each repository, which is useful during active development
-- for clean builds, you can generally pass the word `clean` to any build script (you can also do `./rebuildAll.sh clean` to clean build everything)
+- execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of
+  dependences; this is useful when you switch branches in *any* of the
+  repositories, or if you pull in updates
+  - sometimes things will break, simply because a dependent module is out of
+    date; in that case, make sure all repositories are as up-to-date as
+    possible; you may also need to update your Singularity/Docker image
+    (`opt/update.sh`)
+- be mindful of which branch you are on in each repository, especially if you
+  have several active merge requests
+  - for example, `irt` requires the new `eicd` components and datatypes, which
+    at the time of writing this have not been merged to `eicd` `master`
+  - use `./checkBranches.sh` to quickly check which branches you are on in all
+    repositories
+  - use `./checkStatus.sh` to run `git status` in each repository, which is
+    useful during active development
+- for clean builds, you can generally pass the word `clean` to any build script
+  (you can also do `./rebuildAll.sh clean` to clean-build everything)
 - most build scripts will run `cmake --build` multi-threaded
-  - the `$BUILD_NPROC` environment variable should be set to the number of CPUs you want to build with (see `environ.sh`)
-  - careful, some module builds consume a lot of memory (Juggler); the build scripts will force single-threaded building for such cases
+  - the `$BUILD_NPROC` environment variable should be set to the number of
+    parellel threads you want to build with (see `environ.sh`)
+  - careful, some module builds consume a lot of memory (Juggler); the build
+    scripts will force single-threaded building for such cases
+
 
 ### Benchmarks Setup
-before running benchmarks, you must setup the common benchmarks:
+The benchmarks run downstream of all other modules, and are useful for running
+tests. For example, automated checks of upstream geometry changes, to see what
+happens to performance plots. They are not required for upstream development,
+but are certainly very useful. Currently we only have plots of raw hits; more
+development is needed here.
+
+Before running benchmarks, you must setup the common benchmarks:
 ```
 pushd reconstruction_benchmarks
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/common_bench.git setup
@@ -86,15 +142,23 @@ source setup/bin/env.sh
 popd
 source environ.sh
 ```
-- these directions are similar to those in the [reconstruction_benchmarks Readme](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/blob/master/README.md), but with some minor differences for our current setup (e.g., there is no need to build another detector in `reconstruction_benchmarks/.local`)
-- the `source environ.sh` step will now set additional environment variables, since you now have common benchmarks installed
-- there is no need to repeat this setup procedure, unless you want to start from a clean slate or update the common benchmarks
+- these directions are similar to those in the
+  [reconstruction_benchmarks Readme](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/blob/master/README.md),
+  but with some minor differences for our current setup (e.g., there is no need
+  to build another detector in `reconstruction_benchmarks/.local`)
+- the `source environ.sh` step will now set additional environment variables,
+  since you now have common benchmarks installed
+- there is no need to repeat this setup procedure, unless you want to start from
+  a clean slate or update the common benchmarks
+
+---
+
 
 ## Execution
 
 ### Geometry
-- execute `./runDDwebDisplay.sh` to produce the geometry `root` file
-  - by default, it will use the compact file for the full detector
+- run `./runDDwebDisplay.sh` to produce the geometry `root` file
+  - by default, it will use the compact file for the *full* detector
   - run `./runDDwebDisplay.sh d` to run on dRICH only
   - run `./runDDwebDisplay.sh p` to run on pfRICH only
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
@@ -111,48 +175,73 @@ source environ.sh
           ├── PFRICH
           └── ...
   ```
-  - right click on desired component, then click `Draw`
-  - default projection is perspective, but if you need to check alignment, change to orthographic projection
+  - right click on the desired component, then click `Draw`
+  - the default projection is perspective, but if you need to check alignment,
+    change to orthographic projection:
     - right click -> show controls -> advanced -> orthographic camera
-    - square your browser window aspect ratio, since the default aspect ratio is whatever your browser window is
+    - square your browser window aspect ratio, since the default aspect ratio is
+      whatever your browser window is
   - more documentation found on [jsroot website](https://root.cern/js/)
 - check for overlaps
   - typically more efficient to let the CI do this
   - call `./overlapCheck.sh` to run a local check
     - one check faster and less accurate, the other is slower and more accurate
-- use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any parameter in the compact files
-  - for example, `./searchCompactParams.sh RICH` to get all RICH variables
+- use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any
+  parameter in the compact files, rather than trying to "reverse" the formulas
+  - for example, `./searchCompactParams.sh DRICH` to get all dRICH variables
   - the search pattern is case sensitive
-  - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for further usage
+  - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
+    further guidance
 
-### Simulation and Reconstruction Benchmarks
-- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
-  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, which is executed by the CI
-    - this script runs `npsim` and `juggler`
-  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the commands used by the CI
-  - it is practical to edit this wrapper script during development, for testing purposes; this is why several lines are commented out
+#### GDML Output
+- currently we use the CI for this, from the `ecce` repository
+  (the `athena` repository has a dRICH specific GDML output CI job, but at the
+  time of writing this, this automation is not yet present in `ecce` CI)
+- TODO: add a local script to automate connection to Fun4all
 
-#### Local Scripts
-There are some local scripts to aid in simulation development; some of them have been copied to the `reconstruction_benchmarks` repository, and may be more up-to-date there.
+### Simulation
+
+There are some local scripts to aid in simulation development; some of them have
+been copied to the `reconstruction_benchmarks` repository, and may be more
+up-to-date there.
+
+All `.cpp` programs are compiled by running `make`, to corresponding `.exe`
+executables.
+
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
-  - run with no arguments for usage
-  - basically copied to `reconstruction_benchmarks`, but stored here as well for backup
+  - run with no arguments for usage guidance
+  - `npsim` is the main script for running Geant4 simulations with DD4hep
+  - basically copied to `reconstruction_benchmarks`, but stored here as well for
+    backup
 - `drawHits.cpp`
-  - reads simulation output and draws raw hit positions and number of hits vs. momentum
-  - build with `make`, execute with `./drawHits.exe [simulation_output_file]`
-  - basically copied to `reconstruction_benchmarks`
+  - reads simulation output and draws raw hit positions and number of hits vs.
+    momentum
+  - build with `make`, execute as `./drawHits.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
 - `drawSegmentation.cpp`
-  - reads simulation output and draws the hits within sensor pixels, which is useful for checking mapping
+  - reads simulation output and draws the hits within sensor pixels, which is
+    useful for checking mapping of sensor segmentation (pixels)
   - relies on `text/sensorLUT.dat`, which must be up-to-date
-    - you can produce a new version of this file by uncommenting relevant lines in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
+    - you can produce a new version of this file by uncommenting relevant lines
+      in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running
+      something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
-- the `math/` directory contains scripts and Mathematica notebooks used to
-  perform miscellanous calculations; many are "once and done" and don't really
-  need to be implemented in the source code
-- the `scripts/` directory contains all other miscellaneous scripts
+
+### Benchmarks
+- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
+  benchmarks
+  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
+    which is executed by the benchmarks CI
+    - this script runs `npsim` and `juggler`
+  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
+    commands used by the CI
+  - it is practical to edit this wrapper script during development, for testing
+    purposes; this is why several lines are commented out
 
 ### Miscellaneous
-- `makeDocumentation.sh`: calls script for auto-documentation from compact tags, outputs in `./doc`
-- `deprecated/` contains some old scripts which may be helpful
+- the `math/` directory contains scripts and Mathematica notebooks used to
+  perform miscellaneous calculations; many are "once and done" and don't really
+  need to be implemented in the source code
+- the `scripts/` directory contains all other miscellaneous scripts
+- `deprecated/` contains some old scripts which may also be helpful

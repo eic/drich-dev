@@ -3,7 +3,7 @@
 # pass an argument to rebuild everything cleanly
 set -e
 ./buildEICD.sh $*
-./buildIRT.sh $*
+#./buildIRT.sh $* # temporarily disabled
 ./buildIP6.sh $*
 ./buildECCE.sh $*
-./buildJuggler.sh $*
+#./buildJuggler.sh $* # temporarily disabled
