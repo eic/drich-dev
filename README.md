@@ -223,7 +223,7 @@ source environ.sh
       whatever your browser window is
   - more documentation found on [jsroot website](https://root.cern/js/)
 - check for overlaps
-  - typically more efficient to let the CI do this
+  - typically more efficient to let the CI do this (in `detectors/ecce`)
   - call `./overlapCheck.sh` to run a local check
     - one check faster and less accurate, the other is slower and more accurate
 - use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any
