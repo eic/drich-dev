@@ -154,6 +154,46 @@ source environ.sh
 ---
 
 
+## Implementation
+
+### Geometry and Materials
+- the geometry and materials are implemented in DD4hep, in
+  [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce)
+  - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
+    or the [homepage](https://dd4hep.web.cern.ch/dd4hep/) for documentation
+  - the following files in `ecce/` are relevant for the dRICH:
+    - `compact/drich.xml`: the compact file for the dRICH
+      - constants for the geometry (e.g., dimensions, positions)
+      - see `compact/definitions.xml` for main constants (for the full detector),
+        such as global positioning
+      - use `./searchCompactParams.sh [PATTERN]` to quickly obtain the
+        *numerical* value of any constant, where `[PATTERN]` is case sensitive
+        (e.g., `./searchCompactParams.sh DRICH`); this is a script in
+        `drich-dev` which wraps `npdet_info`
+      - see `comment` tags for details of all parameters
+    - `compact/optical_materials.xml` for surface and material property tables,
+      such as refractive index
+      - see `compact/materials.xml` for material definitions and
+        `compact/elements.xml` for elements
+      - materials and parameterizations relevent for the dRICH contain the
+        substring `DRICH` in their name
+      - materials etc. are referenced by name in `compact/drich.xml`
+      - most of these tables were obtained from the
+        [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
+    - the full detector compact file is `ecce.xml`, and there is also a
+      dRICH-only compact file `compact/subsystem_views/drich_only.xml`; these
+      compact files are used by many scripts, such as `npsim` (whereas `compact/drich.xml` is
+      *only* for the dRICH implementation itself)
+    - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
+      - relies on constants from the compact files
+      - builds the dRICH
+      - placement algorithms
+      - parameterizations (e.g., of the mirrors)
+      - see comments within the code for documentation
+
+---
+
+
 ## Execution
 
 ### Geometry
