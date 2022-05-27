@@ -5,6 +5,9 @@ EIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
 general guidance of the modules relevant for RICH development. It shows their
 dependences, calls, and data flow.
 
+See also [the collection of links](doc/links.md) to various resources and dRICH
+implementations.
+
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
   has since been modified to support the Project Detector of the EIC
