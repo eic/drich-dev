@@ -1,10 +1,14 @@
 *.sw*
 *.root
 *.exe
+*.png
+macro/*.mac
+Gemfile.lock
 
 juggler
 irt
 athena
+ecce
 ip6
 eicd
 reconstruction_benchmarks
@@ -13,3 +17,7 @@ calibrations
 fieldmaps
 doc/detector.md
 tmp.mac
+
+*.hepmc*
+hepmc/*
+!hepmc/README.md

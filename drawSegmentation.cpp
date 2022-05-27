@@ -32,12 +32,12 @@ int main(int argc, char** argv) {
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // number of pixels along sensor side
-  const Int_t numPx = 16;
+  const Int_t numPx = 8;
 
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
-  Long64_t dilation = 8;
+  Long64_t dilation = 4;
 
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
           xSens + numPx,
           ySens + numPx
           ));
+    boxList.back()->SetLineColor(kGray);
   };
   
 
@@ -184,8 +185,8 @@ int main(int argc, char** argv) {
       );
 
   // pixel hits
-  Double_t pixelXmin = dilation * 135;
-  Double_t pixelXmax = dilation * 220;
+  Double_t pixelXmin = dilation * 120;
+  Double_t pixelXmax = dilation * 180;
   Double_t pixelYmin = dilation * -55;
   Double_t pixelYmax = dilation * 55;
   auto pixelHits = dfFinal.Histo3D(
@@ -227,12 +228,12 @@ int main(int argc, char** argv) {
     pixelHitsSec[sec] = (TH2D*) pixelHits->Project3D("yx");
     pixelHitsSec[sec]->SetName(Form("pixelHits_s%d",sec));
     pixelHitsSec[sec]->SetTitle(Form("pixel hits sector %d",sec));
-    pixelHitsSec[sec]->Draw("*"); // (or colz)
+    pixelHitsSec[sec]->Draw("colz"); // (or colz)
     for(auto box : boxList) {
       box->SetFillStyle(0);
       box->Draw("same");
     };
-    pixelHitsSec[sec]->Draw("* same"); // (or colz)
+    pixelHitsSec[sec]->Draw("colz same"); // (or colz)
   };
 
 

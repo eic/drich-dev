@@ -6,18 +6,21 @@ export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 echo "detected $BUILD_NPROC cpus"
 
+# primary prefix: 
+# note: if you prefer a different prefix, change it here
+export PRIMARY_PREFIX=$ATHENA_PREFIX # currently ATHENA_PREFIX still exists, but it may change in the future...
+
 # juggler paths
-#export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
-export JUGGLER_INSTALL_PREFIX=$ATHENA_PREFIX
+export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
 export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=${JUGGLER_INSTALL_PREFIX}/python:${PYTHONPATH} # make sure gaudirun.py prioritizes local juggler installation
 
 # cmake packages
-export IRT_ROOT=$ATHENA_PREFIX # overrides container version with local version
-export EICD_ROOT=$ATHENA_PREFIX # overrides container version with local version
+export IRT_ROOT=$PRIMARY_PREFIX # overrides container version with local version
+export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 
 # juggler config vars
-export JUGGLER_DETECTOR="athena"
+export JUGGLER_DETECTOR="ecce"
 export BEAMLINE_CONFIG="ip6"
 export JUGGLER_SIM_FILE=$(pwd)/out/sim_run.root
 export JUGGLER_REC_FILE=test.root
@@ -34,7 +37,7 @@ fi
 
 # fix juggler config vars which would have been overwritten by 
 # `reconstruction_benchmarks/.local/bin/env.sh`:
-export DETECTOR_PATH=$(pwd)/athena
+export DETECTOR_PATH=$(pwd)/ecce
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
 #export DETECTOR_VERSION=master
@@ -44,3 +47,8 @@ if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   print_env.sh
   echo "--------------------------------"
 fi
+
+### additional comfort settings, dependent on host machine; 
+### feel free to add your own here
+if [ -d "${HOME}/bin" ]; then export PATH=${HOME}/bin:$PATH; fi   # add ~/bin to $PATH
+if [ -n "$(which rbenv)" ]; then eval "$(rbenv init - bash)"; fi  # switch to host's rbenv ruby shim (and its gems)
