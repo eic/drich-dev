@@ -157,8 +157,8 @@ source environ.sh
 ## Implementation
 
 ### Geometry and Materials
-- the geometry and materials are implemented in DD4hep, in
-  [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce)
+- the geometry and materials are implemented in DD4hep, in the
+  [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
     or the [homepage](https://dd4hep.web.cern.ch/dd4hep/) for documentation
   - the following files in `ecce/` are relevant for the dRICH:
