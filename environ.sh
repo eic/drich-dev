@@ -11,7 +11,6 @@ echo "detected $BUILD_NPROC cpus"
 export PRIMARY_PREFIX=$ATHENA_PREFIX # currently ATHENA_PREFIX still exists, but it may change in the future...
 
 # juggler paths
-#export JUGGLER_INSTALL_PREFIX=$(pwd)/juggler/install
 export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
 export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=${JUGGLER_INSTALL_PREFIX}/python:${PYTHONPATH} # make sure gaudirun.py prioritizes local juggler installation
