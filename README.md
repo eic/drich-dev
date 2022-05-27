@@ -73,7 +73,7 @@ dependences, calls, and data flow.
   - you can find documentation for many other variables in the corresponding
     module repositories
   - there are some additional "comfort" settings, which depend on your host
-    environment; feel free to add your own
+    environment; it is not required to use these, but feel free to add your own
     - if `~/bin` exists, it will be added to your `$PATH`
     - if you use Ruby shims via `rbenv`, it will make sure the container will
       use those, plus any corresponding gems
