@@ -33,8 +33,6 @@ Additional upstream DAGs to keep an eye on:
 
 ### `athena`
 - BRANCH `144-irt-geometry` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/331)
-  - TODO: this is the "backdoor" in frontdoor vs. backdoor (see below)
-  - cloned and rebased from branch `irt-init-v01`; see [miscellaneous notes section below](#rebasenotes) for notes on validation of this procedure 
 - BRANCH `129-update-erich-name` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/328) (merged)
 - BRANCH `drich-two-mirrors` - [MR](https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/260) (draft)
 
