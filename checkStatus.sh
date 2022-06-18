@@ -1,9 +1,10 @@
 #!/bin/bash
 # runs 'git status' in each repository
 wd=$(pwd)
-for repo in irt ip6 ecce eicd juggler reconstruction_benchmarks; do
+echo ""
+for repo in . ip6 ecce eicd irt juggler reconstruction_benchmarks; do
   cd $repo
-  echo "===============>>> $repo"
+  echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  $(basename `pwd`)"
   git status
   cd $wd
   echo ""
