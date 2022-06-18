@@ -1,6 +1,19 @@
 # dRICH-dev
 Scripts for EIC dRICH development 
 
+| **Documentation Links**                        |                                                |
+| --:                                            | ---                                            |
+| [Flowchart](doc/docDiagram.pdf)                | Diagram of software modules                    |
+| [Links](doc/links.md)                          | Collection of dRICH Software and Resources     |
+| [Branches and Merge Requests](doc/branches.md) | Active development branches and merge requests |
+
+| **Table of Contents**             |                                         |
+| --:                               |                                         |
+| [Setup](#setup)                   | How to download and build the code      |
+| [Implementation](#implementation) | Where to find the code and what it does |
+| [Execution](#execution)           | How to run the code                     |
+
+## Notes
 EIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
 general guidance of the modules relevant for RICH development. It shows their
 dependences, calls, and data flow.
@@ -10,18 +23,9 @@ implementations.
 
 ## Active Branches
 
-The following is a table of `git` branches for each repository. Each column is for a 
-project or recommended configuration. Links to corresponding merge requests are provided.
-We intend to keep this table up-to-date as development proceeds.
-
-| Repository                  | Production | IRT Development                                                                                              | Sensor Development                                                                                                       |
-| --:                         | ---        | ---                                                                                                          | ---                                                                                                                      |
-| `ip6`                       | `master`   | `master`                                                                                                     | `master`                                                                                                                 |
-| `ecce`                      | `main`     | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) | [`12-drich-sensor-material-should-not-be-airoptical`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) |
-| `eicd`                      | `master`   | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  | `master`                                                                                                                 |
-| `irt`                       | `main`     | [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                              | `main`                                                                                                                   |
-| `juggler`                   | `master`   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   | `master`                                                                                                                 |
-| `reconstruction_benchmarks` | `master`   | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)  | `master`                                                                                                                 |
+Depending on the development, you likely need to change `git` branches for some
+of the modules. See the [active branches tables](doc/branches.md) for tables
+of branches for varying configurations.
 
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
@@ -34,7 +38,8 @@ We intend to keep this table up-to-date as development proceeds.
 ---
 
 
-## Setup
+<a name="setup"></a>
+# Setup
 - First, clone this `drich-dev` repository
   - If you follow the directions below as is, everything will be installed in
     subdirectories of this repository; you will need a few GB of disk space
@@ -144,7 +149,7 @@ We intend to keep this table up-to-date as development proceeds.
     scripts will force single-threaded building for such cases
 
 
-### Benchmarks Setup
+## Benchmarks Setup
 The benchmarks run downstream of all other modules, and are useful for running
 tests. For example, automated checks of upstream geometry changes, to see what
 happens to performance plots. They are not required for upstream development,
@@ -172,9 +177,10 @@ source environ.sh
 ---
 
 
-## Implementation
+<a name="implementation"></a>
+# Implementation
 
-### Geometry and Materials
+## Geometry and Materials
 - the geometry and materials are implemented in DD4hep, in the
   [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
@@ -212,9 +218,10 @@ source environ.sh
 ---
 
 
-## Execution
+<a name="execution"></a>
+# Execution
 
-### Geometry
+## Geometry
 - run `./runDDwebDisplay.sh` to produce the geometry `root` file
   - by default, it will use the compact file for the *full* detector
   - run `./runDDwebDisplay.sh d` to run on dRICH only
@@ -251,13 +258,13 @@ source environ.sh
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
     further guidance
 
-#### GDML Output
+### GDML Output
 - currently we use the CI for this, from the `ecce` repository
   (the `athena` repository has a dRICH specific GDML output CI job, but at the
   time of writing this, this automation is not yet present in `ecce` CI)
 - TODO: add a local script to automate connection to Fun4all
 
-### Simulation
+## Simulation
 
 There are some local scripts to aid in simulation development; some of them have
 been copied to the `reconstruction_benchmarks` repository, and may be more
@@ -286,7 +293,7 @@ executables.
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
 
-### Benchmarks
+## Benchmarks
 - use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
   benchmarks
   - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
@@ -297,7 +304,7 @@ executables.
   - it is practical to edit this wrapper script during development, for testing
     purposes; this is why several lines are commented out
 
-### Miscellaneous
+## Miscellaneous
 - the `math/` directory contains scripts and Mathematica notebooks used to
   perform miscellaneous calculations; many are "once and done" and don't really
   need to be implemented in the source code
