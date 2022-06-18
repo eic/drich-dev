@@ -8,6 +8,17 @@ dependences, calls, and data flow.
 See also [the collection of links](doc/links.md) to various resources and dRICH
 implementations.
 
+## Active Branches
+
+| Repository                  | Production | IRT Development                         |
+| --:                         | ---        | ---                                     |
+| `ip6`                       | `master`   | `master`                                |
+| `ecce`                      | `main`     | `17-drich-produce-irt-geometry-objects` |
+| `eicd`                      | `master`   | `irt-data-model`                        |
+| `irt`                       | `main`     | `irt-init-v02`                          |
+| `juggler`                   | `master`   | `73-add-rich-irt-algorithm`             |
+| `reconstruction_benchmarks` | `master`   | `irt-benchmark`                         |
+
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
   has since been modified to support the Project Detector of the EIC
