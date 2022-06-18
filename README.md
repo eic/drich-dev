@@ -10,14 +10,18 @@ implementations.
 
 ## Active Branches
 
-| Repository                  | Production | IRT Development                         |
-| --:                         | ---        | ---                                     |
-| `ip6`                       | `master`   | `master`                                |
-| `ecce`                      | `main`     | `17-drich-produce-irt-geometry-objects` |
-| `eicd`                      | `master`   | `irt-data-model`                        |
-| `irt`                       | `main`     | `irt-init-v02`                          |
-| `juggler`                   | `master`   | `73-add-rich-irt-algorithm`             |
-| `reconstruction_benchmarks` | `master`   | `irt-benchmark`                         |
+The following is a table of `git` branches for each repository. Each column is for a 
+project or recommended configuration. Links to corresponding merge requests are provided.
+We intend to keep this table up-to-date as development proceeds.
+
+| Repository                  | Production | IRT Development                                                                                              |
+| --:                         | ---        | ---                                                                                                          |
+| `ip6`                       | `master`   | `master`                                                                                                     |
+| `ecce`                      | `main`     | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) |
+| `eicd`                      | `master`   | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
+| `irt`                       | `main`     | `irt-init-v02`                                                                                               |
+| `juggler`                   | `master`   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   |
+| `reconstruction_benchmarks` | `master`   | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)  |
 
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
