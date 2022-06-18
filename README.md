@@ -14,14 +14,14 @@ The following is a table of `git` branches for each repository. Each column is f
 project or recommended configuration. Links to corresponding merge requests are provided.
 We intend to keep this table up-to-date as development proceeds.
 
-| Repository                  | Production | IRT Development                                                                                              |
-| --:                         | ---        | ---                                                                                                          |
-| `ip6`                       | `master`   | `master`                                                                                                     |
-| `ecce`                      | `main`     | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) |
-| `eicd`                      | `master`   | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
-| `irt`                       | `main`     | [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                              |
-| `juggler`                   | `master`   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   |
-| `reconstruction_benchmarks` | `master`   | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)  |
+| Repository                  | Production | IRT Development                                                                                              | Sensor Development                                                                                                       |
+| --:                         | ---        | ---                                                                                                          | ---                                                                                                                      |
+| `ip6`                       | `master`   | `master`                                                                                                     | `master`                                                                                                                 |
+| `ecce`                      | `main`     | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) | [`12-drich-sensor-material-should-not-be-airoptical`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) |
+| `eicd`                      | `master`   | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  | `master`                                                                                                                 |
+| `irt`                       | `main`     | [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                              | `main`                                                                                                                   |
+| `juggler`                   | `master`   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   | `master`                                                                                                                 |
+| `reconstruction_benchmarks` | `master`   | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)  | `master`                                                                                                                 |
 
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
