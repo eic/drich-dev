@@ -1,5 +1,5 @@
 # dRICH-dev
-Scripts for EIC dRICH development 
+Resources and Tools for EIC dRICH development 
 
 | **Table of Contents**             |                                         |
 | --:                               | ---                                     |
