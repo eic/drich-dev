@@ -1,17 +1,17 @@
 # dRICH-dev
 Scripts for EIC dRICH development 
 
+| **Table of Contents**             |                                         |
+| --:                               | ---                                     |
+| [Setup](#setup)                   | How to download and build the code      |
+| [Implementation](#implementation) | Where to find the code and what it does |
+| [Execution](#execution)           | How to run the code                     |
+
 | **Documentation Links**                        |                                                |
 | --:                                            | ---                                            |
 | [Flowchart](doc/docDiagram.pdf)                | Diagram of software modules                    |
 | [Links](doc/links.md)                          | Collection of dRICH Software and Resources     |
 | [Branches and Merge Requests](doc/branches.md) | Active development branches and merge requests |
-
-| **Table of Contents**             |                                         |
-| --:                               |                                         |
-| [Setup](#setup)                   | How to download and build the code      |
-| [Implementation](#implementation) | Where to find the code and what it does |
-| [Execution](#execution)           | How to run the code                     |
 
 ## Notes
 EIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
@@ -36,7 +36,6 @@ of branches for varying configurations.
   the dRICH
 
 ---
-
 
 <a name="setup"></a>
 # Setup
@@ -78,9 +77,6 @@ of branches for varying configurations.
     ```
   - follow directions below to build each module
 
----
-
-
 ## Environment
 - execute `source environ.sh`
   - this file contains several environment variables needed by many scripts;
@@ -103,9 +99,6 @@ of branches for varying configurations.
       - note: some miscellaneous scripts are in Ruby (extension `.rb`); if you
         want to run them, ask their developer for assistance
 
----
-
-
 ## Building Modules
 - you must be in the EIC container (`opt/eic-shell`) and have environment
   variables set (`source environ.sh`)
@@ -122,7 +115,6 @@ of branches for varying configurations.
   - you could also run `./rebuildAll.sh` to (re)build all of the modules in the
     recommended order
 - instructions for the `reconstruction_benchmarks` repository are below
-
 
 ### Recommendations and Troubleshooting
 - execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of
@@ -147,7 +139,6 @@ of branches for varying configurations.
     parellel threads you want to build with (see `environ.sh`)
   - careful, some module builds consume a lot of memory (Juggler); the build
     scripts will force single-threaded building for such cases
-
 
 ## Benchmarks Setup
 The benchmarks run downstream of all other modules, and are useful for running
@@ -175,7 +166,6 @@ source environ.sh
   a clean slate or update the common benchmarks
 
 ---
-
 
 <a name="implementation"></a>
 # Implementation
@@ -216,7 +206,6 @@ source environ.sh
       - see comments within the code for documentation
 
 ---
-
 
 <a name="execution"></a>
 # Execution
@@ -265,7 +254,6 @@ source environ.sh
 - TODO: add a local script to automate connection to Fun4all
 
 ## Simulation
-
 There are some local scripts to aid in simulation development; some of them have
 been copied to the `reconstruction_benchmarks` repository, and may be more
 up-to-date there.
