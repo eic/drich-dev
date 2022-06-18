@@ -19,7 +19,7 @@ We intend to keep this table up-to-date as development proceeds.
 | `ip6`                       | `master`   | `master`                                                                                                     |
 | `ecce`                      | `main`     | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) |
 | `eicd`                      | `master`   | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
-| `irt`                       | `main`     | `irt-init-v02`                                                                                               |
+| `irt`                       | `main`     | [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                              |
 | `juggler`                   | `master`   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   |
 | `reconstruction_benchmarks` | `master`   | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222)  |
 
