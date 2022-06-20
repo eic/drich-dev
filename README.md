@@ -194,10 +194,11 @@ source environ.sh
       - materials etc. are referenced by name in `compact/drich.xml`
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
-    - the full detector compact file is `ecce.xml`, and there is also a
-      dRICH-only compact file `compact/subsystem_views/drich_only.xml`; these
-      compact files are used by many scripts, such as `npsim` (whereas `compact/drich.xml` is
-      *only* for the dRICH implementation itself)
+    - the full detector compact file is `ecce.xml`, which is generated via
+      Jinja during `cmake` (run `buildECCE.sh`), along with a dRICH-only
+      compact file `ecce_drich_only.xml`; these compact files are used by many
+      scripts, such as `npsim` (whereas `compact/drich.xml` is *only* for the
+      dRICH implementation itself)
     - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
       - relies on constants from the compact files
       - builds the dRICH

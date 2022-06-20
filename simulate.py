@@ -137,7 +137,7 @@ localDir = os.environ['LOCAL_DATA_PATH']
 
 ### set compact file
 compactFileFull = detPath+'/'+detMain+'.xml'
-compactFileRICH = detPath+'/compact/subsystem_views/'+xrich+'_only.xml'
+compactFileRICH = detPath+'/'+detMain+'_'+xrich+'_only.xml'
 compactFile = compactFileRICH if standalone else compactFileFull
 
 ### print args and settings
