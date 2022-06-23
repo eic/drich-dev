@@ -53,12 +53,12 @@ We intend to keep these tables up-to-date as development proceeds.
 It is useful to watch the commit graphs (DAGs), for a visualization of the commits and branches:
 - [`drich-dev`](https://github.com/c-dilks/drich-dev/network)
 - [`ip6`](https://eicweb.phy.anl.gov/EIC/detectors/ip6/-/network/master)
-- [`ecce`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/network/master)
+- [`ecce`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/network/main)
 - [`eicd`](https://eicweb.phy.anl.gov/EIC/eicd/-/network/master)
 - [`irt`](https://eicweb.phy.anl.gov/EIC/irt/-/network/main)
 - [`juggler`](https://eicweb.phy.anl.gov/EIC/juggler/-/network/master)
 - [`reconstruction_benchmarks`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/network/master)
 
 Additional upstream DAGs to keep an eye on:
-- [`EDM4hep`](https://github.com/key4hep/EDM4hep/network)
+- [`EDM4hep`](https://github.com/key4hep/EDM4hep/network) - upstream data model
 - [`NPDet`](https://eicweb.phy.anl.gov/EIC/NPDet/-/network/master) - includes (older) `dd4pod` data model (`src/dd4pod`)
