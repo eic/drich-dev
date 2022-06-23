@@ -11,8 +11,12 @@ compactFile=$(
 echo "compactFile = $compactFile"
 
 # produce geometry root file
-wdir=$(pwd)
+wdir=$(pwd)/geo
+mkdir -p $wdir
 pushd ecce
 dd_web_display --export -o $wdir/detector_geometry.root $compactFile
 popd
-echo "produced $(ls -t *.root|head -n1), view with jsroot"
+echo ""
+echo "produced $(ls -t $wdir/*.root|head -n1)"
+echo " -> open it with jsroot to view the geometry"
+echo ""

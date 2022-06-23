@@ -212,10 +212,11 @@ source environ.sh
 # Execution
 
 ## Geometry
-- run `./runDDwebDisplay.sh` to produce the geometry `root` file
+- run `./runDDwebDisplay.sh` to produce the geometry ROOT file
   - by default, it will use the compact file for the *full* detector
   - run `./runDDwebDisplay.sh d` to run on dRICH only
   - run `./runDDwebDisplay.sh p` to run on pfRICH only
+  - output ROOT file will be in `geo/`
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [ANL hosted instance](https://eic.phy.anl.gov/geoviewer/)
   - [CERN hosted instance](https://root.cern/js/)
