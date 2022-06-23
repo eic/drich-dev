@@ -6,6 +6,7 @@ Resources and Tools for EIC dRICH development
 | [Setup](#setup)                   | How to download and build the code      |
 | [Implementation](#implementation) | Where to find the code and what it does |
 | [Execution](#execution)           | How to run the code                     |
+| [Algorithms](#algorithms)         | Documentation for algorithms            |
 
 | **Documentation Links**                        |                                                |
 | --:                                            | ---                                            |
@@ -300,3 +301,14 @@ executables.
   need to be implemented in the source code
 - the `scripts/` directory contains all other miscellaneous scripts
 - `deprecated/` contains some old scripts which may also be helpful
+
+
+---
+
+
+<a name="algorithms"></a>
+# Algorithms
+
+## IRT: Indirect Ray Tracing
+
+- `createIRTconfig.sh`: create IRT geometry config file
