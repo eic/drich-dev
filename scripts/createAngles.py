@@ -14,7 +14,6 @@ def makeAngles(theta_min: float, theta_max: float, theta_increment: float, hit_d
     :param theta_max: maximum polar angle of photon, in radians
     :param theta_increment: increment of polar angle between theta_min and theta_max
     :param hit_density: the amount of photon hits for the smallest polar angle
-    :param show_plot: if True, will display distribution of hits, default False
     :return: returns a list of tuples containing polar and azimuthal angles, in radians, in the form
     [(polar, azimuthal), (...), ...] for generating photons that will have an even distribution on the dRICH sensor
     """
