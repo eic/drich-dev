@@ -311,4 +311,4 @@ executables.
 
 ## IRT: Indirect Ray Tracing
 
-- `createIRTconfig.sh`: create IRT geometry config file
+- `createIRTauxfile.sh`: create IRT geometry auxiliary config file
