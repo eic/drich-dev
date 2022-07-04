@@ -1,3 +1,7 @@
 #!/bin/bash
 # create IRT geometry config file
-python ecce/scripts/create_IRT_auxfile.py -o geo/irt-drich.root
+outFile=geo/irt-drich.root
+python ecce/scripts/create_IRT_auxfile.py -o $outFile | grep IRTLOG
+echo ""
+echo "produced $outFile"
+echo ""
