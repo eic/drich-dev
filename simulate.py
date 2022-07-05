@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # -----------------------------------------------#
-# npsim wrapper with EIC RICH specific tests    #
-# Author: C. Dilks                              #
+# npsim wrapper with EIC RICH specific tests     #
+# Author: C. Dilks                               #
 # -----------------------------------------------#
 
 import sys, getopt, os, re, importlib
@@ -48,6 +48,7 @@ helpStr = f'''
                 12:   parallel-to-point focal test
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=0 )
                 13:   evenly distributed sensor hits test
+                        ( recommend: optDbg=3 / mirDbg=0 / sensDbg=0 )
 
 [OPTIONAL ARGUMENTS]
 
