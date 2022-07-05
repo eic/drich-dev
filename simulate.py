@@ -220,15 +220,16 @@ for paramLine in open(paramListFileN, 'r'):
     if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
 
 ### set envelope limits
-envBuffer = 5
+envBufferMin = 5
+envBufferMax = 10
 if (zDirection < 0):
-    rMin = params['PFRICH_rmin1'] + envBuffer
-    rMax = params['PFRICH_rmax'] - envBuffer
+    rMin = params['PFRICH_rmin1'] + envBufferMin
+    rMax = params['PFRICH_rmax'] - envBufferMax
     zMax = params['PFRICH_zmax'] * -1 - 20  # must be positive; subtract 20 since sensors are not at `zmax`
     # TODO: use instead `params['PFRICH_sensor_dist']` `when https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/290` is merged
 else:
-    rMin = params['DRICH_rmin1'] + envBuffer
-    rMax = params['DRICH_rmax2'] - envBuffer
+    rMin = params['DRICH_rmin1'] + envBufferMin
+    rMax = params['DRICH_rmax2'] - envBufferMax
     zMax = params['DRICH_zmin'] + params['DRICH_Length']
 print('** acceptance limits **')
 print(f'rMin = {rMin} cm')
@@ -387,13 +388,12 @@ elif testNum == 13:
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
 
     from scripts import createAngles
-    buffer = math.radians(0.0) # increase polar angle range by this amount
-    theta_min = thetaMin - buffer # minimum polar angle
-    theta_max = thetaMax + buffer # maximum polar angle
-    # theta_min = math.radians(3.8) - buffer # default, maybe outdated values (use if `npdet_info` fails)
-    # theta_max = math.radians(32.0) + buffer
-    num_rings = 12  # number of concentric rings, type=int
-    hit_density = 20  # amount of photon hits for the smallest polar angle, type=int
+    theta_min = thetaMin # minimum polar angle
+    theta_max = thetaMax # maximum polar angle
+    # theta_min = math.radians(3.8) # default, maybe outdated values (use if `npdet_info` fails)
+    # theta_max = math.radians(32.0)
+    num_rings = 120  # number of concentric rings, type=int
+    hit_density = 80  # amount of photon hits for the smallest polar angle, type=int
     angles = createAngles.makeAngles(theta_min, theta_max, num_rings, hit_density)  # list of angles
 
     print(f'SET theta range to {math.degrees(theta_min)} to {math.degrees(theta_max)} deg')
