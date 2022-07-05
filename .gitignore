@@ -1,6 +1,7 @@
 *.sw*
 *.root
 *.exe
+*.pyc
 *.png
 macro/*.mac
 Gemfile.lock

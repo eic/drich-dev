@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # -----------------------------------------------#
-# npsim wrapper with EIC RICH specific tests    #
-# Author: C. Dilks                              #
+# npsim wrapper with EIC RICH specific tests     #
+# Author: C. Dilks                               #
 # -----------------------------------------------#
 
 import sys, getopt, os, re, importlib
@@ -48,6 +48,7 @@ helpStr = f'''
                 12:   parallel-to-point focal test
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=0 )
                 13:   evenly distributed sensor hits test
+                        ( recommend: optDbg=3 / mirDbg=0 / sensDbg=0 )
 
 [OPTIONAL ARGUMENTS]
 
@@ -100,7 +101,10 @@ elif (testNum > 0 and inputFileName != ''):
 if (testNum >= 10):
     print("optics test, overriding some settings...")
     particle = 'opticalphoton'
-    runType = 'vis'
+    standalone = True
+    if (testNum in [10,11,12]):
+        print("-- this is a visual test --")
+        runType = 'vis'
 if (particle == "opticalphoton"):
     energy = '3.0 eV'
     print(f'optical photons test: using energy {energy}')
@@ -381,27 +385,22 @@ elif testNum == 13:
     if runType == "vis":
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
-    if zDirection < 0:
-        etaMin_ = 1.6
-        etaMax_ = 3.8
-    else:
-        etaMin_ = 1.5
-        etaMax_ = 3.4
-    thetaMin_ = 2 * math.atan(math.exp(-etaMax_))
-    thetaMax_ = 2 * math.atan(math.exp(-etaMin_))
 
     from scripts import createAngles
-    theta_min = thetaMin_  # minimum polar angle
-    theta_max = thetaMax_  # maximum polar angle
+    buffer = math.radians(0.0) # increase polar angle range by this amount
+    theta_min = thetaMin - buffer # minimum polar angle
+    theta_max = thetaMax + buffer # maximum polar angle
+    # theta_min = math.radians(3.8) - buffer # default, maybe outdated values (use if `npdet_info` fails)
+    # theta_max = math.radians(32.0) + buffer
     num_rings = 12  # number of concentric rings, type=int
     hit_density = 20  # amount of photon hits for the smallest polar angle, type=int
     angles = createAngles.makeAngles(theta_min, theta_max, num_rings, hit_density)  # list of angles
 
-    print(f'SET theta range to {math.degrees(thetaMin_)} to {math.degrees(thetaMax_)} deg')
+    print(f'SET theta range to {math.degrees(theta_min)} to {math.degrees(theta_max)} deg')
     for angle in angles:
         theta, phi = angle[0], angle[1]
         if math.pi / 6 < phi < (2 * math.pi - math.pi / 6): continue  # restrict to one sector
-        if abs(phi) > 0.001 and abs(theta - thetaMin_) < 0.001: continue  # allow only one ring at thetaMin
+        if abs(phi) > 0.001 and abs(theta - theta_min) < 0.001: continue  # allow only one ring at thetaMin
         x = math.sin(theta) * math.cos(phi)
         y = math.sin(theta) * math.sin(phi)
         z = math.cos(theta) * zDirection
