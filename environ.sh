@@ -38,6 +38,7 @@ fi
 # fix juggler config vars which would have been overwritten by 
 # `reconstruction_benchmarks/.local/bin/env.sh`:
 export DETECTOR_PATH=$(pwd)/ecce
+export LOCAL_DATA_PATH={pwd}
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
 #export DETECTOR_VERSION=master
