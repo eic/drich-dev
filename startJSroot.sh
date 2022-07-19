@@ -6,3 +6,4 @@ ln -svf ../geo jsroot/
 # start a local server
 pushd jsroot
 python -m http.server
+popd
