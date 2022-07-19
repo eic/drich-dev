@@ -220,7 +220,7 @@ source environ.sh
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [ANL hosted instance](https://eic.phy.anl.gov/geoviewer/)
   - [CERN hosted instance](https://root.cern/js/)
-  - a locally hosted instance
+  - a locally hosted instance (see below)
 - browse the ROOT file geometry tree in the sidebar on the left:
   ```
   detector_geometry.root
@@ -248,6 +248,20 @@ source environ.sh
   - the search pattern is case sensitive
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
     further guidance
+
+### Locally Hosting JSroot
+
+It is convenient to locally run JSroot, so you can automate opening and
+viewing the geometry. First, clone the JSroot repository:
+```
+git clone https://github.com/root-project/jsroot.git
+```
+Then run `./startJSroot.sh`, which will start a local HTTP server. To open JSroot, navigate to <http://localhost:8000>. For convenience, to automatically open `geo/detector_geometry.root`, produced by `runDDwebDisplay.sh`, open:
+
+<http://localhost:8000/?dark&file=geo/detector_geometry.root>
+
+Remove `?dark` from the URL if you prefer light mode; it is recommended to bookmark this link.
+
 
 ### GDML Output
 - currently we use the CI for this, from the `ecce` repository
