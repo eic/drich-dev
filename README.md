@@ -258,9 +258,9 @@ git clone https://github.com/root-project/jsroot.git
 ```
 Then run `./startJSroot.sh`, which will start a local HTTP server. To open JSroot, navigate to <http://localhost:8000>. For convenience, to automatically open `geo/detector_geometry.root`, produced by `runDDwebDisplay.sh`, open:
 
-<http://localhost:8000/?dark&file=geo/detector_geometry.root>
+<http://localhost:8000/?file=geo/detector_geometry.root&dark>
 
-Remove `?dark` from the URL if you prefer light mode; it is recommended to bookmark this link.
+Remove `&dark` from the URL if you prefer light mode; it is recommended to bookmark this link.
 
 
 ### GDML Output
