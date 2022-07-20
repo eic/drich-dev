@@ -48,9 +48,16 @@ if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   echo "--------------------------------"
 fi
 
+# use local rbenv ruby shims, if installed
+export RBENV_ROOT=$(pwd)/.rbenv
+if [ -d "$RBENV_ROOT" ]; then
+  export PATH=$RBENV_ROOT/bin:$PATH
+  eval "$(.rbenv/bin/rbenv init - bash)"
+  export PYTHON=$(which python) # for pycall gem
+fi
+
 ### additional comfort settings, some dependent on host machine; 
 ### feel free to add your own here
 export PATH=.:$PATH  # add ./ to $PATH
 shopt -s autocd      # enable autocd
-if [ -d "${HOME}/bin" ]; then export PATH=${HOME}/bin:$PATH; fi   # add ~/bin to $PATH
-if [ -n "$(which rbenv)" ]; then eval "$(rbenv init - bash)"; fi  # switch to host's rbenv ruby shim (and its gems)
+if [ -d "${HOME}/bin" ]; then export PATH=$PATH:${HOME}/bin; fi   # add ~/bin to $PATH

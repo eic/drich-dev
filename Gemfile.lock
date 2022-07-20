@@ -1,0 +1,20 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    awesome_print (1.9.2)
+    numpy (0.4.0)
+      pycall (>= 1.2.0.beta1)
+    pycall (1.4.1)
+    thread (0.2.2)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  awesome_print
+  numpy
+  pycall
+  thread
+
+BUNDLED WITH
+   2.3.7

@@ -94,10 +94,6 @@ of branches for varying configurations.
   - there are some additional "comfort" settings, which depend on your host
     environment; it is not required to use these, but feel free to add your own
     - if `~/bin` exists, it will be added to your `$PATH`
-    - if you use Ruby shims via `rbenv`, it will make sure the container will
-      use those, plus any corresponding gems
-      - note: some miscellaneous scripts are in Ruby (extension `.rb`); if you
-        want to run them, ask their developer for assistance
 
 ## Building Modules
 - you must be in the EIC container (`eic-shell`) and have environment
@@ -299,5 +295,7 @@ executables.
 - the `math/` directory contains scripts and Mathematica notebooks used to
   perform miscellaneous calculations; many are "once and done" and don't really
   need to be implemented in the source code
-- the `scripts/` directory contains all other miscellaneous scripts
+- the `scripts/` directory contains all other miscellaneous scripts; 
+  - some scripts are in Ruby; follow [this guide](doc/ruby.md) to install gems
+  (dependencies)
 - `deprecated/` contains some old scripts which may also be helpful
