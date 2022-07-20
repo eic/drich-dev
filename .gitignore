@@ -27,3 +27,6 @@ fieldmaps
 *.hepmc*
 hepmc
 !hepmc/README.md
+
+.rbenv
+.ruby-version
