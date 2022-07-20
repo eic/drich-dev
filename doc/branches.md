@@ -16,15 +16,15 @@ We intend to keep these tables up-to-date as development proceeds.
 | `reconstruction_benchmarks` | `master` |
 
 ## Envelope Updates
-| Repository                  | Branch                                                                                                                                  |
-| --:                         | ---                                                                                                                                     |
-| `drich-dev`                 | `main`                                                                                                                                  |
-| `ip6`                       | `master`                                                                                                                                |
-| `ecce`                      | `main` vs. [`18-drich-increase-z-length-and-add-space-for-services`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/33) |
-| `eicd`                      | `master`                                                                                                                                |
-| `irt`                       | `main`                                                                                                                                  |
-| `juggler`                   | `master`                                                                                                                                |
-| `reconstruction_benchmarks` | `master`                                                                                                                                |
+| Repository                  | Branch                                                                                                                                |
+| --:                         | ---                                                                                                                                   |
+| `drich-dev`                 | `main`                                                                                                                                |
+| `ip6`                       | `master`                                                                                                                              |
+| `ecce`                      | [`18-drich-increase-z-length-and-add-space-for-services`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/33) - MERGED |
+| `eicd`                      | `master`                                                                                                                              |
+| `irt`                       | `main`                                                                                                                                |
+| `juggler`                   | `master`                                                                                                                              |
+| `reconstruction_benchmarks` | `master`                                                                                                                              |
 
 ## IRT Development
 | Repository                  | Branch                                                                                                       |
