@@ -1,4 +1,5 @@
 #!/bin/bash
+# use rbenv and ruby-install to install a local copy of ruby
 
 set -e
 
