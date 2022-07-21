@@ -31,7 +31,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:                         | ---                                                                                                          |
 | `drich-dev`                 | `dev-irt`                                                                                                    |
 | `ip6`                       | `master`                                                                                                     |
-| `ecce`                      | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) |
+| `ecce`                      | [`17-drich-produce-irt-geometry-objects`](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/31) - MERGED |
 | `eicd`                      | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
 | `irt`                       | `main` or [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                    |
 | `juggler`                   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                   |
