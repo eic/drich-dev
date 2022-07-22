@@ -10,17 +10,23 @@ import subprocess, shlex
 import math
 from numpy import linspace
 
+# SETTINGS
+################################################################
+use_npdet_info = False  # use np_det_info to get envelope dimensions
+
 # ARGUMENTS
 ################################################################
 
 inputFileName = ''
 testNum = -1
 standalone = False
+compactFileCustom = ''
 zDirection = 1
 particle = 'pi+'
 energy = '8.0 GeV'
 runType = 'run'
 numEvents = 10
+outputImageType = ''
 outputFileName = ''
 
 helpStr = f'''
@@ -56,6 +62,8 @@ helpStr = f'''
                     1 = toward positive (hadron) endcap RICH (default)
                    -1 = toward negative (electron) endcap RICH
                 -s: enable standalone RICH-only simulation (default is full detector)
+                -c [compact file]: specify a custom compact file
+                   (this will override -d and -s options)
                 -p [particle]: name of particle to throw; default: {particle}
                    examples:
                     - e- / e+
@@ -68,14 +76,15 @@ helpStr = f'''
                 -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
-                -o [output file]: absolute path output root file name (overrides any default name)
+                -m [output image type]: save visual with specified type (svg,pdf,ps)
+                -o [output file]: output root file name (overrides any default name)
     '''
 
 if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sp:n:e:rvo:')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:n:e:rvm:o:')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr)
     sys.exit(2)
@@ -84,11 +93,13 @@ for opt, arg in opts:
     if (opt == '-t'): testNum = int(arg)
     if (opt == '-d'): zDirection = int(arg)
     if (opt == '-s'): standalone = True
+    if (opt == '-c'): compactFileCustom = arg
     if (opt == '-p'): particle = arg
     if (opt == '-n'): numEvents = int(arg)
     if (opt == '-e'): energy = arg + " GeV"
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
+    if (opt == '-m'): outputImageType = arg
     if (opt == '-o'): outputFileName = arg
 if (testNum < 0 and inputFileName == ''):
     print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr)
@@ -145,6 +156,10 @@ localDir = os.environ['LOCAL_DATA_PATH']
 compactFileFull = detPath + '/' + detMain + '.xml'
 compactFileRICH = detPath + '/' + detMain + '_' + xrich + '_only.xml'
 compactFile = compactFileRICH if standalone else compactFileFull
+if compactFileCustom != '':
+    if not bool(re.search('^/', compactFileCustom)):
+        compactFileCustom = workDir + "/" + compactFileCustom  # convert relative path to absolute path
+    compactFile = compactFileCustom
 
 ### print args and settings
 sep = '-' * 40
@@ -205,19 +220,30 @@ m.write(f'/gps/position 0 0 0 cm\n')
 # ACCEPTANCE LIMITS
 ################################################################
 
-### call `npdet_info` to obtain RICH attributes and values
-paramListFileN = f'{localDir}/params_{outputName}.txt'
-with open(paramListFileN, 'w') as paramListFile:
-    cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
-    print(sep)
-    print('EXECUTE: ' + cmd)
-    print(sep)
-    subprocess.call(shlex.split(cmd), stdout=paramListFile)
+### RICH envelope parameters
 params = {}
-for paramLine in open(paramListFileN, 'r'):
-    print(paramLine)
-    paramLineKV = paramLine.strip().split('=')
-    if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+if use_npdet_info:
+    ### call `npdet_info` to obtain most up-to-date RICH attributes and values
+    paramListFileN = f'{localDir}/params_{outputName}.txt'
+    with open(paramListFileN, 'w') as paramListFile:
+        cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
+        print(sep)
+        print('EXECUTE: ' + cmd)
+        print(sep)
+        subprocess.call(shlex.split(cmd), stdout=paramListFile)
+    for paramLine in open(paramListFileN, 'r'):
+        print(paramLine)
+        paramLineKV = paramLine.strip().split('=')
+        if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+else:
+    ### hard-coded values (faster and reliable, but maybe out of date)
+    params['DRICH_rmin1']  = 15.332
+    params['DRICH_rmax2']  = 180.0
+    params['DRICH_zmin']   = 195.0
+    params['DRICH_Length'] = 120.0
+    params['PFRICH_rmin1'] = 10 ## FIXME: pfRICH is not used, these numbers are a complete guess
+    params['PFRICH_rmax']  = 80
+    params['PFRICH_zmax']  = 100
 
 ### set envelope limits
 envBufferMin = 5
@@ -416,6 +442,9 @@ elif testNum > 0:
 if (runType == "vis"):
     m.write(f'/vis/viewer/flush\n')
     m.write(f'/vis/viewer/refresh\n')
+    if outputImageType!='':
+        m.write(f'/vis/ogl/set/printFilename {outputName}.{outputImageType}\n')
+        m.write(f'/vis/ogl/export\n')
 
 ### print macro and close stream
 m.seek(0, 0)

@@ -17,9 +17,13 @@ rm ip6
 ln -svf $beamDir ip6
 
 if [ $clean -eq 1 ]; then
-  echo "clean build dir..."
+  echo "--- CLEAN: clean build dir..."
   mkdir -p build
   rm -rv build
+  echo "--- CLEAN: remove rendered xml files..."
+  rm -vf ecce*.xml
+  echo "--- CLEAN: remove variant drich xml files..."
+  rm -vf compact/drich_variant*.xml
 fi
 
 cmake -B build -S . \
