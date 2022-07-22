@@ -4,6 +4,8 @@
 *.pyc
 *.png
 macro/*.mac
+out/*
+!out/.keep
 
 juggler
 irt
