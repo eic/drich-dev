@@ -89,18 +89,18 @@ except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr)
     sys.exit(2)
 for opt, arg in opts:
-    if (opt == '-i'): inputFileName = arg
+    if (opt == '-i'): inputFileName = arg.lstrip()
     if (opt == '-t'): testNum = int(arg)
     if (opt == '-d'): zDirection = int(arg)
     if (opt == '-s'): standalone = True
-    if (opt == '-c'): compactFileCustom = arg
-    if (opt == '-p'): particle = arg
+    if (opt == '-c'): compactFileCustom = arg.lstrip()
+    if (opt == '-p'): particle = arg.lstrip()
     if (opt == '-n'): numEvents = int(arg)
-    if (opt == '-e'): energy = arg + " GeV"
+    if (opt == '-e'): energy = arg.lstrip() + " GeV"
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
-    if (opt == '-m'): outputImageType = arg
-    if (opt == '-o'): outputFileName = arg
+    if (opt == '-m'): outputImageType = arg.lstrip()
+    if (opt == '-o'): outputFileName = arg.lstrip()
 if (testNum < 0 and inputFileName == ''):
     print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr)
     sys.exit(2)

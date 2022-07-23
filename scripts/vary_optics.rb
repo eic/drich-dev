@@ -1,37 +1,58 @@
 #!/usr/bin/env ruby
-# vary parameters for dRICH optics
+#--------------------------------------------------------------------#
+# vary parameters of dRICH geometry, and run simulations in parallel #
+# Author: C. Dilks                                                   #
+#--------------------------------------------------------------------#
 
 require 'numpy'
 require 'awesome_print'
 require 'nokogiri'
 require 'fileutils'
 require 'thread/pool'
+require 'open3'
 require 'pry'
 
 
 ### SETTINGS *************************************
 Detector      = 'ecce'                          # path to detector repository
 CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
-MultiThreaded = false                           # if true, run one simulation job per thread
 Cleanup       = false                           # if true, remove transient files from `#{Detector}/`
+MultiThreaded = true                            # if true, run one simulation job per thread
+PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to run (`if MultiThreaded`)
 
 
-### SIMULATION COMMAND ***************************
-# - Array representing the simulation command and arguments
-# - a full-detector compact file will be created for each variant,
-#   thus the simulation command should involve `compact_file`
-# - a unique `output_file` name must also be specified
-simulation_command = Proc.new do |compact_file,output_file|
+### SIMULATION COMMANDS **************************
+# - list of commands to run the simulation
+# - the full `simulation_pipelines` array is a list of pipelines, which will be
+#   executed sequentially
+#   - a pipeline is a list of commands, where stdout of one command is streamed
+#     to stdin of the next command
+#     - each command is written as an array, where the first element is the
+#       command, and the remaining elements are its arguments
+# - the list of pipelines will be executed for each variant
+# - example pipelines:
+#   [[ "ls", "-t" ]]                  # => `ls -t`
+#   [ ["ls","-lt"], ["tail","-n3"] ]  # => `ls -lt | tail -n3`
+simulation_pipelines = Proc.new do |compact_file,output_file|
   [
-    # "exit|",
-    # "echo",
-    "./simulate.py",
-    "-t 1",
-    # "-t 12",
-    # "-v",
-    # "-m svg",
-    "-c #{compact_file}",
-    "-o #{output_file}",
+    [[
+      "./simulate.py",
+      "-t 1",
+      "-c #{compact_file}",
+      "-o #{output_file}",
+    ]],
+    # [
+    #   ["exit"],
+    #   [
+    #     "echo",
+    #     "./simulate.py",
+    #     "-t12",
+    #     "-v",
+    #     "-msvg",
+    #     "-c#{compact_file}",
+    #     "-o#{output_file}",
+    #   ],
+    # ],
   ]
 end
 
@@ -67,7 +88,7 @@ variations = [
     :attribute => 'focus_tune_x',
     :function  => center_delta,
     :args      => [70, 20],
-    :count     => 1,
+    :count     => 4,
   },
   # {
   #   :xpath     => '//mirror',
@@ -84,11 +105,15 @@ variations = [
 #   { :constant, :value }           # for `XPATH=//constant` nodes
 #   { :xpath, :attribute, :value }  # for general attribute
 fixed_settings = [
-  { :constant=>'DRICH_debug_optics', :value=>'1' },
+  # { :constant=>'DRICH_debug_optics', :value=>'1' },
 ]
 
 
+
 #####################################################################
+#
+# BEGIN PROGRAM
+#
 #####################################################################
 
 
@@ -109,10 +134,10 @@ OutputDir = [OutputDirMain,ARGV[0]].join '/'
 ### PREPARATION **************************************
 
 # status printout
-def status(message)
+def print_status(message)
   puts "[***] #{message}"
 end
-status 'preparation'
+print_status 'preparation'
 
 # error collection
 errors = Array.new
@@ -125,7 +150,7 @@ end
 puts "Writing output to #{OutputDir}"
 FileUtils.mkdir_p OutputDir
 FileUtils.rm_r OutputDir, secure: true, verbose: true
-[ 'compact', 'config', 'sim' ].each do |subdir|
+[ 'compact', 'config', 'sim', 'log', ].each do |subdir|
   FileUtils.mkdir_p "#{OutputDir}/#{subdir}"
 end
 
@@ -182,9 +207,9 @@ variant_settings_list = variant_arrays.first.product *variant_arrays[1..]
 
 
 ### PRODUCE COMPACT FILES **************************************
-status 'loop over variants'
-cleanup_list    = []
-simulation_list = []
+print_status 'loop over variants'
+cleanup_list = []
+simulations  = []
 variant_settings_list.each_with_index do |variant_settings,variant_id|
 
   # clone the xml tree
@@ -192,7 +217,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
 
   # in `xml_clone`, set each attribute of this variant's settings, along with the fixed settings
   settings = variant_settings + fixed_settings
-  status "-----> setting variant #{variant_id}:"
+  print_status "-----> setting variant #{variant_id}:"
   ap settings
   settings.each do |var|
     node = xml_clone.at_xpath var[:xpath]
@@ -204,7 +229,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   # - `compact_drich` is written to `#{Detector}/compact`, and copied to `OutputDir`
   basename = File.basename(CompactFile,'.xml') + "_variant#{variant_id}"
   compact_drich = "#{File.dirname(CompactFile)}/#{basename}.xml"
-  status "produce compact file variant #{compact_drich}"
+  print_status "produce compact file variant #{compact_drich}"
   File.open(compact_drich,'w') { |out| out.puts xml_clone.to_xml }
   FileUtils.cp compact_drich, "#{OutputDir}/compact"
   cleanup_list << compact_drich
@@ -212,7 +237,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   # create detector template config
   # - this will be combined with `compact_drich` to render the full detector compact file
   config_drich = "#{OutputDir}/config/#{basename}.yml"
-  status "produce jinja2 config #{config_drich}"
+  print_status "produce jinja2 config #{config_drich}"
   File.open(config_drich,'w') do |out|
     out.puts <<~EOF
       features:
@@ -224,7 +249,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   # render the full detector compact file, `compact_detector`
   # - it will include `compact_drich` instead of the default `CompactFile`
   compact_detector = "#{Detector}/#{Detector}_#{basename}.xml"
-  status "jinja2 render template to #{compact_detector}"
+  print_status "jinja2 render template to #{compact_detector}"
   render = [
     "#{Detector}/bin/make_detector_configuration",
     "-d #{Detector}/templates",
@@ -237,44 +262,72 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
 
   # build simulation command
   simulation_output = "#{OutputDir}/sim/#{basename}.root"
-  simulation_list << simulation_command.call(compact_detector,simulation_output)
+  simulations << {
+    :id        => variant_id,
+    :log       => "#{OutputDir}/log/#{basename}",
+    :pipelines => simulation_pipelines.call(compact_detector,simulation_output),
+  }
 
 end
 
 
 ### EXECUTION **************************************************
 
-# run jobs
-status 'simulation commands:'.upcase
-ap simulation_list
-status 'begin simulation '.upcase + '='*40
+# run the commands listed in `sim[:pipelines]`, and log to `sim[:log]`
+def execute_thread(sim)
+  print_thread_status = Proc.new do |message|
+    puts "-> variant #{sim[:id]} -> #{message}"
+  end
+  print_thread_status.call "BEGIN"
+  sim[:pipelines].each do |simulation_pipeline|
+    print_thread_status.call simulation_pipeline.map(&:first).join(' | ')
+    Open3.pipeline(
+      *simulation_pipeline,
+      :out=>["#{sim[:log]}.out",'a'],
+      :err=>["#{sim[:log]}.err",'a'],
+    )
+  end
+  print_thread_status.call "END"
+end
+
+# execute the threads, either single- or multi-threaded
+print_status 'SIMULATION COMMAND (for one variant):'
+ap simulations.first
+print_status 'begin simulation '.upcase + '='*40
 if MultiThreaded
-  pool_size = [`nproc`.to_i-2,1].max # nCPUs-2
-  puts "thread pool size = #{pool_size}"
-  pool = Thread.pool(pool_size)
-  simulation_list.each do |simulation|
-    pool.process{ system simulation.join(' ') }
+  print_status "running multi-threaded with PoolSize = #{PoolSize}"
+  pool = Thread.pool(PoolSize)
+  simulations.each do |simulation|
+    pool.process{ execute_thread simulation }
   end
   pool.shutdown
 else
-  simulation_list.each do |simulation|
-    system simulation.join(' ')
+  simulations.each do |simulation|
+    execute_thread simulation
   end
 end
 
 # cleanup the transient compact files
 if Cleanup
-  status "cleanup transient files:"
+  print_status "cleanup transient files:"
   ap cleanup_list.sort
   cleanup_list.each do |file|
     FileUtils.rm file, verbose: true
   end
 end
 
-status 'DONE'
+# collect and print
+print_status 'DONE'
+simulations.each do |simulation|
+  err_log = simulation[:log]+".err"
+  num_errors = `grep -v '^$' #{err_log} | wc -l`.chomp.split.first.to_i
+  if num_errors>0
+    errors << "  #{err_log}  => #{num_errors} errors"
+  end
+end
 if errors.size>0
-  status 'ERRORS:'
+  print_status 'ERRORS:'
   ap errors
 else
-  status 'NO ERRORS'
+  print_status 'NO ERRORS'
 end
