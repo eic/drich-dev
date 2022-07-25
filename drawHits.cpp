@@ -29,8 +29,12 @@ TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0)
 int main(int argc, char** argv) {
 
   // setup
-  TString infileN="out/sim_run.root";
-  if(argc>1) infileN = TString(argv[1]);
+  TString infileN;
+  if(argc<=1) {
+    cout << "USAGE: " << argv[0] << " [simulation root file]" << endl;
+    return 2;
+  }
+  infileN = TString(argv[1]);
   //TApplication mainApp("mainApp",&argc,argv); // keep canvases open
   //EnableImplicitMT();
   RDataFrame dfIn("events",infileN.Data());

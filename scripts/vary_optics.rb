@@ -4,11 +4,9 @@
 # Author: C. Dilks                                                   #
 #--------------------------------------------------------------------#
 
-require 'numpy'
 require 'awesome_print'
 require 'nokogiri'
 require 'fileutils'
-require 'thread/pool'
 require 'open3'
 require 'pry'
 
@@ -21,115 +19,30 @@ MultiThreaded = true                            # if true, run one simulation jo
 PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to run (`if MultiThreaded`)
 
 
-### SIMULATION COMMANDS **************************
-# - list of commands to run the simulation
-# - the full `simulation_pipelines` array is a list of pipelines, which will be
-#   executed sequentially
-#   - a pipeline is a list of commands, where stdout of one command is streamed
-#     to stdin of the next command
-#     - each command is written as an array, where the first element is the
-#       command, and the remaining elements are its arguments
-# - the list of pipelines will be executed for each variant
-# - example pipelines:
-#   [[ "ls", "-t" ]]                  # => `ls -t`
-#   [ ["ls","-lt"], ["tail","-n3"] ]  # => `ls -lt | tail -n3`
-simulation_pipelines = Proc.new do |compact_file,output_file|
-  [
-    [[
-      "./simulate.py",
-      "-t 1",
-      "-c #{compact_file}",
-      "-o #{output_file}",
-    ]],
-    # [
-    #   ["exit"],
-    #   [
-    #     "echo",
-    #     "./simulate.py",
-    #     "-t12",
-    #     "-v",
-    #     "-msvg",
-    #     "-c#{compact_file}",
-    #     "-o#{output_file}",
-    #   ],
-    # ],
-  ]
-end
-
-
-### VARIATION FUNCTIONS **************************
-# - add any variation functions here
-# - must return Array
-
-# linearly vary by `center +/- delta`, `count` times
-center_delta = Proc.new do |center, delta, count|
-  Numpy.linspace(center-delta, center+delta, count).to_a
-end
-
-# linearly vary from `min` to `max`, `count` times
-min_max = Proc.new do |min, max, count|
-  Numpy.linspace(min, max, count).to_a
-end
-
-
-### PARAMETER VARIATIONS *************************
-# create the following Hash for each variation, and
-# add it to the Array `variations`:
-#   {
-#     :xpath     => XPATH to the XML node
-#     :attribute => node attribute
-#     :function => variation function (see above)
-#     :args      => variation arguments
-#     :count     => number of variations
-#   }
-variations = [
-  {
-    :xpath     => '//mirror',
-    :attribute => 'focus_tune_x',
-    :function  => center_delta,
-    :args      => [70, 20],
-    :count     => 4,
-  },
-  # {
-  #   :xpath     => '//mirror',
-  #   :attribute => 'focus_tune_y',
-  #   :function  => min_max,
-  #   :args      => [20, 50],
-  #   :count     => 3,
-  # },
-]
-
-
-### FIXED SETTINGS *******************************
-# specify specific fixed settings, with similar Hashes, either of:
-#   { :constant, :value }           # for `XPATH=//constant` nodes
-#   { :xpath, :attribute, :value }  # for general attribute
-fixed_settings = [
-  # { :constant=>'DRICH_debug_optics', :value=>'1' },
-]
-
-
-
-#####################################################################
-#
-# BEGIN PROGRAM
-#
-#####################################################################
-
-
 ### ARGUMENTS ****************************************
-OutputDirMain = "out"
+OutputDirMain = 'out'
+VariatorDir   = 'ruby/variator'
+variator_code = 'var0'
 if ARGV.length<1
   $stderr.puts """
-  USAGE: #{$0} [OUTPUT ID]
+  USAGE: #{$0} [OUTPUT ID] [VARIATOR CODE (default=#{variator_code})]
 
     [OUTPUT ID] should be a name for this simulation run
     - output files will be written to #{OutputDirMain}/[OUTPUT ID]
     - warning: this directory will be *removed* before running jobs
+
+    [VARIATOR CODE] is the file containing the variation code
+    - default is '#{variator_code}', which is short-hand for '#{VariatorDir}/#{variator_code}.rb'
+    - two options for specifying the file:
+      - basename of a file in '#{VariatorDir}', e.g., '#{variator_code}'
+      - path to a specific file, e.g., './my_personal_variations/var1.rb'
+    - see examples and template.rb in '#{VariatorDir}' to help define your own
   """
   exit 2
 end
 OutputDir = [OutputDirMain,ARGV[0]].join '/'
+variator_code = ARGV[1] if ARGV.length>1
+
 
 ### PREPARATION **************************************
 
@@ -138,6 +51,25 @@ def print_status(message)
   puts "[***] #{message}"
 end
 print_status 'preparation'
+
+# load variator code
+if variator_code.include? '/' # if variator_code is a path to a file
+  unless variator_code.match? /^(\/|\.\/)/ # unless starts with '/' or './'
+    variator_code = "./#{variator_code}"
+  end
+elsif File.file?(variator_code) or File.file?(variator_code+'.rb') # elsif local file in pwd
+  variator_code = "./#{variator_code}"
+else # else assume file is in VariatorDir
+  variator_code = "./#{VariatorDir}/#{variator_code}"
+end
+print_status "loading variator from #{variator_code}"
+unless File.file?(variator_code) or File.file?(variator_code+'.rb')
+  $stderr.puts "ERROR: cannot find variation code #{variator_code}"
+  exit 1
+end
+require variator_code
+variator = Variator.new
+puts "="*60
 
 # error collection
 errors = Array.new
@@ -155,7 +87,7 @@ FileUtils.rm_r OutputDir, secure: true, verbose: true
 end
 
 # set xpaths for constant fixed_settings
-fixed_settings.each do |setting|
+variator.fixed_settings.each do |setting|
   if setting.has_key? :constant
     setting[:xpath] = "//constant[@name=\"#{setting[:constant]}\"]"
     setting[:attribute] = 'value'
@@ -178,10 +110,16 @@ File.open(compact_drich_orig,'w') { |out| out.puts xml.to_xml }
 #     :xpath     => xml node xpath (copied from variation)
 #     :attribute => attribute name (copied from variation)
 #   }
-variations.each do |var|
-  # get units
+variator.varied_settings.each do |var|
+  # get node
   nodes = xml.xpath var[:xpath]
-  error.call "WARNING: more than one node for xpath '#{var[:xpath]}'" if nodes.size>1  # todo: add support for this case
+  if nodes.size == 0
+    $stderr.puts "ERROR: cannot find node at xpath #{var[:xpath]}"
+    exit 1
+  elsif nodes.size > 1
+    error.call "WARNING: more than one node for xpath '#{var[:xpath]}'" # todo: add support for this case
+  end
+  # get units
   val_str = nodes.first.attr var[:attribute]
   units = val_str.include?('*') ?
     '*' + val_str.split('*').last :
@@ -201,7 +139,7 @@ end
 # take the product of all variant arrays
 # - builds a list `variant_settings_list` of all the possible variable settings
 # - each element is itself a list of `variant_settings`, for a particular variant
-variant_arrays = variations.map{ |var| var[:variants] }
+variant_arrays = variator.varied_settings.map{ |var| var[:variants] }
 variant_settings_list = variant_arrays.first.product *variant_arrays[1..]
 # binding.pry
 
@@ -216,7 +154,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   xml_clone = xml.dup
 
   # in `xml_clone`, set each attribute of this variant's settings, along with the fixed settings
-  settings = variant_settings + fixed_settings
+  settings = variant_settings + variator.fixed_settings
   print_status "-----> setting variant #{variant_id}:"
   ap settings
   settings.each do |var|
@@ -265,7 +203,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   simulations << {
     :id        => variant_id,
     :log       => "#{OutputDir}/log/#{basename}",
-    :pipelines => simulation_pipelines.call(compact_detector,simulation_output),
+    :pipelines => variator.simulation_pipelines.call(compact_detector,simulation_output),
   }
 
 end
@@ -291,16 +229,24 @@ def execute_thread(sim)
 end
 
 # execute the threads, either single- or multi-threaded
+# - todo: use concurrency instead of fixed pool sizes (current implementation
+#         is only efficient if all threads take the same time to run)
 print_status 'SIMULATION COMMAND (for one variant):'
 ap simulations.first
 print_status 'begin simulation '.upcase + '='*40
 if MultiThreaded
   print_status "running multi-threaded with PoolSize = #{PoolSize}"
-  pool = Thread.pool(PoolSize)
-  simulations.each do |simulation|
-    pool.process{ execute_thread simulation }
+  simulations.each_slice(PoolSize) do |slice|
+    pool = slice.map do |simulation|
+      Thread.new{ execute_thread simulation }
+    end
+    trap 'INT' do
+      print_status 'interrupt received; killing threads...'
+      pool.each &:kill
+      exit 1
+    end
+    pool.each &:join
   end
-  pool.shutdown
 else
   simulations.each do |simulation|
     execute_thread simulation
