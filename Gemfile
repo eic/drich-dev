@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 gem 'awesome_print'
-gem 'thread'
 gem 'nokogiri'
 gem 'pycall'
 gem 'numpy'

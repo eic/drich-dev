@@ -13,7 +13,6 @@ GEM
       method_source (~> 1.0)
     pycall (1.4.1)
     racc (1.6.0)
-    thread (0.2.2)
 
 PLATFORMS
   x86_64-linux
@@ -24,7 +23,6 @@ DEPENDENCIES
   numpy
   pry
   pycall
-  thread
 
 BUNDLED WITH
    2.3.7
