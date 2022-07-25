@@ -13,7 +13,7 @@ class Variator < VariationFunctions
     #   {
     #     :xpath     => XPATH to the XML node
     #     :attribute => node attribute
-    #     :function  => variation function (see above)
+    #     :function  => variation function (see functions.rb)
     #     :args      => variation arguments
     #     :count     => number of variations
     #   }
