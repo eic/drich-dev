@@ -1,5 +1,8 @@
 # Transitioning from Gitlab to Github
 
+This guide is meant for those who are already using `drich-dev`. If you
+have started `drich-dev` from a "clean slate", this guide does not apply.
+
 ### Github access:
 - Request to join [EIC organization](https://github.com/eic)
 - Request to join [epic-devs](https://github.com/orgs/eic/teams/epic-devs)
