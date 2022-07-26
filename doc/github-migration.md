@@ -3,7 +3,7 @@
 ### Github access:
 - Request to join [EIC organization](https://github.com/eic)
 - Request to join [epic-devs](https://github.com/orgs/eic/teams/epic-devs)
-  - Click "Members" tab, then "Request to Join"
+  (Click "Members" tab, then "Request to Join)
 
 ### Repositories that have been transitioned to Github:
 - [`ip6`](https://github.com/eic/ip6)
@@ -27,10 +27,17 @@ These are URLs for SSH access; substitute them with HTTPS URLs if you prefer.
 
 # Name change to EPIC:
 If we change the name of the `ecce` repository to `epic`, do the following:
+
+Rename your local clone:
 ```bash
-mv ecce epic   # rename your local clone
+mv ecce epic
+```
+
+Re-configure the remote URL:
+```bash
 pushd epic
 git remote set-url origin git@github.com:eic/epic.git
 popd
 ```
+
 If instead we fork `ecce`, clone the new fork
