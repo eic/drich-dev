@@ -10,8 +10,9 @@
 - [`ecce`](https://github.com/eic/ecce)
 
 For each of your local clones of these repositories, re-configure remote URLs.
-Assuming your remote is `origin` (check with `remote -v`), run the following
-commands from _within_ the repository's directory:
+Assuming your remote is `origin` (check with `remote -v`, from within each
+repository directory), run the following commands from the top-level
+`drich-dev` directory:
 ```bash
 pushd ecce && git remote set-url origin git@github.com:eic/ecce.git && popd
 pushd ip6  && git remote set-url origin git@github.com:eic/ip6.git  && popd
