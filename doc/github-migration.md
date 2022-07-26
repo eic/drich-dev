@@ -10,14 +10,14 @@
 - [`ecce`](https://github.com/eic/ecce)
 
 For each of your local clones of these repositories, re-configure remote URLs.
-Assuming your remote is `origin` (check with `remote -v`, from within each
-repository directory), run the following commands from the top-level
-`drich-dev` directory:
+Run the following commands from the top-level `drich-dev` directory:
 ```bash
 pushd ecce && git remote set-url origin git@github.com:eic/ecce.git && popd
 pushd ip6  && git remote set-url origin git@github.com:eic/ip6.git  && popd
 ```
 These are URLs for SSH access; substitute them with HTTPS URLs if you prefer.
+This also assumes your remote repositories are named `origin` (very likely;
+you can check with `git remote -v` from within each repository)
 
 ### For each merge request on Gitlab:
 - the corresponding branch should already be on the Github remote (it was
