@@ -59,8 +59,8 @@ of branches for varying configurations.
 - obtain EIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - modules:
-    - [detectors/ip6](https://eicweb.phy.anl.gov/EIC/detectors/ip6) to `./ip6`
-    - [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) to `./ecce`
+    - [ip6](https://github.com/eic/ip6) to `./ip6`
+    - [ecce](https://github.com/eic/ecce) to `./ecce`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
     - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
@@ -68,8 +68,8 @@ of branches for varying configurations.
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
     ```
-    git clone git@eicweb.phy.anl.gov:EIC/detectors/ip6.git
-    git clone git@eicweb.phy.anl.gov:EIC/detectors/ecce.git
+    git clone git@github.com:eic/ecce.git
+    git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     git clone git@eicweb.phy.anl.gov:EIC/juggler.git
@@ -172,7 +172,7 @@ source environ.sh
 
 ## Geometry and Materials
 - the geometry and materials are implemented in DD4hep, in the
-  [detectors/ecce](https://eicweb.phy.anl.gov/EIC/detectors/ecce) repository
+  [ecce](https://github.com/eic/ecce) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
     or the [homepage](https://dd4hep.web.cern.ch/dd4hep/) for documentation
   - the following files in `ecce/` are relevant for the dRICH:
@@ -239,7 +239,7 @@ source environ.sh
       whatever your browser window is
   - more documentation found on [jsroot website](https://root.cern/js/)
 - check for overlaps
-  - typically more efficient to let the CI do this (in `detectors/ecce`)
+  - typically more efficient to let the CI do this (in `ecce`)
   - call `./overlapCheck.sh` to run a local check
     - one check faster and less accurate, the other is slower and more accurate
 - use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any
