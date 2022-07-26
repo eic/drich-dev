@@ -77,6 +77,9 @@ helpStr = f'''
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
                 -m [output image type]: save visual with specified type (svg,pdf,ps)
+                   - useful tip: if you want to suppress the drawing of the visual, but
+                     still save an output image, use Xvbf (start EIC container shell
+                     as `xvfb-run opt/eic-shell`); this is good for batch processing
                 -o [output file]: output root file name (overrides any default name)
     '''
 
@@ -189,7 +192,7 @@ m.write(f'/run/initialize\n')
 
 ### visual settings
 if (runType == 'vis'):
-    m.write(f'/vis/open OGLSQt 800x800-0+0\n')  # driver
+    m.write(f'/vis/open OGL 800x800-0+0\n')  # driver
     m.write(f'/vis/scene/create\n')
     m.write(f'/vis/scene/add/volume\n')
     m.write(f'/vis/scene/add/axes 0 0 0 1 m\n')
@@ -443,8 +446,7 @@ if (runType == "vis"):
     m.write(f'/vis/viewer/flush\n')
     m.write(f'/vis/viewer/refresh\n')
     if outputImageType!='':
-        m.write(f'/vis/ogl/set/printFilename {outputName}.{outputImageType}\n')
-        m.write(f'/vis/ogl/export\n')
+        m.write(f'/vis/ogl/export {re.sub("root$",outputImageType,outputFileName)}\n')
 
 ### print macro and close stream
 m.seek(0, 0)

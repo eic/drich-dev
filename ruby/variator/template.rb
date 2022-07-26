@@ -46,29 +46,35 @@ class Variator < VariationFunctions
 
     ### SIMULATION COMMANDS **************************
     # - list of commands to run the simulation
-    # - use `compact_file` and `output_file`, which are unique to the variant
     # - the full `simulation_pipelines` array is a list of pipelines, which will be
     #   executed sequentially
     #   - a pipeline is a list of commands, where stdout of one command is streamed
     #     to stdin of the next command
     #     - each command is written as an array, where the first element is the
     #       command, and the remaining elements are its arguments
-    # - the list of pipelines will be executed for each variant
-    # - example pipelines:
-    #   [[ "ls", "-t" ]]                  # => `ls -t`
-    #   [ ["ls","-lt"], ["tail","-n3"] ]  # => `ls -lt | tail -n3`
-    @simulation_pipelines = Proc.new do |compact_file,output_file|
+    #   - the list of pipelines will be executed for each variant
+    #   - example pipelines:
+    #     [[ "ls", "-t" ]]                  # => `ls -t`
+    #     [ ["ls","-lt"], ["tail","-n3"] ]  # => `ls -lt | tail -n3`
+    # - `settings` is a Hash, including the following:
+    #     {
+    #       :id      => variant ID
+    #       :compact => main compact file
+    #       :output  => output ROOT file
+    #       :log     => output log file prefix
+    #     }
+    @simulation_pipelines = Proc.new do |settings|
       [
         [[
           "./simulate.py",
           "-t 1",
           "-n 100",
-          "-c #{compact_file}",
-          "-o #{output_file}",
+          "-c #{settings[:compact]}",
+          "-o #{settings[:output]}",
         ]],
         [[
           "./drawHits.exe",
-          output_file,
+          settings[:output],
         ]],
       ]
     end
