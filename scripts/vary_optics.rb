@@ -171,6 +171,7 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   File.open(compact_drich,'w') { |out| out.puts xml_clone.to_xml }
   FileUtils.cp compact_drich, "#{OutputDir}/compact"
   cleanup_list << compact_drich
+  cleanup_list << "#{compact_drich}.bak"
 
   # create detector template config
   # - this will be combined with `compact_drich` to render the full detector compact file
@@ -267,7 +268,7 @@ if Cleanup
   print_status "cleanup transient files:"
   ap cleanup_list.sort
   cleanup_list.each do |file|
-    FileUtils.rm file, verbose: true
+    FileUtils.rm_f file, verbose: true
   end
 end
 
