@@ -60,7 +60,7 @@ of branches for varying configurations.
   specified paths:
   - modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`
-    - [ecce](https://github.com/eic/ecce) to `./ecce`
+    - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
     - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
@@ -68,7 +68,7 @@ of branches for varying configurations.
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
     ```
-    git clone git@github.com:eic/ecce.git
+    git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
@@ -107,7 +107,7 @@ of branches for varying configurations.
   - build scripts, in recommended order:
   ```
   ./build_eicd.sh
-  ./build_irt.sh  # TODO: we need to update this for ECCE, you can ignore it for now...
+  ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
   ./build_ip6.sh
   ./build_epic.sh
   ./build_juggler.sh # TODO: we need to also update this
@@ -172,10 +172,10 @@ source environ.sh
 
 ## Geometry and Materials
 - the geometry and materials are implemented in DD4hep, in the
-  [ecce](https://github.com/eic/ecce) repository
+  [epic](https://github.com/eic/epic) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
     or the [homepage](https://dd4hep.web.cern.ch/dd4hep/) for documentation
-  - the following files in `ecce/` are relevant for the dRICH:
+  - the following files in `epic/` are relevant for the dRICH:
     - `compact/drich.xml`: the compact file for the dRICH
       - constants for the geometry (e.g., dimensions, positions)
       - see `compact/definitions.xml` for main constants (for the full detector),
@@ -194,9 +194,9 @@ source environ.sh
       - materials etc. are referenced by name in `compact/drich.xml`
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
-    - the full detector compact file is `ecce.xml`, which is generated via
+    - the full detector compact file is `epic.xml`, which is generated via
       Jinja during `cmake` (run `build_epic.sh`), along with a dRICH-only
-      compact file `ecce_drich_only.xml`; these compact files are used by many
+      compact file `epic_drich_only.xml`; these compact files are used by many
       scripts, such as `npsim` (whereas `compact/drich.xml` is *only* for the
       dRICH implementation itself)
     - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
@@ -239,7 +239,7 @@ source environ.sh
       whatever your browser window is
   - more documentation found on [jsroot website](https://root.cern/js/)
 - check for overlaps
-  - typically more efficient to let the CI do this (in `ecce`)
+  - typically more efficient to let the CI do this (in `epic`)
   - call `./overlap_check.sh` to run a local check
     - one check faster and less accurate, the other is slower and more accurate
 - use `./search_compact_params.sh [PATTERN]` to quickly obtain the value of any
@@ -251,9 +251,9 @@ source environ.sh
 
 
 ### GDML Output
-- currently we use the CI for this, from the `ecce` repository
+- currently we use the CI for this, from the `epic` repository
   (the `athena` repository has a dRICH specific GDML output CI job, but at the
-  time of writing this, this automation is not yet present in `ecce` CI)
+  time of writing this, this automation is not yet present in `epic` CI)
 - TODO: add a local script to automate connection to Fun4all
 
 ## Simulation
@@ -279,7 +279,7 @@ executables.
     useful for checking mapping of sensor segmentation (pixels)
   - relies on `text/sensorLUT.dat`, which must be up-to-date
     - you can produce a new version of this file by uncommenting relevant lines
-      in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running
+      in `epic/src/DRICH_geo.cpp` (search for `generate LUT`), and running
       something like `./rebuild_all.sh && ./run_dd_web_display.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
