@@ -14,7 +14,7 @@ require 'pry'
 ### SETTINGS *************************************
 Detector      = 'ecce'                          # path to detector repository
 CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
-Cleanup       = false                           # if true, remove transient files from `#{Detector}/`
+Cleanup       = true                            # if true, remove transient files from `#{Detector}/`
 MultiThreaded = true                            # if true, run one simulation job per thread
 PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to run (`if MultiThreaded`)
 
@@ -198,13 +198,19 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   system render.join(' ')
   cleanup_list << compact_detector
 
-  # build simulation command
-  simulation_output = "#{OutputDir}/sim/#{basename}.root"
-  simulations << {
-    :id        => variant_id,
-    :log       => "#{OutputDir}/log/#{basename}",
-    :pipelines => variator.simulation_pipelines.call(compact_detector,simulation_output),
+  # simulation settings
+  # NOTE: if you change this, update ruby/variator/template.md
+  simulation_settings = {
+    :id      => variant_id,
+    :compact => compact_detector,
+    :output  => "#{OutputDir}/sim/#{basename}.root",
+    :log     => "#{OutputDir}/log/#{basename}",
   }
+
+  # build simulation pipeline command
+  simulations << {
+    :pipelines => variator.simulation_pipelines.call(simulation_settings)
+  }.merge(simulation_settings)
 
 end
 
@@ -213,11 +219,14 @@ end
 
 # run the commands listed in `sim[:pipelines]`, and log to `sim[:log]`
 def execute_thread(sim)
+  # status update
   print_thread_status = Proc.new do |message|
     puts "-> variant #{sim[:id]} -> #{message}"
   end
   print_thread_status.call "BEGIN"
+  # loop over pipelines
   sim[:pipelines].each do |simulation_pipeline|
+    # execute pipeline, with logging
     print_thread_status.call simulation_pipeline.map(&:first).join(' | ')
     Open3.pipeline(
       *simulation_pipeline,
