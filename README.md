@@ -109,7 +109,7 @@ of branches for varying configurations.
   ./buildEICD.sh
   ./buildIRT.sh  # TODO: we need to update this for ECCE, you can ignore it for now...
   ./buildIP6.sh
-  ./buildECCE.sh
+  ./buildEPIC.sh
   ./buildJuggler.sh # TODO: we need to also update this
   ```
   - you could also run `./rebuildAll.sh` to (re)build all of the modules in the
@@ -195,7 +195,7 @@ source environ.sh
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
     - the full detector compact file is `ecce.xml`, which is generated via
-      Jinja during `cmake` (run `buildECCE.sh`), along with a dRICH-only
+      Jinja during `cmake` (run `buildEPIC.sh`), along with a dRICH-only
       compact file `ecce_drich_only.xml`; these compact files are used by many
       scripts, such as `npsim` (whereas `compact/drich.xml` is *only* for the
       dRICH implementation itself)

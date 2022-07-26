@@ -22,6 +22,19 @@ These are URLs for SSH access; substitute them with HTTPS URLs if you prefer.
 This also assumes your remote repositories are named `origin` (very likely;
 you can check with `git remote -v` from within each repository)
 
+### Update drich-dev
+The current `main` branch of `drich-dev` has all scripts and documentation
+updated. In anticipation of the name change `ECCE` to `EPIC`, rename your
+`ecce` directory to `epic`:
+```bash
+mv ecce epic
+```
+The build script `buildECCE.sh` has been renamed to `buildEPIC.sh`, and now
+points to the `epic` directory.
+
+See below for steps to take when the name of the `ecce` repository is changed.
+
+
 ### For each merge request on Gitlab:
 - the corresponding branch should already be on the Github remote (it was
   mirrored)

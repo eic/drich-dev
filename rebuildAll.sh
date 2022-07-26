@@ -5,5 +5,5 @@ set -e
 ./buildEICD.sh $*
 #./buildIRT.sh $* # temporarily disabled
 ./buildIP6.sh $*
-./buildECCE.sh $*
+./buildEPIC.sh $*
 #./buildJuggler.sh $* # temporarily disabled
