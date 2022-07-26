@@ -1,5 +1,7 @@
 # Working Branches
 
+TODO: update this for EPIC
+
 The following tables list `git` branches for each repository. Each table is for a 
 project or recommended configuration. Links to corresponding merge requests are provided.
 We intend to keep these tables up-to-date as development proceeds.
