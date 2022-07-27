@@ -1,6 +1,4 @@
-# Links to dRICH Software and Resources
-
-- TODO: should we update this for EPIC?
+# Links to Additional dRICH Software and Resources
 
 - Fun4all Standalone: <https://github.com/cisbani/dRICh>
   - Geometry G4 text file: <https://github.com/cisbani/dRICh/tree/main/share/config>
