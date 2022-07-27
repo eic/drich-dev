@@ -21,7 +21,7 @@ if [ $clean -eq 1 ]; then
   mkdir -p build
   rm -rv build
   echo "--- CLEAN: remove rendered xml files..."
-  rm -vf ecce*.xml
+  rm -vf epic*.xml
   echo "--- CLEAN: remove variant drich xml files..."
   rm -vf compact/drich_variant*.xml
 fi
