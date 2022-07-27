@@ -129,9 +129,9 @@ variator.varied_settings.each do |var|
   # fill variant array with Hashes
   var[:variants] = variant_values.map do |val|
     {
-      :value     => "#{val}#{units}",
       :xpath     => var[:xpath],
       :attribute => var[:attribute],
+      :value     => "#{val}#{units}",
     }
   end
 end
@@ -202,10 +202,12 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
   # simulation settings
   # NOTE: if you change this, update ruby/variator/template.md
   simulation_settings = {
-    :id      => variant_id,
-    :compact => compact_detector,
-    :output  => "#{OutputDir}/sim/#{basename}.root",
-    :log     => "#{OutputDir}/log/#{basename}",
+    :id               => variant_id,
+    :variant_info     => settings,
+    :compact_detector => compact_detector,
+    :compact_drich    => compact_drich,
+    :output           => "#{OutputDir}/sim/#{basename}.root",
+    :log              => "#{OutputDir}/log/#{basename}",
   }
 
   # build simulation pipeline command
@@ -225,6 +227,11 @@ def execute_thread(sim)
     puts "-> variant #{sim[:id]} -> #{message}"
   end
   print_thread_status.call "BEGIN"
+  # print settings for this variant to log file
+  File.open("#{sim[:log]}.info",'w') do |out|
+    out.puts "VARIANT #{sim[:id]}"
+    out.write sim[:variant_info].ai(plain: true)
+  end
   # loop over pipelines
   sim[:pipelines].each do |simulation_pipeline|
     # execute pipeline, with logging
