@@ -1,19 +1,19 @@
 #!/bin/bash
 set -e
 
-# set compact file, depending on (optional) argument; default is full ecce
+# set compact file, depending on (optional) argument; default is full epic
 compactFile=$(
   case "$1" in
-    ("d") echo "ecce_drich_only.xml"  ;;
-    ("p") echo "ecce_pfrich_only.xml" ;;
-    (*)   echo "ecce.xml"             ;;
+    ("d") echo "epic_drich_only.xml"  ;;
+    ("p") echo "epic_pfrich_only.xml" ;;
+    (*)   echo "epic.xml"             ;;
   esac)
 echo "compactFile = $compactFile"
 
 # produce geometry root file
 wdir=$(pwd)/geo
 mkdir -p $wdir
-pushd ecce
+pushd epic
 dd_web_display --export -o $wdir/detector_geometry.root $compactFile
 popd
 echo ""

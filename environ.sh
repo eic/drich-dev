@@ -20,7 +20,7 @@ export IRT_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 
 # juggler config vars
-export JUGGLER_DETECTOR="ecce"
+export JUGGLER_DETECTOR="epic"
 export BEAMLINE_CONFIG="ip6"
 export JUGGLER_SIM_FILE=$(pwd)/out/sim_run.root
 export JUGGLER_REC_FILE=test.root
@@ -37,7 +37,7 @@ fi
 
 # fix juggler config vars which would have been overwritten by 
 # `reconstruction_benchmarks/.local/bin/env.sh`:
-export DETECTOR_PATH=$(pwd)/ecce
+export DETECTOR_PATH=$(pwd)/epic
 export LOCAL_DATA_PATH=$(pwd)
 #export BEAMLINE_CONFIG_VERSION=master
 #export JUGGLER_DETECTOR_VERSION=master
