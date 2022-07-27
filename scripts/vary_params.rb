@@ -12,7 +12,7 @@ require 'pry'
 
 
 ### SETTINGS *************************************
-Detector      = 'ecce'                          # path to detector repository
+Detector      = 'epic'                          # path to detector repository
 CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
 Cleanup       = true                            # if true, remove transient files from `#{Detector}/`
 MultiThreaded = true                            # if true, run one simulation job per thread
