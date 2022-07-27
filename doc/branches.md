@@ -26,7 +26,7 @@ We intend to keep these tables up-to-date as development proceeds.
 ## IRT Development
 | Repository                  | Branch                                                                                                      |
 | --:                         | ---                                                                                                         |
-| `drich-dev`                 | `dev-irt`                                                                                                   |
+| `drich-dev`                 | [`dev-irt`](https://github.com/c-dilks/drich-dev/pull/2)                                                    |
 | `epic`                      | `main`                                                                                                      |
 | `eicd`                      | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                 |
 | `irt`                       | `main` or [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                   |
