@@ -10,7 +10,7 @@ pushd ip6/ip6
 beamDir=$(pwd -P)
 popd
 
-pushd ecce
+pushd epic
 
 touch ip6
 rm ip6

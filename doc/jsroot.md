@@ -24,6 +24,6 @@ if yours is different)
 
 Various settings can be set via the URL. For example, the following URL
 automatically opens the `detector_geometry.root` file (produced by
-`runDDwebDisplay.sh`) using `file=...`, and enables dark mode:
+`run_dd_web_display.sh`) using `file=...`, and enables dark mode:
 
 <http://localhost:8000/?file=geo/detector_geometry.root&dark>

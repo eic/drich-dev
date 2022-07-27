@@ -60,7 +60,7 @@ of branches for varying configurations.
   specified paths:
   - modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`
-    - [ecce](https://github.com/eic/ecce) to `./ecce`
+    - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
     - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
@@ -68,7 +68,7 @@ of branches for varying configurations.
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
     ```
-    git clone git@github.com:eic/ecce.git
+    git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
@@ -106,18 +106,18 @@ of branches for varying configurations.
   [flowchart](doc/docDiagram.pdf) dependency graph)
   - build scripts, in recommended order:
   ```
-  ./buildEICD.sh
-  ./buildIRT.sh  # TODO: we need to update this for ECCE, you can ignore it for now...
-  ./buildIP6.sh
-  ./buildECCE.sh
-  ./buildJuggler.sh # TODO: we need to also update this
+  ./build_eicd.sh
+  ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
+  ./build_ip6.sh
+  ./build_epic.sh
+  ./build_juggler.sh # TODO: we need to also update this
   ```
-  - you could also run `./rebuildAll.sh` to (re)build all of the modules in the
+  - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
 - instructions for the `reconstruction_benchmarks` repository are below
 
 ### Recommendations and Troubleshooting
-- execute `./rebuildAll.sh` to quickly rebuild all repositories, in order of
+- execute `./rebuild_all.sh` to quickly rebuild all repositories, in order of
   dependences; this is useful when you switch branches in *any* of the
   repositories, or if you pull in updates
   - sometimes things will break, simply because a dependent module is out of
@@ -128,12 +128,12 @@ of branches for varying configurations.
   have several active merge requests
   - for example, `irt` requires the new `eicd` components and datatypes, which
     at the time of writing this have not been merged to `eicd` `master`
-  - use `./checkBranches.sh` to quickly check which branches you are on in all
+  - use `./check_branches.sh` to quickly check which branches you are on in all
     repositories
-  - use `./checkStatus.sh` to run `git status` in each repository, which is
+  - use `./check_status.sh` to run `git status` in each repository, which is
     useful during active development
 - for clean builds, you can generally pass the word `clean` to any build script
-  (you can also do `./rebuildAll.sh clean` to clean-build everything)
+  (you can also do `./rebuild_all.sh clean` to clean-build everything)
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NPROC` environment variable should be set to the number of
     parellel threads you want to build with (see `environ.sh`)
@@ -172,17 +172,17 @@ source environ.sh
 
 ## Geometry and Materials
 - the geometry and materials are implemented in DD4hep, in the
-  [ecce](https://github.com/eic/ecce) repository
+  [epic](https://github.com/eic/epic) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
     or the [homepage](https://dd4hep.web.cern.ch/dd4hep/) for documentation
-  - the following files in `ecce/` are relevant for the dRICH:
+  - the following files in `epic/` are relevant for the dRICH:
     - `compact/drich.xml`: the compact file for the dRICH
       - constants for the geometry (e.g., dimensions, positions)
       - see `compact/definitions.xml` for main constants (for the full detector),
         such as global positioning
-      - use `./searchCompactParams.sh [PATTERN]` to quickly obtain the
+      - use `./search_compact_params.sh [PATTERN]` to quickly obtain the
         *numerical* value of any constant, where `[PATTERN]` is case sensitive
-        (e.g., `./searchCompactParams.sh DRICH`); this is a script in
+        (e.g., `./search_compact_params.sh DRICH`); this is a script in
         `drich-dev` which wraps `npdet_info`
       - see `comment` tags for details of all parameters
     - `compact/optical_materials.xml` for surface and material property tables,
@@ -194,9 +194,9 @@ source environ.sh
       - materials etc. are referenced by name in `compact/drich.xml`
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
-    - the full detector compact file is `ecce.xml`, which is generated via
-      Jinja during `cmake` (run `buildECCE.sh`), along with a dRICH-only
-      compact file `ecce_drich_only.xml`; these compact files are used by many
+    - the full detector compact file is `epic.xml`, which is generated via
+      Jinja during `cmake` (run `build_epic.sh`), along with a dRICH-only
+      compact file `epic_drich_only.xml`; these compact files are used by many
       scripts, such as `npsim` (whereas `compact/drich.xml` is *only* for the
       dRICH implementation itself)
     - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
@@ -212,10 +212,10 @@ source environ.sh
 # Execution
 
 ## Geometry
-- run `./runDDwebDisplay.sh` to produce the geometry ROOT file
+- run `./run_dd_web_display.sh` to produce the geometry ROOT file
   - by default, it will use the compact file for the *full* detector
-  - run `./runDDwebDisplay.sh d` to run on dRICH only
-  - run `./runDDwebDisplay.sh p` to run on pfRICH only
+  - run `./run_dd_web_display.sh d` to run on dRICH only
+  - run `./run_dd_web_display.sh p` to run on pfRICH only
   - output ROOT file will be in `geo/`
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [CERN host](https://root.cern/js/) (recommended)
@@ -239,21 +239,21 @@ source environ.sh
       whatever your browser window is
   - more documentation found on [jsroot website](https://root.cern/js/)
 - check for overlaps
-  - typically more efficient to let the CI do this (in `ecce`)
-  - call `./overlapCheck.sh` to run a local check
+  - typically more efficient to let the CI do this (in `epic`)
+  - call `./overlap_check.sh` to run a local check
     - one check faster and less accurate, the other is slower and more accurate
-- use `./searchCompactParams.sh [PATTERN]` to quickly obtain the value of any
+- use `./search_compact_params.sh [PATTERN]` to quickly obtain the value of any
   parameter in the compact files, rather than trying to "reverse" the formulas
-  - for example, `./searchCompactParams.sh DRICH` to get all dRICH variables
+  - for example, `./search_compact_params.sh DRICH` to get all dRICH variables
   - the search pattern is case sensitive
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
     further guidance
 
 
 ### GDML Output
-- currently we use the CI for this, from the `ecce` repository
+- currently we use the CI for this, from the `epic` repository
   (the `athena` repository has a dRICH specific GDML output CI job, but at the
-  time of writing this, this automation is not yet present in `ecce` CI)
+  time of writing this, this automation is not yet present in `epic` CI)
 - TODO: add a local script to automate connection to Fun4all
 
 ## Simulation
@@ -279,13 +279,13 @@ executables.
     useful for checking mapping of sensor segmentation (pixels)
   - relies on `text/sensorLUT.dat`, which must be up-to-date
     - you can produce a new version of this file by uncommenting relevant lines
-      in `ecce/src/DRICH_geo.cpp` (search for `generate LUT`), and running
-      something like `./rebuildAll.sh && ./runDDwebDisplay.sh`
+      in `epic/src/DRICH_geo.cpp` (search for `generate LUT`), and running
+      something like `./rebuild_all.sh && ./run_dd_web_display.sh`
   - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `pfrich/`
 
 ## Benchmarks
-- use `./runBenchmark.sh` to run the simulation and subsequent reconstruction
+- use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
   benchmarks
   - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
     which is executed by the benchmarks CI
