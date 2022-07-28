@@ -19,7 +19,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | Repository  | Branch                                                           |
 | --:         | ---                                                              |
 | `drich-dev` | [`param-variation`](https://github.com/c-dilks/drich-dev/pull/5) |
-| `epic`      | [`drich-optics-7-27`](https://github.com/eic/epic/pull/24)https://github.com/eic/epic/pull/24       |
+| `epic`      | [`drich-optics-7-27`](https://github.com/eic/epic/pull/24)       |
 | `eicd`      | `master`                                                         |
 | `irt`       | `main`                                                           |
 
