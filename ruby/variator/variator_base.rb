@@ -58,4 +58,14 @@ class VariatorBase
     ]
   end
 
+
+  ### construtor **************************
+  # - instantiates instance variables, which are meant to be overridden in subclasses
+  #   (see template.rb)
+  def initialize
+    @varied_settings  = Array.new
+    @fixed_settings   = Array.new
+    @derived_settings = Array.new
+  end
+
 end
