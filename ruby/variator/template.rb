@@ -1,11 +1,20 @@
 # Template variator code
 # - use this to start your own variation study
 # - see other `var*.rb` files for more examples
+# - here we define the class `Variator`, which inherits from `VariatorBase`,
+#   where we only need to write the constructor `initialize`:
+#   - first call `VariatorBase` constructor (`super`) to instantiate instance
+#     variables such as `@varied_settings` (they all start with a single `@`)
+#   - overwrite the instance variables with your own
 
 require './ruby/variator/variator_base.rb'
 
 class Variator < VariatorBase
+  attr_accessor :varied_settings, :fixed_settings, :simulation_pipelines
+
+  # `Variator` CONSTRUCTOR ***************************************************
   def initialize
+    super
 
     ### PARAMETER VARIATIONS *************************
     # - create the following Hash for each variation, and add it to the 
@@ -41,8 +50,9 @@ class Variator < VariatorBase
 
     ### FIXED SETTINGS *******************************
     # specify specific fixed settings, with similar Hashes, either of:
-    #   { :constant, :value }           # for `XPATH=//constant` nodes
-    #   { :xpath, :attribute, :value }  # for general attribute
+    #     { :constant, :value }           # for `XPATH=//constant` nodes
+    #     { :xpath, :attribute, :value }  # for general attribute
+    # - this is optional, don't set it if you don't need it
     @fixed_settings = [
       { :constant=>'DRICH_debug_optics', :value=>'0' },
     ]
@@ -91,9 +101,5 @@ class Variator < VariatorBase
       ]
     end
 
-
-    ### **********************************************
-
-  end
-  attr_accessor :varied_settings, :fixed_settings, :simulation_pipelines
-end
+  end # `Variator` constructor
+end # class `Variator`
