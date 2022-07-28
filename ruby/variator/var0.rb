@@ -1,8 +1,6 @@
 require './ruby/variator/variator_base.rb'
 
 class Variator < VariatorBase
-  attr_accessor :varied_settings, :fixed_settings, :simulation_pipelines
-
   def initialize
     super
 

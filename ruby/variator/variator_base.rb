@@ -68,4 +68,7 @@ class VariatorBase
     @derived_settings = Array.new
   end
 
+  ### accessors
+  attr_accessor :varied_settings, :fixed_settings, :derived_settings, :simulation_pipelines
+
 end

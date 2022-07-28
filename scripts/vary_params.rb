@@ -52,6 +52,15 @@ def print_status(message)
 end
 print_status 'preparation'
 
+# get units, given string with value # todo: might not work for every case; need to generalize
+def get_units(str)
+  if str.include?('*')
+    '*' + str.split('*').last
+  else
+    ''
+  end
+end
+
 # load variator code
 if variator_code.include? '/' # if variator_code is a path to a file
   unless variator_code.match? /^(\/|\.\/)/ # unless starts with '/' or './'
@@ -121,9 +130,7 @@ variator.varied_settings.each do |var|
   end
   # get units
   val_str = nodes.first.attr var[:attribute]
-  units = val_str.include?('*') ?
-    '*' + val_str.split('*').last :
-    ''
+  units = get_units val_str
   # fill variant_values array by calling the variation function Proc
   variant_values = var[:function].call *var[:args], var[:count]
   # fill variant array with Hashes
@@ -132,6 +139,7 @@ variator.varied_settings.each do |var|
       :xpath     => var[:xpath],
       :attribute => var[:attribute],
       :value     => "#{val}#{units}",
+      :label     => var[:label],
     }
   end
 end
@@ -141,6 +149,27 @@ end
 # - each element is itself a list of `variant_settings`, for a particular variant
 variant_arrays = variator.varied_settings.map{ |var| var[:variants] }
 variant_settings_list = variant_arrays.first.product *variant_arrays[1..]
+# binding.pry
+
+# calculate derived settings
+variant_settings_list.each do |variant_settings|
+  variator.derived_settings.each do |derived_setting|
+    # fill valHash with variant-specific settings (which have a label);
+    # units are stripped away and values are assumed to be floats
+    valHash = variant_settings
+      .find_all{ |h| not h[:label].nil? }
+      .map{ |h| [ h[:label], h[:value].split('*').first.to_f ] }
+      .to_h
+    # get units for the derived setting
+    nodes   = xml.xpath derived_setting[:xpath]
+    val_str = nodes.first.attr derived_setting[:attribute]
+    units   = get_units val_str
+    # calculate derived settings value, and add the setting to `variant_settings`
+    derived_value = derived_setting[:derivation].call(valHash)
+    # add to `variant_settings`, including appended units
+    variant_settings << { :value => "#{derived_value}#{units}" }.merge(derived_setting)
+  end
+end
 # binding.pry
 
 
