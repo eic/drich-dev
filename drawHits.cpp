@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
   outfileN(TRegexp("\\.root$"))=".";
   TFile *outfile = new TFile(outfileN+"plots.root","RECREATE");
   gStyle->SetOptStat(0);
+  gStyle->SetPalette(55);
 
 
   /* lambdas
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
       { "numHitsVsThrownP","number of dRICh hits vs. thrown momentum", 
-      65,0,65, 100,0,200 },
+      65,0,65, 100,0,80 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
 

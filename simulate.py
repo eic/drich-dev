@@ -25,7 +25,7 @@ zDirection = 1
 particle = 'pi+'
 energy = '8.0 GeV'
 runType = 'run'
-numEvents = 10
+numEvents = 50
 outputImageType = ''
 outputFileName = ''
 
@@ -276,6 +276,9 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
+### ideal direction (for a general test, such as a momentum scan)
+idealDirection = f'0.35 0.0 {zDirection}'
+
 # TEST SETTINGS
 ######################################
 
@@ -283,7 +286,7 @@ print(sep)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    m.write(f'/gps/direction 0.35 0.0 {zDirection}\n')
+    m.write(f'/gps/direction {idealDirection}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 2:
@@ -343,7 +346,7 @@ elif testNum == 6:
 
 elif testNum == 7:
     m.write(f'\n# momentum scan\n')
-    m.write(f'/gps/direction 0.25 0.0 {zDirection}\n')
+    m.write(f'/gps/direction {idealDirection}\n')
     for en in list(linspace(1, 60, 10)):
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
