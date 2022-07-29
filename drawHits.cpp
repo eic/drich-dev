@@ -86,12 +86,12 @@ int main(int argc, char** argv) {
 
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
-      { "hitPositions","dRICh hit positions (units=cm)",
+      { "hitPositions","dRICH hit positions (units=cm)",
       1000,-200,200, 1000,-200,200 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
-      { "numHitsVsThrownP","number of dRICh hits vs. thrown momentum", 
+      { "numHitsVsThrownP","number of dRICH hits vs. thrown momentum", 
       65,0,65, 100,0,80 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
