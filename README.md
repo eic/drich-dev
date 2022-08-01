@@ -55,7 +55,7 @@ of branches for varying configurations.
       see for example `opt/update.arcturus.sh` (especially if you are low on
       disk space on your `/` partition)
     - the image and builds will be stored in `./opt`
-  - execute `opt/eic-shell` to start the container; practically everything below
+  - execute `./eic-shell` to start the container; practically everything below
     must be executed within this container
 - obtain EIC Software modules, either clone or symlink the repositories to the
   specified paths:
@@ -101,7 +101,7 @@ of branches for varying configurations.
         want to run them, ask their developer for assistance
 
 ## Building Modules
-- you must be in the EIC container (`opt/eic-shell`) and have environment
+- you must be in the EIC container (`eic-shell`) and have environment
   variables set (`source environ.sh`)
 - build each repository, one-by-one, in order of dependences (see
   [flowchart](doc/docDiagram.pdf) dependency graph)

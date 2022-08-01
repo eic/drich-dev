@@ -16,12 +16,12 @@ We intend to keep these tables up-to-date as development proceeds.
 | `reconstruction_benchmarks` | `master` |
 
 ## Optics Tuning
-| Repository  | Branch                                                                  |
-| --:         | ---                                                                     |
-| `drich-dev` | [`param-variation`](https://github.com/c-dilks/drich-dev/pull/5)        |
-| `epic`      | [`parse-modified-drich-xml-files`](https://github.com/eic/epic/pull/14) |
-| `eicd`      | `master`                                                                |
-| `irt`       | `main`                                                                  |
+| Repository  | Branch                                                           |
+| --:         | ---                                                              |
+| `drich-dev` | [`param-variation`](https://github.com/c-dilks/drich-dev/pull/5) |
+| `epic`      | [`drich-optics-7-27`](https://github.com/eic/epic/pull/24)       |
+| `eicd`      | `master`                                                         |
+| `irt`       | `main`                                                           |
 
 ## IRT Development
 | Repository                  | Branch                                                                                                      |

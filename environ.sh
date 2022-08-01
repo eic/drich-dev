@@ -8,7 +8,7 @@ echo "detected $BUILD_NPROC cpus"
 
 # primary prefix: 
 # note: if you prefer a different prefix, change it here
-export PRIMARY_PREFIX=$ATHENA_PREFIX # currently ATHENA_PREFIX still exists, but it may change in the future...
+export PRIMARY_PREFIX=$EIC_SHELL_PREFIX
 
 # juggler paths
 export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
