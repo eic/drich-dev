@@ -215,7 +215,6 @@ source environ.sh
 - run `./run_dd_web_display.sh` to produce the geometry ROOT file
   - by default, it will use the compact file for the *full* detector
   - run `./run_dd_web_display.sh d` to run on dRICH only
-  - run `./run_dd_web_display.sh p` to run on pfRICH only
   - output ROOT file will be in `geo/`
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [CERN host](https://root.cern/js/) (recommended)
@@ -228,7 +227,6 @@ source environ.sh
       └── world_volume
           ├── ...
           ├── DRICH
-          ├── PFRICH
           └── ...
   ```
   - right click on the desired component, then click `Draw`
@@ -261,28 +259,32 @@ There are some local scripts to aid in simulation development; some of them have
 been copied to the `reconstruction_benchmarks` repository, and may be more
 up-to-date there.
 
-All `.cpp` programs are compiled by running `make`, to corresponding `.exe`
-executables.
+All `src/.cpp` programs are compiled by running `make`, which will build corresponding
+executables and install them to `bin/`
 
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage guidance
   - `npsim` is the main script for running Geant4 simulations with DD4hep
   - basically copied to `reconstruction_benchmarks`, but stored here as well for
     backup
-- `drawHits.cpp`
+- example simulation analysis code is found in `src/examples`
+  - see comments within each for more details
+  - build with `make` (from the top-level directory); the corresponding executables
+    will be installed to `bin/`
+- `src/draw_hits.cpp` (run with `bin/draw_hits`)
   - reads simulation output and draws raw hit positions and number of hits vs.
     momentum
-  - build with `make`, execute as `./drawHits.exe [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `pfrich/`
-- `drawSegmentation.cpp`
+  - build with `make`, execute as `bin/draw_hits [simulation_output_file]`
+  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
+- `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
   - relies on `text/sensorLUT.dat`, which must be up-to-date
     - you can produce a new version of this file by uncommenting relevant lines
       in `epic/src/DRICH_geo.cpp` (search for `generate LUT`), and running
       something like `./rebuild_all.sh && ./run_dd_web_display.sh`
-  - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `pfrich/`
+  - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
+  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
 ## Benchmarks
 - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction

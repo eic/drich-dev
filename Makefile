@@ -10,24 +10,44 @@ LIBS += -L/usr/local/lib -lDD4pod -lpodio -lpodioRootIO -ledm4hep
 
 #--------------------------------------------
 
-SOURCES := $(basename $(wildcard *.cpp))
-EXES := $(addsuffix .exe, $(SOURCES))
+INSTALL_PREFIX = bin
+SRC_MAIN := $(basename $(notdir $(wildcard src/*.cpp)))
+SRC_EXAMPLES := $(basename $(notdir $(wildcard src/examples/*.cpp)))
 
 #--------------------------------------------
 
 all: 
-	make exe
+	@echo ""
+	@echo "BUILDING SOURCES ==========================================="
+	@echo "$(SRC_MAIN)"
+	@echo "============================================================"
+	make main
+	@echo ""
+	@echo "BUILDING EXAMPLES =========================================="
+	@echo "$(SRC_EXAMPLES)"
+	@echo "============================================================"
+	make examples
 
-exe: $(EXES)
+main: $(SRC_MAIN)
+examples: $(SRC_EXAMPLES)
 
-%.exe: %.o
-	@echo "--- make executable $@"
-	$(CXX) -o $@ $< $(LIBS)
+clean:
+	@echo "CLEAN ======================================================"
+	$(RM) $(addprefix $(INSTALL_PREFIX)/, $(SRC_MAIN))
+	$(RM) $(addprefix $(INSTALL_PREFIX)/, $(SRC_EXAMPLES))
 
-%.o: %.cpp
+#--------------------------------------------
+
+%: %.o
+	@echo "--- make executable $(INSTALL_PREFIX)/$@"
+	$(CXX) -o $(INSTALL_PREFIX)/$@ $< $(LIBS)
+
+%.o: src/%.cpp
+	mkdir -p $(INSTALL_PREFIX)
 	@echo "----- build $@ -----"
 	$(CXX) -c $^ -o $@ $(FLAGS) $(DEPS)
 
-clean:
-	@echo "----- clean -----"
-	$(RM) $(EXES)
+%.o: src/examples/%.cpp
+	mkdir -p $(INSTALL_PREFIX)
+	@echo "----- build $@ -----"
+	$(CXX) -c $^ -o $@ $(FLAGS) $(DEPS)

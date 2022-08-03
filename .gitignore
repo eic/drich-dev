@@ -1,9 +1,9 @@
 *.sw*
 *.root
-*.exe
 *.pyc
 *.png
 macro/*.mac
+bin
 Gemfile.lock
 
 juggler

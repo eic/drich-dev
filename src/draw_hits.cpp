@@ -1,5 +1,5 @@
 // draw hits, and make some other related plots
-// (cf. drawSegmentation.cpp for readout)
+// (cf. draw_segmentation.cpp for readout)
 #include <cstdlib>
 #include <iostream>
 
