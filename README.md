@@ -63,7 +63,6 @@ of branches for varying configurations.
     - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-    - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
     - [benchmarks/reconstruction_benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
@@ -72,7 +71,6 @@ of branches for varying configurations.
     git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
-    git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
     ```
   - follow directions below to build each module
@@ -83,7 +81,7 @@ of branches for varying configurations.
     it is recommended to read through `environ.sh` and make any changes as
     needed
   - `$BUILD_NPROC` is the number of parallel threads used for multi-threaded
-    building and running Juggler multi-threaded
+    building and running multi-threaded
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
   - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
@@ -110,7 +108,6 @@ of branches for varying configurations.
   ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
   ./build_ip6.sh
   ./build_epic.sh
-  ./build_juggler.sh # TODO: we need to also update this
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
@@ -137,8 +134,6 @@ of branches for varying configurations.
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NPROC` environment variable should be set to the number of
     parellel threads you want to build with (see `environ.sh`)
-  - careful, some module builds consume a lot of memory (Juggler); the build
-    scripts will force single-threaded building for such cases
 
 ## Benchmarks Setup
 The benchmarks run downstream of all other modules, and are useful for running
@@ -287,15 +282,18 @@ executables and install them to `bin/`
   - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
 ## Benchmarks
-- use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
-  benchmarks
-  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
-    which is executed by the benchmarks CI
-    - this script runs `npsim` and `juggler`
-  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
-    commands used by the CI
-  - it is practical to edit this wrapper script during development, for testing
-    purposes; this is why several lines are commented out
+- TODO: in light of the reconstruction framework change, the benchmarks will need
+  to be updated; any local benchmark code will be updated or deprecated, but
+  we leave the current documentation here for reference:
+  - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
+    benchmarks
+    - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
+      which is executed by the benchmarks CI
+      - this script runs `npsim` and `juggler`
+    - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
+      commands used by the CI
+    - it is practical to edit this wrapper script during development, for testing
+      purposes; this is why several lines are commented out
 
 ## Miscellaneous
 - the `math/` directory contains scripts and Mathematica notebooks used to

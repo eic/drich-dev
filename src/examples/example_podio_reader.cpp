@@ -1,3 +1,8 @@
+/* example showing how to use PODIO to read a simulation output file
+ * - run `simulate.py -t1 -s` to produce a sample simulation ROOT file
+ * - then run this example (see README.md for building and running)
+*/
+
 #include <cstdlib>
 #include <iostream>
 
@@ -24,18 +29,12 @@ using std::endl;
 int main(int argc, char** argv) {
 
   // open simulation output file (from simulate.py / npsim / ddsim)
-  TString infileN="sim_rich_run.root";
+  TString infileN="out/sim.root";
   if(argc>1) infileN = TString(argv[1]);
   podio::EventStore store;
   podio::ROOTReader reader;
   reader.openFile(infileN.Data());
   store.setReader(&reader);
-
-  // setup output file
-  // TString outfileN = infileN;
-  // outfileN(TRegexp("\\.root$"))=".";
-  // TFile *outfile = new TFile(outfileN+"plots.root","RECREATE");
-  // gStyle->SetOptStat(0);
 
   // containers
   std::set<edm4hep::MCParticle> true_tracks;
