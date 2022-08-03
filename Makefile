@@ -4,7 +4,9 @@ FLAGS = -g -Wno-deprecated -fPIC -m64 -fno-inline -Wno-write-strings
 # ROOT
 DEPS += $(shell root-config --cflags)
 LIBS += $(shell root-config --glibs)
-LIBS += -L/usr/local/lib -lDD4pod
+
+# PODIO
+LIBS += -L/usr/local/lib -lDD4pod -lpodio -lpodioRootIO -ledm4hep
 
 #--------------------------------------------
 

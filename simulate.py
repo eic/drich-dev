@@ -432,6 +432,7 @@ cmd += " --runType " + runType
 cmd += " --compactFile " + compactFile
 # cmd += " --random.seed 1 "
 cmd += " --outputFile " + outputFileName
+# cmd += " --part.keepAllParticles True "
 if (testNum > 0):
     cmd += " --macro " + m.name
     cmd += " --enableG4GPS"
