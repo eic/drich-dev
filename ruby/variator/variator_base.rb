@@ -38,7 +38,7 @@ class VariatorBase
         "-o #{settings[:output]}",
       ]],
       ### draw the hits
-      [[ './drawHits.exe', settings[:output] ]],
+      [[ 'bin/draw_hits', settings[:output] ]],
       ### enable optics-debugging mode: all components become vacuum, except for mirrors
       [[ 'scripts/edit_xml.rb', settings[:compact_drich], '//constant[@name="DRICH_debug_optics"]', 'value', '1' ]],
       ### visualize parallel-to-point focal region

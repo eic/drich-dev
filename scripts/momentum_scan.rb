@@ -12,6 +12,7 @@ NumEvents = 300                 # number of events per fixed momentum
 PoolSize  = 4                   # number of parallel threads to run
 OutputDir = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
 DrawOnly  = false               # if true, do not run simulation, only draw the result
+MaxCounts = 80                  # vertical axis limit of the counts vs. momentum plot
 
 ## list of particles to test
 particle_a = [
@@ -49,7 +50,7 @@ unless DrawOnly
         "-o#{out_file particle, 'root'}",
       ]
       cmds << [
-        './drawHits.exe',
+        'bin/draw_hits',
         out_file(particle,'root'),
       ]
       # spawn thread
@@ -119,7 +120,7 @@ particle_h.each do |particle,h|
   plot.SetMarkerColor h[:color]
   plot.SetLineColor   h[:color]
   plot.SetMarkerSize  1.5
-  plot.GetYaxis.SetRangeUser 0, 20
+  plot.GetYaxis.SetRangeUser 0, MaxCounts
   plot.Draw 'SAME E X0'
   plot.GetXaxis.SetTitle 'Thrown Momentum [GeV]'
   plot.GetYaxis.SetTitle 'Number of dRICH hits'

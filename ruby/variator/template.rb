@@ -123,7 +123,7 @@ class Variator < VariatorBase
           "-o #{settings[:output]}",
         ]],
         [[
-          "./drawHits.exe",
+          "bin/draw_hits",
           settings[:output],
         ]],
       ]
