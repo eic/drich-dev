@@ -461,24 +461,29 @@ m.close()
 #########################################################
 
 ### simulation executable and arguments
-cmd = "npsim"
-cmd += " --runType " + runType
-cmd += " --compactFile " + compactFile
-# cmd += " --random.seed 1 "
-cmd += " --outputFile " + outputFileName
-# cmd += " --part.keepAllParticles True "
+cmd = [
+        'npsim',
+        f'--runType {runType}',
+        f'--compactFile {compactFile}',
+        f'--outputFile {outputFileName}',
+        # '--random.seed 1',
+        # '--part.keepAllParticles True',
+        ]
 if (testNum > 0):
-    cmd += " --macro " + m.name
-    cmd += " --enableG4GPS"
+    cmd.extend([
+        f'--macro {m.name}',
+        '--enableG4GPS',
+        ])
 else:
-    cmd += f' -N {numEvents}'
-    cmd += " --inputFiles '" + inputFileName + "'"
+    cmd.extend([
+      f'-N {numEvents}',
+      f'--inputFiles \'{inputFileName}\'',
+      ])
 
 ### run simulation
-print(sep)
-print('EXECUTE: ' + cmd)
-print(sep)
-subprocess.call(shlex.split(cmd), cwd=detPath)
+cmdShell = shlex.split(" ".join(cmd))
+print(f'{sep}\nRUN SIMULATION:\n{shlex.join(cmdShell)}\n{sep}')
+subprocess.run(cmdShell, cwd=detPath)
 
 ### cleanup
 # os.remove(m.name) # remove macro
