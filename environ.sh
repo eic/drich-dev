@@ -25,7 +25,7 @@ fi
 export DETECTOR=epic
 export DETECTOR_PATH=$(pwd)/$DETECTOR
 #export BEAMLINE_CONFIG_VERSION=master
-#export DETECTOR_VERSION=master
+#export DETECTOR_VERSION=main
 
 if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   printf "\n\n--------------------------------\n"
