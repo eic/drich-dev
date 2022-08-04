@@ -6,4 +6,3 @@ set -e
 #./build_irt.sh $* # temporarily disabled
 ./build_ip6.sh $*
 ./build_epic.sh $*
-#./build_juggler.sh $* # temporarily disabled

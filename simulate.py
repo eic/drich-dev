@@ -10,17 +10,23 @@ import subprocess, shlex
 import math
 from numpy import linspace
 
+# SETTINGS
+################################################################
+use_npdet_info = False  # use np_det_info to get envelope dimensions
+
 # ARGUMENTS
 ################################################################
 
 inputFileName = ''
 testNum = -1
 standalone = False
+compactFileCustom = ''
 zDirection = 1
 particle = 'pi+'
 energy = '8.0 GeV'
 runType = 'run'
-numEvents = 10
+numEvents = 50
+outputImageType = ''
 outputFileName = ''
 
 helpStr = f'''
@@ -56,6 +62,8 @@ helpStr = f'''
                     1 = toward positive (hadron) endcap RICH (default)
                    -1 = toward negative (electron) endcap RICH
                 -s: enable standalone RICH-only simulation (default is full detector)
+                -c [compact file]: specify a custom compact file
+                   (this will override -d and -s options)
                 -p [particle]: name of particle to throw; default: {particle}
                    examples:
                     - e- / e+
@@ -68,28 +76,34 @@ helpStr = f'''
                 -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
-                -o [output file]: absolute path output root file name (overrides any default name)
+                -m [output image type]: save visual with specified type (svg,pdf,ps)
+                   - useful tip: if you want to suppress the drawing of the visual, but
+                     still save an output image, use Xvbf (start EIC container shell
+                     as `xvfb-run ./eic-shell`); this is good for batch processing
+                -o [output file]: output root file name (overrides any default name)
     '''
 
 if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sp:n:e:rvo:')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:n:e:rvm:o:')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr)
     sys.exit(2)
 for opt, arg in opts:
-    if (opt == '-i'): inputFileName = arg
+    if (opt == '-i'): inputFileName = arg.lstrip()
     if (opt == '-t'): testNum = int(arg)
     if (opt == '-d'): zDirection = int(arg)
     if (opt == '-s'): standalone = True
-    if (opt == '-p'): particle = arg
+    if (opt == '-c'): compactFileCustom = arg.lstrip()
+    if (opt == '-p'): particle = arg.lstrip()
     if (opt == '-n'): numEvents = int(arg)
-    if (opt == '-e'): energy = arg + " GeV"
+    if (opt == '-e'): energy = arg.lstrip() + " GeV"
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
-    if (opt == '-o'): outputFileName = arg
+    if (opt == '-m'): outputImageType = arg.lstrip()
+    if (opt == '-o'): outputFileName = arg.lstrip()
 if (testNum < 0 and inputFileName == ''):
     print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr)
     sys.exit(2)
@@ -117,7 +131,7 @@ if inputFileName != '':
     if not bool(re.search('^/', inputFileName)): inputFileName = workDir + "/" + inputFileName
 ##### ensure output file name has absolute path (and generate default name, if unspecified)
 if outputFileName == '':
-    outputFileName = workDir + "/sim_rich_" + runType + ".root"  # default name
+    outputFileName = workDir + "/out/sim.root"  # default name
 elif not bool(re.search('^/', outputFileName)):
     outputFileName = workDir + "/" + outputFileName  # convert relative path to absolute path
 ##### get output file basename
@@ -137,14 +151,18 @@ else:
 
 ### get env vars
 
+detMain = 'epic'
 detPath = os.environ['DETECTOR_PATH']
-detMain = os.environ['JUGGLER_DETECTOR']
 localDir = os.environ['LOCAL_DATA_PATH']
 
 ### set compact file
 compactFileFull = detPath + '/' + detMain + '.xml'
 compactFileRICH = detPath + '/' + detMain + '_' + xrich + '_only.xml'
 compactFile = compactFileRICH if standalone else compactFileFull
+if compactFileCustom != '':
+    if not bool(re.search('^/', compactFileCustom)):
+        compactFileCustom = workDir + "/" + compactFileCustom  # convert relative path to absolute path
+    compactFile = compactFileCustom
 
 ### print args and settings
 sep = '-' * 40
@@ -174,7 +192,7 @@ m.write(f'/run/initialize\n')
 
 ### visual settings
 if (runType == 'vis'):
-    m.write(f'/vis/open OGLSQt 800x800-0+0\n')  # driver
+    m.write(f'/vis/open OGL 800x800-0+0\n')  # driver
     m.write(f'/vis/scene/create\n')
     m.write(f'/vis/scene/add/volume\n')
     m.write(f'/vis/scene/add/axes 0 0 0 1 m\n')
@@ -205,19 +223,30 @@ m.write(f'/gps/position 0 0 0 cm\n')
 # ACCEPTANCE LIMITS
 ################################################################
 
-### call `npdet_info` to obtain RICH attributes and values
-paramListFileN = f'{localDir}/params_{outputName}.txt'
-with open(paramListFileN, 'w') as paramListFile:
-    cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
-    print(sep)
-    print('EXECUTE: ' + cmd)
-    print(sep)
-    subprocess.call(shlex.split(cmd), stdout=paramListFile)
+### RICH envelope parameters
 params = {}
-for paramLine in open(paramListFileN, 'r'):
-    print(paramLine)
-    paramLineKV = paramLine.strip().split('=')
-    if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+if use_npdet_info:
+    ### call `npdet_info` to obtain most up-to-date RICH attributes and values
+    paramListFileN = f'{localDir}/params_{outputName}.txt'
+    with open(paramListFileN, 'w') as paramListFile:
+        cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
+        print(sep)
+        print('EXECUTE: ' + cmd)
+        print(sep)
+        subprocess.call(shlex.split(cmd), stdout=paramListFile)
+    for paramLine in open(paramListFileN, 'r'):
+        print(paramLine)
+        paramLineKV = paramLine.strip().split('=')
+        if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+else:
+    ### hard-coded values (faster and reliable, but maybe out of date)
+    params['DRICH_rmin1']  = 15.332
+    params['DRICH_rmax2']  = 180.0
+    params['DRICH_zmin']   = 195.0
+    params['DRICH_Length'] = 120.0
+    params['PFRICH_rmin1'] = 10 ## FIXME: pfRICH is not used, these numbers are a complete guess
+    params['PFRICH_rmax']  = 80
+    params['PFRICH_zmax']  = 100
 
 ### set envelope limits
 envBufferMin = 5
@@ -247,6 +276,9 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
+### ideal direction (for a general test, such as a momentum scan)
+idealDirection = f'0.35 0.0 {zDirection}'
+
 # TEST SETTINGS
 ######################################
 
@@ -254,7 +286,7 @@ print(sep)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    m.write(f'/gps/direction 0.35 0.0 {zDirection}\n')
+    m.write(f'/gps/direction {idealDirection}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 2:
@@ -314,7 +346,7 @@ elif testNum == 6:
 
 elif testNum == 7:
     m.write(f'\n# momentum scan\n')
-    m.write(f'/gps/direction 0.25 0.0 {zDirection}\n')
+    m.write(f'/gps/direction {idealDirection}\n')
     for en in list(linspace(1, 60, 10)):
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
@@ -416,6 +448,8 @@ elif testNum > 0:
 if (runType == "vis"):
     m.write(f'/vis/viewer/flush\n')
     m.write(f'/vis/viewer/refresh\n')
+    if outputImageType!='':
+        m.write(f'/vis/ogl/export {re.sub("root$",outputImageType,outputFileName)}\n')
 
 ### print macro and close stream
 m.seek(0, 0)
@@ -427,23 +461,29 @@ m.close()
 #########################################################
 
 ### simulation executable and arguments
-cmd = "npsim"
-cmd += " --runType " + runType
-cmd += " --compactFile " + compactFile
-# cmd += " --random.seed 1 "
-cmd += " --outputFile " + outputFileName
+cmd = [
+        'npsim',
+        f'--runType {runType}',
+        f'--compactFile {compactFile}',
+        f'--outputFile {outputFileName}',
+        # '--random.seed 1',
+        # '--part.keepAllParticles True',
+        ]
 if (testNum > 0):
-    cmd += " --macro " + m.name
-    cmd += " --enableG4GPS"
+    cmd.extend([
+        f'--macro {m.name}',
+        '--enableG4GPS',
+        ])
 else:
-    cmd += f' -N {numEvents}'
-    cmd += " --inputFiles '" + inputFileName + "'"
+    cmd.extend([
+      f'-N {numEvents}',
+      f'--inputFiles \'{inputFileName}\'',
+      ])
 
 ### run simulation
-print(sep)
-print('EXECUTE: ' + cmd)
-print(sep)
-subprocess.call(shlex.split(cmd), cwd=detPath)
+cmdShell = shlex.split(" ".join(cmd))
+print(f'{sep}\nRUN SIMULATION:\n{shlex.join(cmdShell)}\n{sep}')
+subprocess.run(cmdShell, cwd=detPath)
 
 ### cleanup
 # os.remove(m.name) # remove macro
