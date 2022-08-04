@@ -2,25 +2,27 @@
 *.root
 *.pyc
 *.png
-macro/*.mac
-bin
 Gemfile.lock
 
-juggler
+bin
+macro
+!macro/.keep
+out
+!out/.keep
+
 irt
-athena
-ecce
 epic
 ip6
 eicd
 reconstruction_benchmarks
-jsroot
+
+juggler
+athena
+ecce
 
 calibrations
 fieldmaps
-doc/detector.md
-tmp.mac
 
 *.hepmc*
-hepmc/*
+hepmc
 !hepmc/README.md
