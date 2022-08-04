@@ -2,6 +2,7 @@
 *.root
 *.pyc
 *.png
+*.exe
 Gemfile.lock
 
 bin
