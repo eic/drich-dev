@@ -1,5 +1,5 @@
 # dRICH-dev
-Resources and Tools for EIC dRICH development 
+Resources and Tools for EPIC dRICH development 
 
 | **Table of Contents**             |                                         |
 | --:                               | ---                                     |
@@ -14,7 +14,7 @@ Resources and Tools for EIC dRICH development
 | [Branches and Merge Requests](doc/branches.md) | Active development branches and merge requests |
 
 ## Notes
-EIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
+EPIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
 general guidance of the modules relevant for RICH development. It shows their
 dependences, calls, and data flow.
 
@@ -56,7 +56,7 @@ of branches for varying configurations.
     - the image and builds will be stored in `./opt`
   - execute `./eic-shell` to start the container; practically everything below
     must be executed within this container
-- obtain EIC Software modules, either clone or symlink the repositories to the
+- obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`
@@ -283,6 +283,21 @@ executables and install them to `bin/`
       something like `./rebuild_all.sh && ./run_dd_web_display.sh`
   - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
+
+### Automated Parameter Variation
+- use `scripts/vary_params.rb` to run simulation jobs while varying dRICH compact file parameters
+  - Ruby gems (dependencies) are required to run this; see [doc/ruby.md](doc/ruby.md) for guidance
+  - The input of this script is a configuration file, written as a class
+    - This file includes:
+      - Which parameters to vary, and how
+      - Pipelines: shell commands to run on each variant, for example, `simulate.py`
+    - See `ruby/variator/template.rb` for an example and more details
+      - The class `Variator` inherits from the common superclass `VariatorBase`
+      - Add your own `Variator` class in another file, then specify this file
+        when you call `vary_params.rb`, so that it will use your `Variator` class
+        rather than the default
+    - The script runs multi-threaded: one thread per variant
+      - Output `stdout` and `stderr` are logged, along with your shell command pipelines
 
 ## Benchmarks
 - TODO: in light of the reconstruction framework change, the benchmarks will need
