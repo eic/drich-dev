@@ -63,15 +63,13 @@ of branches for varying configurations.
     - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-    - [benchmarks/reconstruction_benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
-    ```
+    ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
-    git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
     ```
   - follow directions below to build each module
 
@@ -103,7 +101,7 @@ of branches for varying configurations.
 - build each repository, one-by-one, in order of dependences (see
   [flowchart](doc/docDiagram.pdf) dependency graph)
   - build scripts, in recommended order:
-  ```
+  ```bash
   ./build_eicd.sh
   ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
   ./build_ip6.sh
@@ -111,7 +109,6 @@ of branches for varying configurations.
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
-- instructions for the `reconstruction_benchmarks` repository are below
 
 ### Recommendations and Troubleshooting
 - execute `./rebuild_all.sh` to quickly rebuild all repositories, in order of
@@ -136,6 +133,10 @@ of branches for varying configurations.
     parellel threads you want to build with (see `environ.sh`)
 
 ## Benchmarks Setup
+- TODO: in light of the reconstruction framework change, the benchmarks will need
+  to be updated; any local benchmark code will be updated or deprecated, but
+  we leave the current documentation here for reference:
+
 The benchmarks run downstream of all other modules, and are useful for running
 tests. For example, automated checks of upstream geometry changes, to see what
 happens to performance plots. They are not required for upstream development,
@@ -143,7 +144,7 @@ but are certainly very useful. Currently we only have plots of raw hits; more
 development is needed here.
 
 Before running benchmarks, you must setup the common benchmarks:
-```
+```bash
 pushd reconstruction_benchmarks
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/common_bench.git setup
 source setup/bin/env.sh
@@ -159,6 +160,12 @@ source environ.sh
   since you now have common benchmarks installed
 - there is no need to repeat this setup procedure, unless you want to start from
   a clean slate or update the common benchmarks
+
+Now install the [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks)
+```bash
+git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
+```
+
 
 ---
 
