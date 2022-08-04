@@ -61,14 +61,14 @@ of branches for varying configurations.
   - modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`
     - [epic](https://github.com/eic/epic) to `./epic`
-    - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
+    - [irt](https://github.com/eic/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
-    git clone git@eicweb.phy.anl.gov:EIC/irt.git
+    git clone git@github.com:eic/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     ```
   - follow directions below to build each module
