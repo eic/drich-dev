@@ -3,7 +3,6 @@
 *.pyc
 *.png
 *.exe
-Gemfile.lock
 
 bin
 macro
@@ -30,3 +29,4 @@ hepmc
 
 .rbenv
 .ruby-version
+Gemfile.lock
