@@ -1,3 +1,4 @@
+# optics tuning
 require './ruby/variator/variator_base.rb'
 
 class Variator < VariatorBase
