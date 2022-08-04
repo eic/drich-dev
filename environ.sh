@@ -22,9 +22,9 @@ if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
 fi
 
 # fix env vars which would have been overwritten by `reconstruction_benchmarks/.local/bin/env.sh`:
-export DETECTOR=epic
-export DETECTOR_PATH=$(pwd)/$DETECTOR
 export LOCAL_DATA_PATH=$(pwd)
+export DETECTOR=epic
+export DETECTOR_PATH=$LOCAL_DATA_PATH/$DETECTOR
 #export BEAMLINE_CONFIG_VERSION=master
 #export DETECTOR_VERSION=main
 
