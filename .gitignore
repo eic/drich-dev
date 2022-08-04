@@ -3,7 +3,6 @@
 *.pyc
 *.png
 *.exe
-Gemfile.lock
 
 bin
 macro
@@ -27,3 +26,7 @@ fieldmaps
 *.hepmc*
 hepmc
 !hepmc/README.md
+
+.rbenv
+.ruby-version
+Gemfile.lock
