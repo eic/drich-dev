@@ -61,7 +61,7 @@ gunTests.keys.product(particles,energies).each do |testNum,particle,energy|
     "-e#{energy}",
     '-r',
     "-o#{outputFile}",
-    "&& ./drawHits.exe #{outputFile}"
+    "&& bin/draw_hits #{outputFile}"
   ]
   cmds << cmd.join(' ')
 end
@@ -79,7 +79,7 @@ cmd = [
   "-n#{numEvents[:forHepmc]}",
   '-r',
   "-o#{outputFile}",
-  "&& ./drawHits.exe #{outputFile}"
+  "&& bin/draw_hits #{outputFile}"
 ]
 cmds << cmd.join(' ')
 

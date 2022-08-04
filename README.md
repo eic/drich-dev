@@ -63,17 +63,13 @@ of branches for varying configurations.
     - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://eicweb.phy.anl.gov/EIC/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-    - [Project Juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`
-    - [benchmarks/reconstruction_benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to `./reconstruction_benchmarks`
   - suggestion: clone with SSH, especially if you will be contributing to
     them:
-    ```
+    ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
     git clone git@eicweb.phy.anl.gov:EIC/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
-    git clone git@eicweb.phy.anl.gov:EIC/juggler.git
-    git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
     ```
   - follow directions below to build each module
 
@@ -83,7 +79,7 @@ of branches for varying configurations.
     it is recommended to read through `environ.sh` and make any changes as
     needed
   - `$BUILD_NPROC` is the number of parallel threads used for multi-threaded
-    building and running Juggler multi-threaded
+    building and running multi-threaded
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
   - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
@@ -105,16 +101,14 @@ of branches for varying configurations.
 - build each repository, one-by-one, in order of dependences (see
   [flowchart](doc/docDiagram.pdf) dependency graph)
   - build scripts, in recommended order:
-  ```
+  ```bash
   ./build_eicd.sh
   ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
   ./build_ip6.sh
   ./build_epic.sh
-  ./build_juggler.sh # TODO: we need to also update this
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
-- instructions for the `reconstruction_benchmarks` repository are below
 
 ### Recommendations and Troubleshooting
 - execute `./rebuild_all.sh` to quickly rebuild all repositories, in order of
@@ -137,10 +131,12 @@ of branches for varying configurations.
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NPROC` environment variable should be set to the number of
     parellel threads you want to build with (see `environ.sh`)
-  - careful, some module builds consume a lot of memory (Juggler); the build
-    scripts will force single-threaded building for such cases
 
 ## Benchmarks Setup
+- TODO: in light of the reconstruction framework change, the benchmarks will need
+  to be updated; any local benchmark code will be updated or deprecated, but
+  we leave the current documentation here for reference:
+
 The benchmarks run downstream of all other modules, and are useful for running
 tests. For example, automated checks of upstream geometry changes, to see what
 happens to performance plots. They are not required for upstream development,
@@ -148,7 +144,7 @@ but are certainly very useful. Currently we only have plots of raw hits; more
 development is needed here.
 
 Before running benchmarks, you must setup the common benchmarks:
-```
+```bash
 pushd reconstruction_benchmarks
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/common_bench.git setup
 source setup/bin/env.sh
@@ -164,6 +160,12 @@ source environ.sh
   since you now have common benchmarks installed
 - there is no need to repeat this setup procedure, unless you want to start from
   a clean slate or update the common benchmarks
+
+Now install the [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks)
+```bash
+git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
+```
+
 
 ---
 
@@ -215,7 +217,6 @@ source environ.sh
 - run `./run_dd_web_display.sh` to produce the geometry ROOT file
   - by default, it will use the compact file for the *full* detector
   - run `./run_dd_web_display.sh d` to run on dRICH only
-  - run `./run_dd_web_display.sh p` to run on pfRICH only
   - output ROOT file will be in `geo/`
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [CERN host](https://root.cern/js/) (recommended)
@@ -228,7 +229,6 @@ source environ.sh
       └── world_volume
           ├── ...
           ├── DRICH
-          ├── PFRICH
           └── ...
   ```
   - right click on the desired component, then click `Draw`
@@ -261,39 +261,46 @@ There are some local scripts to aid in simulation development; some of them have
 been copied to the `reconstruction_benchmarks` repository, and may be more
 up-to-date there.
 
-All `.cpp` programs are compiled by running `make`, to corresponding `.exe`
-executables.
+All `src/.cpp` programs are compiled by running `make`, which will build corresponding
+executables and install them to `bin/`
 
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage guidance
   - `npsim` is the main script for running Geant4 simulations with DD4hep
   - basically copied to `reconstruction_benchmarks`, but stored here as well for
     backup
-- `drawHits.cpp`
+- example simulation analysis code is found in `src/examples`
+  - see comments within each for more details
+  - build with `make` (from the top-level directory); the corresponding executables
+    will be installed to `bin/`
+- `src/draw_hits.cpp` (run with `bin/draw_hits`)
   - reads simulation output and draws raw hit positions and number of hits vs.
     momentum
-  - build with `make`, execute as `./drawHits.exe [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `pfrich/`
-- `drawSegmentation.cpp`
+  - build with `make`, execute as `bin/draw_hits [simulation_output_file]`
+  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
+- `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
   - relies on `text/sensorLUT.dat`, which must be up-to-date
     - you can produce a new version of this file by uncommenting relevant lines
       in `epic/src/DRICH_geo.cpp` (search for `generate LUT`), and running
       something like `./rebuild_all.sh && ./run_dd_web_display.sh`
-  - build with `make`, execute with `./drawSegmentation.exe [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `pfrich/`
+  - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
+  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
 ## Benchmarks
-- use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
-  benchmarks
-  - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
-    which is executed by the benchmarks CI
-    - this script runs `npsim` and `juggler`
-  - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
-    commands used by the CI
-  - it is practical to edit this wrapper script during development, for testing
-    purposes; this is why several lines are commented out
+- TODO: in light of the reconstruction framework change, the benchmarks will need
+  to be updated; any local benchmark code will be updated or deprecated, but
+  we leave the current documentation here for reference:
+  - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
+    benchmarks
+    - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
+      which is executed by the benchmarks CI
+      - this script runs `npsim` and `juggler`
+    - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
+      commands used by the CI
+    - it is practical to edit this wrapper script during development, for testing
+      purposes; this is why several lines are commented out
 
 ## Miscellaneous
 - the `math/` directory contains scripts and Mathematica notebooks used to

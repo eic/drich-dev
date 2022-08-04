@@ -117,7 +117,7 @@ if inputFileName != '':
     if not bool(re.search('^/', inputFileName)): inputFileName = workDir + "/" + inputFileName
 ##### ensure output file name has absolute path (and generate default name, if unspecified)
 if outputFileName == '':
-    outputFileName = workDir + "/sim_rich_" + runType + ".root"  # default name
+    outputFileName = workDir + "/out/sim.root"  # default name
 elif not bool(re.search('^/', outputFileName)):
     outputFileName = workDir + "/" + outputFileName  # convert relative path to absolute path
 ##### get output file basename
@@ -137,8 +137,8 @@ else:
 
 ### get env vars
 
+detMain = 'epic'
 detPath = os.environ['DETECTOR_PATH']
-detMain = os.environ['JUGGLER_DETECTOR']
 localDir = os.environ['LOCAL_DATA_PATH']
 
 ### set compact file
@@ -432,6 +432,7 @@ cmd += " --runType " + runType
 cmd += " --compactFile " + compactFile
 # cmd += " --random.seed 1 "
 cmd += " --outputFile " + outputFileName
+# cmd += " --part.keepAllParticles True "
 if (testNum > 0):
     cmd += " --macro " + m.name
     cmd += " --enableG4GPS"

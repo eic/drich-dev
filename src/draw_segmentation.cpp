@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
   // arguments
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  TString infileN="out/sim_run.root";
+  TString infileN="out/sim.root";
   if(argc>1) infileN = TString(argv[1]);
 
   // settings

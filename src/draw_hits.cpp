@@ -1,5 +1,5 @@
 // draw hits, and make some other related plots
-// (cf. drawSegmentation.cpp for readout)
+// (cf. draw_segmentation.cpp for readout)
 #include <cstdlib>
 #include <iostream>
 
@@ -29,7 +29,7 @@ TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0)
 int main(int argc, char** argv) {
 
   // setup
-  TString infileN="out/sim_run.root";
+  TString infileN="out/sim.root";
   if(argc>1) infileN = TString(argv[1]);
   //TApplication mainApp("mainApp",&argc,argv); // keep canvases open
   //EnableImplicitMT();

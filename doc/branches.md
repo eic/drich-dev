@@ -12,7 +12,6 @@ We intend to keep these tables up-to-date as development proceeds.
 | `epic`                      | `main`   |
 | `eicd`                      | `master` |
 | `irt`                       | `main`   |
-| `juggler`                   | `master` |
 | `reconstruction_benchmarks` | `master` |
 
 ## Optics Tuning
@@ -30,7 +29,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | `epic`                      | `main`                                                                                                      |
 | `eicd`                      | [`irt-data-model`](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                 |
 | `irt`                       | `main` or [`edm4hep-refactoring`](https://eicweb.phy.anl.gov/EIC/irt/-/merge_requests/10)                   |
-| `juggler`                   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                  |
+| `juggler`                   | [`73-add-rich-irt-algorithm`](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377) (for reference)  |
 | `reconstruction_benchmarks` | [`irt-benchmark`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222) |
 
 ## Sensor Development
