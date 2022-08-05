@@ -8,15 +8,18 @@ require 'awesome_print'
 require 'nokogiri'
 require 'fileutils'
 require 'open3'
+require 'timeout'
 require 'pry'
 
 
-### SETTINGS *************************************
+### GLOBAL SETTINGS **********************************
 Detector      = 'epic'                          # path to detector repository
 CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
-Cleanup       = true                            # if true, remove transient files from `#{Detector}/`
-MultiThreaded = true                            # if true, run one simulation job per thread
-PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to run (`if MultiThreaded`)
+# ***
+Cleanup       = false                  # if true, remove transient files from `#{Detector}/`
+MultiThreaded = true                   # if true, run one simulation job per thread
+PoolSize      = [`nproc`.to_i-2,1].max # number of parallel threads to run (`if MultiThreaded`)
+TimeLimit     = 300                    # terminate a pipeline if it takes longer than `TimeLimit` seconds (set to `0` to disable)
 
 
 ### ARGUMENTS ****************************************
@@ -265,14 +268,41 @@ def execute_thread(sim)
     out.puts sim[:pipelines].map{ |p| p.join(' ') }.ai(plain: true)
   end
   # loop over pipelines
+  timed_out = false
   sim[:pipelines].each do |simulation_pipeline|
-    # execute pipeline, with logging
+    # execute pipeline, with logging, and timeout control
     print_thread_status.call simulation_pipeline.map(&:first).join(' | ')
-    Open3.pipeline(
-      *simulation_pipeline,
-      :out=>["#{sim[:log]}.out",'a'],
-      :err=>["#{sim[:log]}.err",'a'],
-    )
+    pipeline_waiters = []
+    begin
+      Timeout::timeout(TimeLimit) do
+        # use `pipeline_start`, so calling thread is in control (allows Timeout::timeout to work)
+        pipeline_waiters = Open3.pipeline_start(
+          *simulation_pipeline,
+          :out=>["#{sim[:log]}.out",'a'],
+          :err=>["#{sim[:log]}.err",'a'],
+        )
+        Process.waitall # wait for all pipeline_waiters to finish
+      end
+    rescue Timeout::Error
+      timed_out = true
+      # print timeout error
+      print_thread_status.call "TIMEOUT: #{simulation_pipeline.map(&:first).join(' | ')}"
+      File.open("#{sim[:log]}.err",'a') do |out|
+        out.puts '='*30
+        out.puts "TIMEOUT LIMIT REACHED, terminate pipeline:"
+        out.puts simulation_pipeline.join(' ')
+        out.puts '='*30
+      end
+      # kill the timed-out pipeline
+      pipeline_waiters.each do |waiter|
+        print_thread_status.call "KILL #{waiter}"
+        begin
+          Process.kill('KILL',waiter.pid)
+        rescue Errno::ESRCH
+        end
+      end
+    end
+    return if timed_out # do not run the next pipeline, if timed out
   end
   print_thread_status.call "END"
 end
@@ -285,6 +315,7 @@ ap simulations.first
 print_status 'begin simulation '.upcase + '='*40
 if MultiThreaded
   print_status "running multi-threaded with PoolSize = #{PoolSize}"
+  print_status "all pipelines have TimeLimit = #{TimeLimit} seconds"
   simulations.each_slice(PoolSize) do |slice|
     pool = slice.map do |simulation|
       Thread.new{ execute_thread simulation }
