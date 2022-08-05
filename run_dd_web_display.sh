@@ -1,22 +1,38 @@
 #!/bin/bash
 set -e
 
+# default output file
+geoDir=$(pwd)/geo
+outputFile=$geoDir/detector_geometry.root
+mkdir -p $geoDir
+
 # set compact file, depending on (optional) argument; default is full epic
-compactFile=$(
-  case "$1" in
-    ("d") echo "epic_drich_only.xml"  ;;
-    ("p") echo "epic_pfrich_only.xml" ;;
-    (*)   echo "epic.xml"             ;;
-  esac)
+case $1 in
+  d)
+    compactFile="epic_drich_only.xml"
+    ;;
+  p)
+    compactFile="epic_pfrich_only.xml"
+    ;;
+  c)
+    if [ $# -lt 3 ]; then
+      echo "ARG 'c' requires <compactFile> and <outputFile>"
+      exit 2
+    fi
+    compactFile=$(echo $2 | sed 's;^epic/;;')
+    outputFile=$(pwd)/$3
+    ;;
+  *)
+    compactFile="epic.xml"
+esac
 echo "compactFile = $compactFile"
+echo "outputFile  = $outputFile"
 
 # produce geometry root file
-wdir=$(pwd)/geo
-mkdir -p $wdir
 pushd epic
-dd_web_display --export -o $wdir/detector_geometry.root $compactFile
+dd_web_display --export -o $outputFile $compactFile
 popd
 echo ""
-echo "produced $(ls -t $wdir/*.root|head -n1)"
+echo "produced $outputFile"
 echo " -> open it with jsroot to view the geometry"
 echo ""

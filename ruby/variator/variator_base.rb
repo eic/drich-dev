@@ -28,7 +28,20 @@ class VariatorBase
   @@test_optics = Proc.new do |settings|
     [
       ### be sure optics-debugging mode is disabled
-      [[ 'scripts/edit_xml.rb', settings[:compact_drich], '//constant[@name="DRICH_debug_optics"]', 'value', '0' ]],
+      [[
+        'scripts/edit_xml.rb',
+        settings[:compact_drich],
+        '//constant[@name="DRICH_debug_optics"]',
+        'value',
+        '0'
+      ]],
+      ### draw geometry
+      [[
+        './run_dd_web_display.sh',
+        'c',
+        settings[:compact_detector], 
+        settings[:output].sub(/root$/,'geometry.root'),
+      ]],
       ### run simulation to check hit rings at varying theta
       [[
         './simulate.py',
@@ -38,9 +51,18 @@ class VariatorBase
         "-o #{settings[:output]}",
       ]],
       ### draw the hits
-      [[ 'bin/draw_hits', settings[:output] ]],
+      [[
+        'bin/draw_hits',
+        settings[:output]
+      ]],
       ### enable optics-debugging mode: all components become vacuum, except for mirrors
-      [[ 'scripts/edit_xml.rb', settings[:compact_drich], '//constant[@name="DRICH_debug_optics"]', 'value', '1' ]],
+      [[
+        'scripts/edit_xml.rb',
+        settings[:compact_drich],
+        '//constant[@name="DRICH_debug_optics"]',
+        'value',
+        '1'
+      ]],
       ### visualize parallel-to-point focal region
       #   - NOTE: use Xvfb to suppress OGL windows (`xvfb-run opt/eic-shell`)
       #   - `exit` is piped to automatically exit the interactive G4 shell
@@ -50,6 +72,7 @@ class VariatorBase
           "./simulate.py",
           "-t 12",
           "-v",
+          "-n 15",
           "-m svg",
           "-c #{settings[:compact_detector]}",
           "-o #{settings[:output]}",
