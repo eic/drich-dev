@@ -258,8 +258,11 @@ def execute_thread(sim)
   print_thread_status.call "BEGIN"
   # print settings for this variant to log file
   File.open("#{sim[:log]}.info",'w') do |out|
-    out.puts "VARIANT #{sim[:id]}"
+    out.puts "VARIANT #{sim[:id]}:"
     out.write sim[:variant_info].ai(plain: true)
+    out.puts "\n"
+    out.puts "PIPELINE:"
+    out.puts sim[:pipelines].map{ |p| p.join(' ') }.ai(plain: true)
   end
   # loop over pipelines
   sim[:pipelines].each do |simulation_pipeline|

@@ -250,7 +250,7 @@ else:
 
 ### set envelope limits
 envBufferMin = 5
-envBufferMax = 10
+envBufferMax = 15
 if (zDirection < 0):
     rMin = params['PFRICH_rmin1'] + envBufferMin
     rMax = params['PFRICH_rmax'] - envBufferMax
