@@ -56,14 +56,14 @@ of branches for varying configurations.
     - the image and builds will be stored in `./opt`
     - run `opt/eic-shell` to start a container
     - this wrapper script may not be supported in the future (use `eic-shell --upgrade` instead)
-- obtain EPIC Software modules, either clone or symlink the repositories to the
+- Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
-  - modules:
+  - Modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`
     - [epic](https://github.com/eic/epic) to `./epic`
     - [irt](https://github.com/eic/irt) to `./irt`
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-  - suggestion: clone with SSH, especially if you will be contributing to
+  - Suggestion: clone with SSH, especially if you will be contributing to
     them:
     ```bash
     git clone git@github.com:eic/epic.git
@@ -71,7 +71,7 @@ of branches for varying configurations.
     git clone git@github.com:eic/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     ```
-  - follow directions below to build each module
+  - Follow directions below to build each module
 
 ## Environment
 - execute `source environ.sh`
