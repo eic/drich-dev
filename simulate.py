@@ -79,7 +79,7 @@ helpStr = f'''
                 -m [output image type]: save visual with specified type (svg,pdf,ps)
                    - useful tip: if you want to suppress the drawing of the visual, but
                      still save an output image, use Xvbf (start EIC container shell
-                     as `xvfb-run ./eic-shell`); this is good for batch processing
+                     as `xvfb-run eic-shell`); this is good for batch processing
                 -o [output file]: output root file name (overrides any default name)
     '''
 
