@@ -46,16 +46,16 @@ of branches for varying configurations.
     own set up; in that case, make symlinks to your local `git` repository
     clones, so you can use the scripts in this directory
 - Obtain the EIC Software image (`jug_xl`):
-  - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
-    - this is just a wrapper of the commonly-used `install.sh` script;
-      alternatively, use that script directly by following
-      [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
-    - depending on your setup, you may want or need to pass additional options;
-      see for example `opt/update.arcturus.sh` (especially if you are low on
-      disk space on your `/` partition)
+  - follow [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
+    to obtain the EIC software image
+    - the `eic-shell` script is used to start a container shell
+    - this image contains all the dependencies needed for EPIC simulations
+    - all documentation below assumes you are running in `eic-shell`
+  - alternatively, we have a wrapper script:
+    - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
     - the image and builds will be stored in `./opt`
-  - execute `./eic-shell` to start the container; practically everything below
-    must be executed within this container
+    - run `opt/eic-shell` to start a container
+    - this wrapper script may not be supported in the future (use `eic-shell --upgrade` instead)
 - obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - modules:
