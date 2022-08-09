@@ -49,8 +49,15 @@ of branches for varying configurations.
   - follow [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
     to obtain the EIC software image
     - the `eic-shell` script is used to start a container shell
-    - this image contains all the dependencies needed for EPIC simulations
     - all documentation below assumes you are running in `eic-shell`
+    - this image contains all the dependencies needed for EPIC simulations
+      - tip: when in a container shell (`eic-shell`), see `/opt/software/linux.../gcc.../`
+        for the installed software
+        - for example, if you want to check exactly what is available in the
+          [EDM4hep](https://github.com/key4hep/EDM4hep) data model, see the headers
+          in `/opt/software/linux.../gcc.../edm4hep.../include/edm4hep/` (these are
+          produced by the [edm4hep.yaml](https://github.com/key4hep/EDM4hep/blob/master/edm4hep.yaml)
+          configuration file)
   - alternatively, we have a wrapper script:
     - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
     - the image and builds will be stored in `./opt`
@@ -59,12 +66,15 @@ of branches for varying configurations.
 - Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - Modules:
-    - [ip6](https://github.com/eic/ip6) to `./ip6`
-    - [epic](https://github.com/eic/epic) to `./epic`
-    - [irt](https://github.com/eic/irt) to `./irt`
-    - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`
-  - Suggestion: clone with SSH, especially if you will be contributing to
-    them:
+    - [ip6](https://github.com/eic/ip6) to `./ip6`, for the IP6 beamline geometry,
+      based on [DD4hep](https://github.com/AIDASoft/DD4hep)
+    - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry
+      based on [DD4hep](https://github.com/AIDASoft/DD4hep)
+    - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
+    - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`, for the data model; see also
+      [EDM4hep](https://github.com/key4hep/EDM4hep) for the common data model, which is included
+      in the EIC software image
+  - Suggestion: clone with SSH, which is required for contributions:
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/ip6.git
