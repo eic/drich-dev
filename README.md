@@ -68,7 +68,7 @@ of branches for varying configurations.
   - Modules:
     - [ip6](https://github.com/eic/ip6) to `./ip6`, for the IP6 beamline geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
-    - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry
+    - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
     - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`, for the data model; see also
