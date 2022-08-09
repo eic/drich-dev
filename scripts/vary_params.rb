@@ -22,7 +22,7 @@ PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to 
 ### ARGUMENTS ****************************************
 OutputDirMain = 'out'
 VariatorDir   = 'ruby/variator'
-variator_code = 'var0'
+variator_code = 'template'
 if ARGV.length<1
   $stderr.puts """
   USAGE: #{$0} [OUTPUT ID] [VARIATOR CODE (default=#{variator_code})]
