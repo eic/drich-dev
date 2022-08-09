@@ -29,7 +29,7 @@ of branches for varying configurations.
 
 ## Notes for ATHENA
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
-  has since been modified to support the Project Detector of the EIC
+  has since been modified to support EPIC
 - See [doc/athena-branches.md](doc/athena-branches.md) for information about the
   development branches and merge requests that were used for the ATHENA proposal
 - It is possible that the pfRICH scripts no longer work, since we now focus on
