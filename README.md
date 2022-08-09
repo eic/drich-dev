@@ -83,7 +83,7 @@ of branches for varying configurations.
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
   - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
-    - by default, it should be `./opt/local`
+    - by default, it should be `<path to eic-shell>/local`
     - change it, if you prefer
   - you can find documentation for many other variables in the corresponding
     module repositories
@@ -113,7 +113,7 @@ of branches for varying configurations.
   - sometimes things will break, simply because a dependent module is out of
     date; in that case, make sure all repositories are as up-to-date as
     possible; you may also need to update your Singularity/Docker image
-    (`opt/update.sh`)
+    (`eic-shell --upgrade`)
 - be mindful of which branch you are on in each repository, especially if you
   have several active merge requests
   - for example, `irt` requires the new `eicd` components and datatypes, which
