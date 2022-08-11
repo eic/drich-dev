@@ -1,4 +1,4 @@
-# Links to dRICH Software and Resources
+# Links to Additional dRICH Software and Resources
 
 - Fun4all Standalone: <https://github.com/cisbani/dRICh>
   - Geometry G4 text file: <https://github.com/cisbani/dRICh/tree/main/share/config>
@@ -10,7 +10,7 @@
   - Placement Algorithms: `src/DRICH_geo.cpp`
   - Optical / Material Property Tables: `compact/optical_materials.xml`
   - GDML Files available in CI artifacts
-  - IRT, documentation, and analysis: <https://eicweb.phy.anl.gov/EIC/irt>
+  - IRT, documentation, and analysis: <https://github.com/eic/irt>
   - Development scripts + more documentation: <https://github.com/c-dilks/drich-dev>
 
 - GEMC: <https://github.com/EIC-eRD11/dualRICH_inMEIC>

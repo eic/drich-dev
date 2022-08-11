@@ -6,4 +6,4 @@ if [ $# -ne 1 ]; then
   exit 2
 fi
 
-npdet_info search $1 --value ecce/ecce.xml
+npdet_info search $1 --value epic/epic.xml

@@ -1,23 +1,32 @@
 *.sw*
 *.root
-*.exe
+*.pyc
 *.png
-macro/*.mac
-Gemfile.lock
+*.exe
 
-juggler
+bin
+macro
+!macro/.keep
+out
+!out/.keep
+
 irt
-athena
-ecce
+epic
 ip6
 eicd
 reconstruction_benchmarks
 
+juggler
+athena
+ecce
+
 calibrations
 fieldmaps
-doc/detector.md
-tmp.mac
 
 *.hepmc*
-hepmc/*
+hepmc
 !hepmc/README.md
+
+.rbenv
+.ruby-version
+Gemfile.lock

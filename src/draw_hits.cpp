@@ -1,5 +1,5 @@
 // draw hits, and make some other related plots
-// (cf. drawSegmentation.cpp for readout)
+// (cf. draw_segmentation.cpp for readout)
 #include <cstdlib>
 #include <iostream>
 
@@ -28,9 +28,11 @@ TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0)
 
 int main(int argc, char** argv) {
 
-  // setup
-  TString infileN="out/sim_run.root";
+  // args
+  TString infileN="out/sim.root";
   if(argc>1) infileN = TString(argv[1]);
+
+  // setup
   //TApplication mainApp("mainApp",&argc,argv); // keep canvases open
   //EnableImplicitMT();
   RDataFrame dfIn("events",infileN.Data());
@@ -38,6 +40,7 @@ int main(int argc, char** argv) {
   outfileN(TRegexp("\\.root$"))=".";
   TFile *outfile = new TFile(outfileN+"plots.root","RECREATE");
   gStyle->SetOptStat(0);
+  gStyle->SetPalette(55);
 
 
   /* lambdas
@@ -81,13 +84,13 @@ int main(int argc, char** argv) {
 
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
-      { "hitPositions","dRICh hit positions (units=cm)",
+      { "hitPositions","dRICH hit positions (units=cm)",
       1000,-200,200, 1000,-200,200 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
-      { "numHitsVsThrownP","number of dRICh hits vs. thrown momentum", 
-      65,0,65, 100,0,200 },
+      { "numHitsVsThrownP","number of dRICH hits vs. thrown momentum", 
+      65,0,65, 100,0,80 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
 

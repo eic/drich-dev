@@ -21,7 +21,7 @@ import DDG4
 if not 'DETECTOR_PATH' in os.environ:
     print('ERROR: env var DETECTOR_PATH not set',file=sys.stderr)
     exit(1)
-mainFile = os.environ['DETECTOR_PATH'] + '/ecce.xml'
+mainFile = os.environ['DETECTOR_PATH'] + '/epic.xml'
 richFile = os.environ['DETECTOR_PATH'] + '/compact/drich.xml'
 
 ########################################
