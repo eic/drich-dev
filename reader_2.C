@@ -37,7 +37,7 @@ void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
     exit(0);
   } //if
 
-  auto ed = new TH2D("ed","ed;x[cm];y[cm]",1000,-200,200, 1000,-200,200);
+  //auto ed = new TH2D("ed","ed;x[cm];y[cm]",1000,-200,200, 1000,-200,200);
   auto nq = new TH1D("nq", "Photon count",            50,      0,    100);
   auto np = new TH1D("np", "Photon count",            50,      0,    100);
   //auto fi = new TH1D("fi", "Cherenkov phi angle",      30,-180.0,  180.0);
@@ -139,7 +139,7 @@ void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
         double pmag = TMath::Sqrt(TMath::Power(hit.momentum.x,2)+ TMath::Power(hit.momentum.y,2) + TMath::Power(hit.momentum.z,2));
         double wave_length = 1239.84/(1E9*pmag);
         //cout<<"Lambda: "<<wave_length<<endl;
-        auto xx = hit.position.x; auto yy = hit.position.y; 
+        //auto xx = hit.position.x; auto yy = hit.position.y; 
         //ed->Fill(xx/10,yy/10);
         wl->Fill(wave_length); 
         auto photon = new OpticalPhoton();
@@ -147,12 +147,14 @@ void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
           auto x = hit.position.x;
           auto y = hit.position.y;
           auto z = hit.position.z;
-          printf("Recorded Hit Poistion ------> %f %f %f\n",x,y,z);
+          // printf("Recorded Hit Poistion ------> %f %f %f\n",x,y,z);
+          printf("from reader: %5d %10.3f %10.3f %10.3f\n",phcounter,x,y,z);
           photon->SetDetectionPosition(TVector3(x, y, z));
         }
         // A single photodetector type is used;
         photon->SetPhotonDetector(detector->m_PhotonDetectors[0]);  //?
-        photon->SetDetected(true); phcounter+=1;
+        photon->SetDetected(true);
+        phcounter+=1;
         // Get cell index; mask out everything apart from {module,sector};
         photon->SetVolumeCopy(hit.cellID & detector->GetReadoutCellMask());
         //photon->SetVolumeCopy(hit.cellID & detector->GetReadoutCellMask());
@@ -188,6 +190,7 @@ void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
         pid.AddMassHypothesis(0.494);
         
         printf("Entering PID Rec:%zu\n",photons.size()); 
+        for(auto photon : photons) particle->FindRadiatorHistory(gas)->AddOpticalPhoton(photon);
         particle->PIDReconstruction(pid);
         {
           auto pion = pid.GetHypothesis(0), kaon = pid.GetHypothesis(1);
