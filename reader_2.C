@@ -188,7 +188,7 @@ void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
         pid.AddMassHypothesis(0.494);
         
         printf("Entering PID Rec:%zu\n",photons.size()); 
-        particle->PIDReconstruction(pid, photons);
+        particle->PIDReconstruction(pid);
         {
           auto pion = pid.GetHypothesis(0), kaon = pid.GetHypothesis(1);
           double wt0 = pion->GetWeight(gas), wt1 = kaon->GetWeight(gas);
