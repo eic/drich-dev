@@ -6,3 +6,4 @@ set -e
 ./build_irt.sh $*
 ./build_ip6.sh $*
 ./build_epic.sh $*
+./build_juggler.sh $*
