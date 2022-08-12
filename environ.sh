@@ -14,6 +14,18 @@ export PRIMARY_PREFIX=$EIC_SHELL_PREFIX
 export IRT_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 
+### tempory juggler vars
+export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
+export LD_LIBRARY_PATH=$JUGGLER_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=${JUGGLER_INSTALL_PREFIX}/python:${PYTHONPATH} # make sure gaudirun.py prioritizes local juggler installation
+export JUGGLER_DETECTOR="epic"
+export BEAMLINE_CONFIG="ip6"
+export JUGGLER_SIM_FILE=$(pwd)/out/sim.root
+export JUGGLER_REC_FILE=test.root
+export JUGGLER_N_EVENTS=100
+export JUGGLER_RNG_SEED=1
+export JUGGLER_N_THREADS=$BUILD_NPROC
+
 # environment from reconstruction_benchmarks
 if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   pushd reconstruction_benchmarks
