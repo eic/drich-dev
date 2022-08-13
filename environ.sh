@@ -66,9 +66,9 @@ alias ll='ls -lhp --color=auto'
 echo """
 
 
- ###########################################
- ###    dRICH Development Environment    ###
- ###########################################
+     ###########################################
+     ###    dRICH Development Environment    ###
+     ###########################################
 
 Beam:
   BEAMLINE_PATH           = $BEAMLINE_PATH
