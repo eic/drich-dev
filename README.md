@@ -359,4 +359,5 @@ simulate.py -t1 -oout/irt.root -s -n50
 reconstruction:
 ```
 scripts/create_irt_auxfile.sh
+reconstruct.sh -j
 ```
