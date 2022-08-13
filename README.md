@@ -67,8 +67,6 @@ of branches for varying configurations.
 - Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - Modules:
-    - [ip6](https://github.com/eic/ip6) to `./ip6`, for the IP6 beamline geometry,
-      based on [DD4hep](https://github.com/AIDASoft/DD4hep)
     - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
     - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
@@ -78,7 +76,6 @@ of branches for varying configurations.
   - Suggestion: clone with SSH, which is required for contributions:
     ```bash
     git clone git@github.com:eic/epic.git
-    git clone git@github.com:eic/ip6.git
     git clone git@github.com:eic/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     ```
@@ -111,13 +108,18 @@ of branches for varying configurations.
   ```bash
   ./build_eicd.sh
   ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
-  ./build_ip6.sh
   ./build_epic.sh
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
+- run `source environ.sh` again, if:
+  - if this is your first time building, or a clean build
+  - if a module's environment has been updated, in particular `epic/templates/setup.sh.in`
 
 ### Recommendations and Troubleshooting
+- be mindful of the environment variables
+  - if in doubt, run `source environ.sh` to update all of them
+  - inspect all of the printed environment variables
 - execute `./rebuild_all.sh` to quickly rebuild all repositories, in order of
   dependences; this is useful when you switch branches in *any* of the
   repositories, or if you pull in updates
