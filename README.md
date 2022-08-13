@@ -344,4 +344,19 @@ executables and install them to `bin/`
 
 ## IRT: Indirect Ray Tracing
 
-- `createIRTauxfile.sh`: create IRT geometry auxiliary config file
+build and setup:
+```
+source environ.sh
+rebuild_all.sh
+source environ.sh
+```
+
+simulate:
+```
+simulate.py -t1 -oout/irt.root -s -n50
+```
+
+reconstruction:
+```
+scripts/create_irt_auxfile.sh
+```

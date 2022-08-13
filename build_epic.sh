@@ -20,7 +20,7 @@ fi
 
 cmake -B build -S . \
   -DCMAKE_INSTALL_PREFIX=$PRIMARY_PREFIX \
-  -DIRT_AUXFILE=yes
+  -DIRT_AUXFILE=ON
 cmake --build build -j$BUILD_NPROC -- install
 
 popd
