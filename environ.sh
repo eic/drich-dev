@@ -6,33 +6,44 @@ export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 echo "detected $BUILD_NPROC cpus"
 
-# primary prefix: 
-# note: if you prefer a different prefix, change it here
+# local installation prefix
 export PRIMARY_PREFIX=$EIC_SHELL_PREFIX
 
 # cmake packages
-export IRT_ROOT=$PRIMARY_PREFIX # overrides container version with local version
+export IRT_ROOT=$PRIMARY_PREFIX  # overrides container version with local version
 export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 
-# environment from reconstruction_benchmarks
+# source environment from reconstruction_benchmarks
 if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
   pushd reconstruction_benchmarks
   source .local/bin/env.sh
   popd
 fi
-
-# fix env vars which would have been overwritten by `reconstruction_benchmarks/.local/bin/env.sh`:
 export LOCAL_DATA_PATH=$(pwd)
-export DETECTOR=epic
-export DETECTOR_PATH=$LOCAL_DATA_PATH/$DETECTOR
-#export BEAMLINE_CONFIG_VERSION=master
-#export DETECTOR_VERSION=main
 
-if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
-  printf "\n\n--------------------------------\n"
-  print_env.sh
-  echo "--------------------------------"
-fi
+# source common upstream environment (nightly jug_xl build)
+source /opt/detector/setup.sh
+
+# source local environment
+# - overrides upstream `$DETECTOR*` vars
+# - prioritizes `$PRIMARY_PREFIX/lib` in `$LD_LIBRARY_PATH`
+[ -f $PRIMARY_PREFIX/setup.sh ] && source $PRIMARY_PREFIX/setup.sh
+
+# environment overrides:
+# - prefer local compact files
+export DETECTOR_PATH=$(pwd)/epic
+# - prefer local juggler build
+export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
+export JUGGLER_DETECTOR_PATH=$DETECTOR_PATH
+export JUGGLER_N_THREADS=$BUILD_NPROC
+# - update prompt
+export PS1="${PS1:-}"
+export PS1="drich${PS1_SIGIL}>${PS1#*>}"
+unset branch
+
+# prioritize local build targets
+export LD_LIBRARY_PATH=$PRIMARY_PREFIX/lib:$LD_LIBRARY_PATH # redundant, if sourced `$PRIMARY_PREFIX/setup.sh`
+export PYTHONPATH=$PRIMARY_PREFIX/python:$PYTHONPATH
 
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$(pwd)/.rbenv
@@ -42,9 +53,52 @@ if [ -d "$RBENV_ROOT" ]; then
   export PYTHON=$(which python) # for pycall gem
 fi
 
-### additional comfort settings, some dependent on host machine; 
-### feel free to add your own here
-export PATH=$(pwd)/bin:$PATH  # add ./bin to $PATH
-export PATH=.:$PATH  # add ./ to $PATH
-shopt -s autocd      # enable autocd
-if [ -d "${HOME}/bin" ]; then export PATH=$PATH:${HOME}/bin; fi   # add ~/bin to $PATH
+# additional comfort settings; add your own here
+# - PATH additions
+export PATH=.:$PATH                                   # ./
+export PATH=$(pwd)/bin:$PATH                          # drich-dev/bin
+[ -d "${HOME}/bin" ] && export PATH=$PATH:${HOME}/bin # ~/bin
+# - shell settings and aliases
+shopt -s autocd # enable autocd (`alias <dirname>='cd <dirname>'`)
+alias ll='ls -lhp --color=auto'
+
+# print environment
+echo """
+
+
+ ###########################################
+ ###    dRICH Development Environment    ###
+ ###########################################
+
+Beam:
+  BEAMLINE_PATH           = $BEAMLINE_PATH
+  BEAMLINE_CONFIG         = $BEAMLINE_CONFIG
+  BEAMLINE_CONFIG_VERSION = $BEAMLINE_CONFIG_VERSION
+
+Detector:
+  DETECTOR         = $DETECTOR
+  DETECTOR_PATH    = $DETECTOR_PATH
+  DETECTOR_CONFIG  = $DETECTOR_CONFIG
+  DETECTOR_VERSION = $DETECTOR_VERSION
+
+Packages:
+  IRT_ROOT  = $IRT_ROOT
+  EICD_ROOT = $EICD_ROOT
+
+Juggler (to be deprecated):
+  JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
+  JUGGLER_DETECTOR         = $JUGGLER_DETECTOR
+  JUGGLER_DETECTOR_CONFIG  = $JUGGLER_DETECTOR_CONFIG
+  JUGGLER_DETECTOR_VERSION = $JUGGLER_DETECTOR_VERSION
+  JUGGLER_DETECTOR_PATH    = $JUGGLER_DETECTOR_PATH
+  JUGGLER_BEAMLINE_CONFIG  = $JUGGLER_BEAMLINE_CONFIG
+  JUGGLER_BEAMLINE_CONFIG_VERSION = $JUGGLER_BEAMLINE_CONFIG_VERSION
+
+LD_LIBRARY_PATH:
+  $(echo $LD_LIBRARY_PATH | sed 's/:/\n  /g')
+
+Common:
+  BUILD_NPROC    = $BUILD_NPROC
+  PRIMARY_PREFIX = $PRIMARY_PREFIX
+
+"""
