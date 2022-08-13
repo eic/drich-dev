@@ -24,7 +24,7 @@ export LOCAL_DATA_PATH=$(pwd)
 # source common upstream environment (nightly jug_xl build)
 source /opt/detector/setup.sh
 
-# source local environment
+# source local environment (a build target from `epic`)
 # - overrides upstream `$DETECTOR*` vars
 # - prioritizes `$PRIMARY_PREFIX/lib` in `$LD_LIBRARY_PATH`
 [ -f $PRIMARY_PREFIX/setup.sh ] && source $PRIMARY_PREFIX/setup.sh
