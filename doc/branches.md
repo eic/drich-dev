@@ -8,7 +8,6 @@ We intend to keep these tables up-to-date as development proceeds.
 | Repository                  | Branch   |
 | --:                         | ---      |
 | `drich-dev`                 | `main`   |
-| `ip6`                       | `master` |
 | `epic`                      | `main`   |
 | `eicd`                      | `master` |
 | `irt`                       | `main`   |
