@@ -466,6 +466,7 @@ cmd = [
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName}',
+        "--part.userParticleHandler=''", # necessary for opticalphotons truth output
         # '--random.seed 1',
         # '--part.keepAllParticles True',
         ]
