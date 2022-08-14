@@ -359,5 +359,6 @@ simulate.py -t1 -oout/irt.root -s -n50
 reconstruction:
 ```
 scripts/create_irt_auxfile.sh
-reconstruct.sh -j
+recon.sh -j  # use juggler
+recon.sh -r  # use standalone reader (scripts/irt_reader.C)
 ```

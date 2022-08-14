@@ -1,4 +1,4 @@
-void reader_2(const char *dfname, const char *cfname, const char *dtname = 0)
+void irt_reader(const char *dfname, const char *cfname, const char *dtname = 0)
 {
 #define _AEROGEL_
 #define _DRICH_
