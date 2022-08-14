@@ -349,6 +349,7 @@ build and setup:
 source environ.sh
 rebuild_all.sh
 source environ.sh
+scripts/create_irt_auxfile.sh
 ```
 
 simulate:
@@ -358,7 +359,6 @@ simulate.py -t1 -oout/irt.root -s -n50
 
 reconstruction:
 ```
-scripts/create_irt_auxfile.sh
 recon.sh -j  # use juggler
 recon.sh -r  # use standalone reader (scripts/irt_reader.C)
 ```
