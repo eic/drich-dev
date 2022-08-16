@@ -29,6 +29,6 @@ We intend to keep these tables up-to-date as development proceeds.
 | Repository  | Branch                                              | Pull Request                                                                                                 |
 | --:         | ---                                                 | ---                                                                                                          |
 | `drich-dev` | `main`                                              |                                                                                                              |
-| `epic`      | `12-drich-sensor-material-should-not-be-airoptical` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28)) - **TODO: convert to PR** |
+| `epic`      | `12-drich-sensor-material-should-not-be-airoptical` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) - **TODO: convert to PR**  |
 | `eicd`      | `master`                                            |                                                                                                              |
 | `irt`       | `main`                                              |                                                                                                              |
