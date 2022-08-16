@@ -17,7 +17,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | Repository                  | Branch                      | Pull Request                                                                                             |
 | --:                         | ---                         | ---                                                                                                      |
 | `drich-dev`                 | `dev-irt`                   | https://github.com/c-dilks/drich-dev/pull/2                                                              |
-| `epic`                      | `debug-irt-reader`          | https://github.com/eic/epic/pull/51 - awaiting merge                                                     |
+| `epic`                      | `main`                      |                                                                                                          |
 | `eicd`                      | `irt-data-model`            | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
 | `irt`                       | `edm4hep-refactoring`       | https://github.com/eic/irt/pull/2                                                                        |
 | `juggler`                   | `73-add-rich-irt-algorithm` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                              |
