@@ -7,11 +7,12 @@ Resources and Tools for EPIC dRICH development
 | [Implementation](#implementation) | Where to find the code and what it does |
 | [Execution](#execution)           | How to run the code                     |
 
-| **Documentation Links**                        |                                                |
-| --:                                            | ---                                            |
-| [Flowchart](doc/docDiagram.pdf)                | Diagram of software modules                    |
-| [Links](doc/links.md)                          | Collection of dRICH Software and Resources     |
-| [Branches and Merge Requests](doc/branches.md) | Active development branches and merge requests |
+| **Documentation Links**                       |                                               |
+| --:                                           | ---                                           |
+| [Flowchart](doc/docDiagram.pdf)               | Diagram of software modules                   |
+| [Links](doc/links.md)                         | Collection of dRICH Software and Resources    |
+| [Branches and Pull Requests](doc/branches.md) | Active development branches and pull requests |
+| [Project Board](https://github.com/orgs/eic/projects/4) | Issues tracking                     |
 
 ## Notes
 EPIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
@@ -31,7 +32,7 @@ of branches for varying configurations.
 - This repository was used for development of the ATHENA dRICH and pfRICH; it
   has since been modified to support EPIC
 - See [doc/athena-branches.md](doc/athena-branches.md) for information about the
-  development branches and merge requests that were used for the ATHENA proposal
+  development branches and pull requests that were used for the ATHENA proposal
 - It is possible that the pfRICH scripts no longer work, since we now focus on
   the dRICH
 
@@ -127,7 +128,7 @@ of branches for varying configurations.
     possible; you may also need to update your Singularity/Docker image
     (`eic-shell --upgrade`)
 - be mindful of which branch you are on in each repository, especially if you
-  have several active merge requests
+  have several active pull requests
   - for example, `irt` requires the new `eicd` components and datatypes, which
     at the time of writing this have not been merged to `eicd` `master`
   - use `./check_branches.sh` to quickly check which branches you are on in all
