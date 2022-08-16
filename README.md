@@ -12,6 +12,7 @@ Resources and Tools for EPIC dRICH development
 | [Flowchart](doc/docDiagram.pdf)               | Diagram of software modules                   |
 | [Links](doc/links.md)                         | Collection of dRICH Software and Resources    |
 | [Branches and Pull Requests](doc/branches.md) | Active development branches and pull requests |
+| [Project Board](https://github.com/orgs/eic/projects/4) | Issues tracking                     |
 
 ## Notes
 EPIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
