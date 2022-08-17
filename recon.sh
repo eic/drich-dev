@@ -10,18 +10,18 @@ aux_file="geo/irt-drich.root"
 function usage {
   echo """
 USAGE:
-  $0 [OPTION]...
+  $0 [RECONSTRUCTION METHOD] [OPTION]...
 
   RECONSTRUCTION METHODS: (one required)
     -j  run reconstruction through juggler
     -r  run reconstruction with stand-alone reader macro
 
-  OPTIONS (for method  -r  only)
-    -s <simulation_output_file>
-        ROOT file from DD4hep + Geant4
+  OPTIONS
+    -i <simulation_output_file>
+        Input to the reconstruction: ROOT file from DD4hep + Geant4
         [ default = $sim_file ]
     -o <reconstruction_output_file>
-        Output ROOT file to be produced by $0
+        Output ROOT file
         [ default = $rec_file ]
     -x <irt_auxfile>
         IRT geometry auxiliary config file
@@ -32,12 +32,12 @@ USAGE:
 if [ $# -eq 0 ]; then usage; fi
 
 # parse options
-while getopts "hjrs:o:x:" opt; do
+while getopts "hjri:o:x:" opt; do
   case $opt in
     h|\?) usage ;;
     j) method="juggler" ;;
     r) method="reader"  ;;
-    s) sim_file=$OPTARG ;;
+    i) sim_file=$OPTARG ;;
     o) rec_file=$OPTARG ;;
     x) aux_file=$OPTARG ;;
   esac

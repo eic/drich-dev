@@ -346,7 +346,7 @@ executables and install them to `bin/`
 ## IRT: Indirect Ray Tracing
 
 build and setup:
-```
+```bash
 source environ.sh
 rebuild_all.sh
 source environ.sh
@@ -354,12 +354,16 @@ scripts/create_irt_auxfile.sh
 ```
 
 simulate:
-```
+```bash
 simulate.py -t1 -oout/irt.root -s -n50
 ```
 
 reconstruction:
-```
-recon.sh -j  # use juggler
-recon.sh -r  # use standalone reader (scripts/irt_reader.C)
+```bash
+# use juggler
+recon.sh -j
+evaluate.sh
+
+# use standalone reader (irt/scripts/reader)
+recon.sh -r
 ```
