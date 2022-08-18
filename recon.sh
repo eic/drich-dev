@@ -56,6 +56,7 @@ case $method in
     export JUGGLER_REC_FILE=$rec_file
     export JUGGLER_IRT_AUXFILE=$aux_file
     gaudirun.py juggler/JugPID/tests/options/irt.py
+    printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
     ;;
   reader)
     root -b -q irt/scripts/reader_2.C'("'$sim_file'","'$aux_file'")'
