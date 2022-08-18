@@ -1,12 +1,13 @@
 # dRICH-dev
 Resources and Tools for EPIC dRICH development 
 
-| **Table of Contents**             |                                         |
-| --:                               | ---                                     |
-| [Setup](#setup)                   | How to download and build the code      |
-| [Implementation](#implementation) | Where to find the code and what it does |
-| [Execution](#execution)           | How to run the code                     |
-| [Algorithms](#algorithms)         | Documentation for algorithms            |
+| **Table of Contents**               |                                                       |
+| --:                                 | ---                                                   |
+| [Setup](#setup)                     | How to download and build the code                    |
+| [Geometry and Materials](#geometry) | Detector geometry and material properties description |
+| [Simulation](#simulation)           | Running the simulation in Geant4                      |
+| [Reconstruction](#reconstruction)   | Running the reconstruction algorithms                 |
+| [Miscellaneous](#miscellaneous)     | Additional code for support                           |
 
 | **Documentation Links**                       |                                               |
 | --:                                           | ---                                           |
@@ -182,13 +183,10 @@ Now install the [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/bench
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
 ```
 
-
 ---
 
-<a name="implementation"></a>
-# Implementation
-
-## Geometry and Materials
+<a name="geometry"></a>
+# Geometry and Materials
 - the geometry and materials are implemented in DD4hep, in the
   [epic](https://github.com/eic/epic) repository
   - see the [DD4hep class index](https://dd4hep.web.cern.ch/dd4hep/reference/)
@@ -224,12 +222,7 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
       - parameterizations (e.g., of the mirrors)
       - see comments within the code for documentation
 
----
-
-<a name="execution"></a>
-# Execution
-
-## Geometry
+## Viewing the Geometry and Parameter Values
 - run `./run_dd_web_display.sh` to produce the geometry ROOT file
   - by default, it will use the compact file for the *full* detector
   - run `./run_dd_web_display.sh d` to run on dRICH only
@@ -265,20 +258,19 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
     further guidance
 
-
-### GDML Output
+## GDML Output
 - currently we use the CI for this, from the `epic` repository
   (the `athena` repository has a dRICH specific GDML output CI job, but at the
   time of writing this, this automation is not yet present in `epic` CI)
 - TODO: add a local script to automate connection to Fun4all
 
-## Simulation
-There are some local scripts to aid in simulation development; some of them have
-been copied to the `reconstruction_benchmarks` repository, and may be more
-up-to-date there.
+---
 
-All `src/.cpp` programs are compiled by running `make`, which will build corresponding
-executables and install them to `bin/`
+<a name="simulation"></a>
+# Simulation
+There are some local scripts to aid in simulation development. All compilable
+`src/.cpp` programs are compiled by running `make`, which will build
+corresponding executables and install them to `bin/`
 
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage guidance
@@ -304,7 +296,7 @@ executables and install them to `bin/`
   - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
-### Automated Parameter Variation
+## Automated Parameter Variation
 - use `scripts/vary_params.rb` to run simulation jobs while varying dRICH compact file parameters
   - Ruby gems (dependencies) are required to run this; see [doc/ruby.md](doc/ruby.md) for guidance
   - The input of this script is a configuration file, written as a class
@@ -319,35 +311,10 @@ executables and install them to `bin/`
     - The script runs multi-threaded: one thread per variant
       - Output `stdout` and `stderr` are logged, along with your shell command pipelines
 
-## Benchmarks
-- TODO: in light of the reconstruction framework change, the benchmarks will need
-  to be updated; any local benchmark code will be updated or deprecated, but
-  we leave the current documentation here for reference:
-  - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
-    benchmarks
-    - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
-      which is executed by the benchmarks CI
-      - this script runs `npsim` and `juggler`
-    - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
-      commands used by the CI
-    - it is practical to edit this wrapper script during development, for testing
-      purposes; this is why several lines are commented out
-
-## Miscellaneous
-- the `math/` directory contains scripts and Mathematica notebooks used to
-  perform miscellaneous calculations; many are "once and done" and don't really
-  need to be implemented in the source code
-- the `scripts/` directory contains all other miscellaneous scripts; 
-  - some scripts are in Ruby; follow [this guide](doc/ruby.md) to install gems
-  (dependencies)
-- `deprecated/` contains some old scripts which may also be helpful
-
-
 ---
 
-
-<a name="algorithms"></a>
-# Algorithms
+<a name="reconstruction"></a>
+# Reconstruction
 
 ## IRT: Indirect Ray Tracing
 
@@ -380,3 +347,30 @@ recon.sh -h   # for usage guide, such as how to specify input/output files
 ```bash
 evaluate.sh
 ```
+
+## Benchmarks
+- TODO: in light of the reconstruction framework change, the benchmarks will need
+  to be updated; any local benchmark code will be updated or deprecated, but
+  we leave the current documentation here for reference:
+  - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
+    benchmarks
+    - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
+      which is executed by the benchmarks CI
+      - this script runs `npsim` and `juggler`
+    - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
+      commands used by the CI
+    - it is practical to edit this wrapper script during development, for testing
+      purposes; this is why several lines are commented out
+
+
+---
+
+<a name="miscellaneous"></a>
+# Miscellaneous
+- the `math/` directory contains scripts and Mathematica notebooks used to
+  perform miscellaneous calculations; many are "once and done" and don't really
+  need to be implemented in the source code
+- the `scripts/` directory contains all other miscellaneous scripts; 
+  - some scripts are in Ruby; follow [this guide](doc/ruby.md) to install gems
+  (dependencies)
+- `deprecated/` contains some old scripts which may also be helpful
