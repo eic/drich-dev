@@ -11,12 +11,18 @@ require 'open3'
 require 'timeout'
 require 'pry'
 
+### environment check
+if ENV['DETECTOR'].nil? or ENV['DETECTOR_PATH'].nil?
+  $stderr.puts "ERROR: source environ.sh"
+  exit 1
+end
 
 ### GLOBAL SETTINGS **********************************
-Detector      = 'epic'                          # path to detector repository
-CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
+Detector     = ENV['DETECTOR']                     # detector name
+DetectorPath = ENV['DETECTOR_PATH']                # detector installation prefix path
+CompactFile  = "#{DetectorPath}/compact/drich.xml" # dRICH compact file
 # ***
-Cleanup       = false                  # if true, remove transient files from `#{Detector}/`
+Cleanup       = false                  # if true, remove transient files
 MultiThreaded = true                   # if true, run one simulation job per thread
 PoolSize      = [`nproc`.to_i-2,1].max # number of parallel threads to run (`if MultiThreaded`)
 TimeLimit     = 300                    # terminate a pipeline if it takes longer than `TimeLimit` seconds (set to `0` to disable)
@@ -111,7 +117,7 @@ end
 #   (xml parsers tend to re-format the syntax)
 xml = Nokogiri::XML File.open(CompactFile)
 compact_drich_orig = [OutputDir,'compact',File.basename(CompactFile)].join '/'
-puts compact_drich_orig
+puts "write parsed XML tree to #{compact_drich_orig}"
 File.open(compact_drich_orig,'w') { |out| out.puts xml.to_xml }
 
 # build array of variants, the results of the variation functions
@@ -194,10 +200,10 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
     node.set_attribute var[:attribute], var[:value]
   end
 
-  # create drich compact file `compact_drich`, by writing `xml_clone`
+  # create drich compact file variant `compact_drich`, by writing `xml_clone`
   # - this is a modification of `CompactFile`, with this variant's attributes set
-  # - `compact_drich` is written to `#{Detector}/compact`, and copied to `OutputDir`
-  basename = File.basename(CompactFile,'.xml') + "_variant#{variant_id}"
+  # - `compact_drich` is written to `#{DetectorPath}/compact`, and copied to `OutputDir`
+  basename      = "#{File.basename(CompactFile,'.xml')}_variant#{variant_id}"
   compact_drich = "#{File.dirname(CompactFile)}/#{basename}.xml"
   print_status "produce compact file variant #{compact_drich}"
   File.open(compact_drich,'w') { |out| out.puts xml_clone.to_xml }
@@ -213,13 +219,13 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
     out.puts <<~EOF
       features:
         pid:
-          drich: #{compact_drich.gsub(/^#{Detector}\//,'')}
+          drich: #{compact_drich}
     EOF
   end
 
   # render the full detector compact file, `compact_detector`
   # - it will include `compact_drich` instead of the default `CompactFile`
-  compact_detector = "#{Detector}/#{Detector}_#{basename}.xml"
+  compact_detector = "#{DetectorPath}/#{Detector}_#{basename}.xml"
   print_status "jinja2 render template to #{compact_detector}"
   render = [
     "#{Detector}/bin/make_detector_configuration",
