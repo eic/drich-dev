@@ -74,11 +74,14 @@ of branches for varying configurations.
     - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`, for the data model; see also
       [EDM4hep](https://github.com/key4hep/EDM4hep) for the common data model, which is included
       in the EIC software image
+    - [juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`, for the reconstruction
+      framework used in ATHENA, and supported while we migrate to the new reconstruction framework in EPIC
   - Suggestion: clone with SSH, which is required for contributions:
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/irt.git
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
+    git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     ```
   - Follow directions below to build each module
 
@@ -108,8 +111,9 @@ of branches for varying configurations.
   - build scripts, in recommended order:
   ```bash
   ./build_eicd.sh
-  ./build_irt.sh  # TODO: we need to update this for EPIC, you can ignore it for now...
+  ./build_irt.sh
   ./build_epic.sh
+  ./build_juggler.sh
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
@@ -345,25 +349,32 @@ executables and install them to `bin/`
 
 ## IRT: Indirect Ray Tracing
 
-build and setup:
+We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
+as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
+until it is time to migrate to the new reconstruction framework.
+
+Procedure:
+
+- Create the auxiliary IRT configuration file; this uses a temporary "backdoor"
+  dependency on `irt` in `epic` to produce a ROOT file containing `libIRT`
+  objects, such as optical boundaries, based on the dRICH geometry description.
 ```bash
-source environ.sh
-rebuild_all.sh
-source environ.sh
 scripts/create_irt_auxfile.sh
 ```
 
-simulate:
+- Run the simulation, for example:
 ```bash
-simulate.py -t1 -oout/irt.root -s -n50
+simulate.py -t 1 -s -n 50
 ```
 
-reconstruction:
+- Run the reconstruction via Juggler, or try the stand-alone reader macro:
 ```bash
-# use juggler
-recon.sh -j
-evaluate.sh
+recon.sh -j   # to use Juggler (IRTAlgorithm)
+recon.sh -r   # to use standalone reader (irt/scripts/reader*.C)
+recon.sh -h   # for usage guide, such as how to specify input/output files
+```
 
-# use standalone reader (irt/scripts/reader)
-recon.sh -r
+- Run the evaluation code (use `-h` for usage):
+```bash
+evaluate.sh
 ```

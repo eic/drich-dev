@@ -2,8 +2,8 @@
 
 # default settings
 method=""
-sim_file="out/irt.root"
-rec_file="out/reco.root"
+sim_file="out/sim.root"
+rec_file="out/rec.root"
 aux_file="geo/irt-drich.root"
 
 # usage

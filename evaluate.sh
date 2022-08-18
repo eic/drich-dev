@@ -2,7 +2,7 @@
 # evaluation of reconstruction performance
 
 # default settings
-rec_file="out/reco.root"
+rec_file="out/rec.root"
 out_file="out/eval.root"
 
 # usage
