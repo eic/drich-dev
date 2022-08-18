@@ -26,7 +26,8 @@ export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local versio
 #   source .local/bin/env.sh
 #   popd
 # fi
-# export LOCAL_DATA_PATH=$DRICH_DEV
+
+export LOCAL_DATA_PATH=$DRICH_DEV
 
 # source common upstream environment (nightly jug_xl build)
 source /opt/detector/setup.sh
