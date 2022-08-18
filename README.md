@@ -56,10 +56,12 @@ of branches for varying configurations.
       - tip: when in a container shell (`eic-shell`), see `/opt/software/linux.../gcc.../`
         for the installed software
         - for example, if you want to check exactly what is available in the
-          [EDM4hep](https://github.com/key4hep/EDM4hep) data model, see the headers
+          [EDM4hep data model](https://github.com/key4hep/EDM4hep), see the headers
           in `/opt/software/linux.../gcc.../edm4hep.../include/edm4hep/` (these are
           produced by the [edm4hep.yaml](https://github.com/key4hep/EDM4hep/blob/master/edm4hep.yaml)
           configuration file)
+    - be sure to regularly update your image by running `eic-shell --upgrade`; this is necessary
+      to keep up with upstream changes, such as in EDM4hep or DD4hep
   - alternatively, we have a wrapper script:
     - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
     - the image and builds will be stored in `./opt`
