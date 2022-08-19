@@ -22,7 +22,7 @@ Detector     = ENV['DETECTOR']                     # detector name
 DetectorPath = ENV['DETECTOR_PATH']                # detector installation prefix path
 CompactFile  = "#{DetectorPath}/compact/drich.xml" # dRICH compact file
 # ***
-Cleanup       = false                  # if true, remove transient files
+Cleanup       = true                   # if true, remove transient files
 MultiThreaded = true                   # if true, run one simulation job per thread
 PoolSize      = [`nproc`.to_i-2,1].max # number of parallel threads to run (`if MultiThreaded`)
 TimeLimit     = 300                    # terminate a pipeline if it takes longer than `TimeLimit` seconds (set to `0` to disable)
