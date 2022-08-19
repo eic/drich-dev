@@ -12,7 +12,7 @@ if [ $# -ne 1 ]; then
   exit 2
 fi
 
-xmlfile=epic/epic.xml
+xmlfile=${DETECTOR_PATH}/${DETECTOR}.xml
 wdir=$(pwd)
 
 case $1 in
