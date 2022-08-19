@@ -320,7 +320,7 @@ elif testNum == 4:
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 5:
-    numTheta = 6 # number of theta steps
+    numTheta = 4 # number of theta steps
     numPhi = 24  # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
     m.write(f'\n# polar+azimuthal scan test\n')
     if (runType == "vis"):
