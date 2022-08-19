@@ -227,6 +227,9 @@ m.write(f'/gps/position 0 0 0 cm\n')
 
 ### RICH envelope parameters
 params = {}
+if detMain=='athena':
+    print('This is ATHENA, calling npdet_info to determine acceptance limits')
+    use_npdet_info = True
 if use_npdet_info:
     ### call `npdet_info` to obtain most up-to-date RICH attributes and values
     paramListFileN = f'{localDir}/params_{outputName}.txt'
