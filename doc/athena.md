@@ -1,26 +1,28 @@
 Legacy ATHENA Support
 =====================
 
-Clone `athena` repo:
+Clone the `athena` repo, and checkout the `144-irt-geometry` development branch:
 ```bash
-git clone git@eicweb.phy.anl.gov:EIC/detectors/athena.git
+git clone --branch=144-irt-geometry git@eicweb.phy.anl.gov:EIC/detectors/athena.git
 ```
 
-Checkout the development branch (or your preferred branch):
+Source environment:
 ```bash
-pushd athena
-git checkout 144-irt-geometry
-popd
+source environ.sh                     # EPIC environment
+source deprecated/environ_athena.sh   # overrides for ATHENA
 ```
 
-Source environment. The `deprecated/environ_athena.sh` file will override some
-variables for ATHENA; source `environ.sh` again to revert to EPIC
-```bash
-source environ.sh
-source deprecated/environ_athena.sh
-```
-
-Build the ATHENA geometry:
+Build the ATHENA geometry, then re-build Juggler:
 ```bash
 deprecated/build_athena.sh
+build_juggler.sh clean
+```
+
+Reverting to EPIC
+=================
+
+To switch your environment back to EPIC:
+```bash
+source environ.sh
+rebuild_all.sh clean
 ```

@@ -153,9 +153,9 @@ else:
 
 ### get env vars
 
-detMain  = os.environ['DETECTOR']
-detPath  = os.environ['DETECTOR_PATH']
-localDir = os.environ['DRICH_DEV']
+detMain = os.environ['DETECTOR']
+detPath = os.environ['DETECTOR_PATH']
+outDir  = os.environ['DRICH_DEV'] + '/out'
 
 ### set compact file
 compactFileFull = detPath + '/' + detMain + '.xml'
@@ -232,7 +232,7 @@ if detMain=='athena':
     use_npdet_info = True
 if use_npdet_info:
     ### call `npdet_info` to obtain most up-to-date RICH attributes and values
-    paramListFileN = f'{localDir}/params_{outputName}.txt'
+    paramListFileN = f'{outDir}/params_{outputName}.txt'
     with open(paramListFileN, 'w') as paramListFile:
         cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
         print(sep)
