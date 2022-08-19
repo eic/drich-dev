@@ -13,6 +13,9 @@ from numpy import linspace
 # SETTINGS
 ################################################################
 use_npdet_info = False  # use np_det_info to get envelope dimensions
+restrict_sector = True  # for tests with phi-dependence, restrict to 1 sector
+rMinBuffer = 5   # acceptance test rMin = vessel rMin + rMinBuffer [cm]
+rMaxBuffer = 20  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
 ################################################################
@@ -41,11 +44,10 @@ helpStr = f'''
                 1: aim pions at center of aerogel sector
                 2: inner edge test
                 3: outer edge test
-                4: radial scan test
-                5: azimuthal+radial scan test (cf. test 8)
+                4: polar scan test
+                5: azimuthal + polar scan test
                 6: spray pions in one sector
                 7: momentum scan
-                8: azimuthal+polar scan test (cf. test 5)
             >> optics tests:
                 10:   focal point, in RICH acceptance
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=1 )
@@ -249,16 +251,14 @@ else:
     params['PFRICH_zmax']  = 100
 
 ### set envelope limits
-envBufferMin = 5
-envBufferMax = 10
 if (zDirection < 0):
-    rMin = params['PFRICH_rmin1'] + envBufferMin
-    rMax = params['PFRICH_rmax'] - envBufferMax
+    rMin = params['PFRICH_rmin1'] + rMinBuffer
+    rMax = params['PFRICH_rmax'] - rMaxBuffer
     zMax = params['PFRICH_zmax'] * -1 - 20  # must be positive; subtract 20 since sensors are not at `zmax`
     # TODO: use instead `params['PFRICH_sensor_dist']` `when https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/290` is merged
 else:
-    rMin = params['DRICH_rmin1'] + envBufferMin
-    rMax = params['DRICH_rmax2'] - envBufferMax
+    rMin = params['DRICH_rmin1'] + rMinBuffer
+    rMax = params['DRICH_rmax2'] - rMaxBuffer
     zMax = params['DRICH_zmin'] + params['DRICH_Length']
 print('** acceptance limits **')
 print(f'rMin = {rMin} cm')
@@ -276,9 +276,6 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
-### ideal direction (for a general test, such as a momentum scan)
-idealDirection = f'0.35 0.0 {zDirection}'
-
 # TEST SETTINGS
 ######################################
 
@@ -286,49 +283,58 @@ idealDirection = f'0.35 0.0 {zDirection}'
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    m.write(f'/gps/direction {idealDirection}\n')
+    thetaMid = (thetaMin+thetaMax)/2.0
+    x = math.sin(thetaMid)
+    y = 0.0
+    z = math.cos(thetaMid) * zDirection
+    m.write(f'/gps/direction {x} {y} {z}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 2:
     m.write(f'\n# inner edge of acceptance\n')
-    if (zDirection < 0):
-        m.write(f'/gps/direction {math.sin(math.radians(2.4))} 0.0 -{math.cos(math.radians(2.4))}\n')
-    else:
-        m.write(f'/gps/direction {math.sin(math.radians(2.9))} 0.0 {math.cos(math.radians(2.9))}\n')
+    x = math.sin(thetaMin)
+    y = 0.0
+    z = math.cos(thetaMin) * zDirection
+    m.write(f'/gps/direction {x} {y} {z}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 3:
     m.write(f'\n# outer edge of acceptance\n')
-    if (zDirection < 0):
-        m.write(f'/gps/direction {math.sin(math.radians(25.0))} 0.0 -{math.cos(math.radians(25.0))}\n')
-    else:
-        m.write(f'/gps/direction {math.sin(math.radians(33.2))} 0.0 {math.cos(math.radians(33.2))}\n')  # aerogel limit
-        # m.write(f'/gps/direction {math.sin(math.radians(35))} 0.0 {math.cos(math.radians(35))}\n') # gas limit
+    x = math.sin(thetaMax)
+    y = 0.0
+    z = math.cos(thetaMax) * zDirection
+    m.write(f'/gps/direction {x} {y} {z}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 4:
-    numRad = 4  # number of radial steps
-    m.write(f'\n# radial scan test\n')
+    numTheta = 4  # number of theta steps
+    m.write(f'\n# polar scan test\n')
     if (runType == "vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
-    for r in list(linspace(rMin, rMax, numRad)):
-        m.write(f'/gps/direction {r} 0.0 {zDirection * zMax}\n')
+    for theta in list(linspace(thetaMin, thetaMax, numTheta)):
+        x = math.sin(theta)
+        y = 0.0
+        z = math.cos(theta) * zDirection
+        m.write(f'/gps/direction {x} {y} {z}\n')
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 5:
-    numRad = 3  # number of radial steps
+    numTheta = 4 # number of theta steps
     numPhi = 24  # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
-    m.write(f'\n# azimuthal+radial scan test\n')
+    m.write(f'\n# polar+azimuthal scan test\n')
     if (runType == "vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
-    for r in list(linspace(rMin, rMax, numRad)):
+    print(f'SET theta range to {math.degrees(thetaMin)} to {math.degrees(thetaMax)} deg')
+    for theta in list(linspace(thetaMin, thetaMax, numTheta)):
         for phi in list(linspace(0, 2 * math.pi, numPhi, endpoint=False)):
-            if (phi > math.pi / 6 and phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
-            x = r * math.cos(phi)
-            y = r * math.sin(phi)
-            m.write(f'/gps/direction {x} {y} {zDirection * zMax}\n')
+            if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
+            if (abs(phi) > 0.001 and abs(theta - thetaMin) < 0.001): continue  # allow only one ring at thetaMin
+            x = math.sin(theta) * math.cos(phi)
+            y = math.sin(theta) * math.sin(phi)
+            z = math.cos(theta) * zDirection
+            m.write(f'/gps/direction {x} {y} {z}\n')
             m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 6:
@@ -346,36 +352,14 @@ elif testNum == 6:
 
 elif testNum == 7:
     m.write(f'\n# momentum scan\n')
-    m.write(f'/gps/direction {idealDirection}\n')
+    thetaMid = (thetaMin+thetaMax)/2.0
+    x = math.sin(thetaMid)
+    y = 0.0
+    z = math.cos(thetaMid) * zDirection
+    m.write(f'/gps/direction {x} {y} {z}\n')
     for en in list(linspace(1, 60, 10)):
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
-
-elif testNum == 8:
-    numTheta = 6  # number of theta steps
-    numPhi = 24  # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
-    m.write(f'\n# demonstrate rings\n')
-    if (runType == "vis"):
-        m.write(f'/vis/scene/endOfEventAction accumulate\n')
-        m.write(f'/vis/scene/endOfRunAction accumulate\n')
-    if (zDirection < 0):
-        etaMin_ = 1.6
-        etaMax_ = 3.8
-    else:
-        etaMin_ = 1.5
-        etaMax_ = 3.4
-    thetaMin_ = 2 * math.atan(math.exp(-etaMax_))
-    thetaMax_ = 2 * math.atan(math.exp(-etaMin_))
-    print(f'SET theta range to {math.degrees(thetaMin_)} to {math.degrees(thetaMax_)} deg')
-    for theta in list(linspace(thetaMin_, thetaMax_, numTheta)):
-        for phi in list(linspace(0, 2 * math.pi, numPhi, endpoint=False)):
-            if (phi > math.pi / 6 and phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
-            if (abs(phi) > 0.001 and abs(theta - thetaMin_) < 0.001): continue  # allow only one ring at thetaMin
-            x = math.sin(theta) * math.cos(phi)
-            y = math.sin(theta) * math.sin(phi)
-            z = math.cos(theta) * zDirection
-            m.write(f'/gps/direction {x} {y} {z}\n')
-            m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 10:
     m.write(f'\n# opticalphoton scan test, {xRICH} range\n')
@@ -431,7 +415,7 @@ elif testNum == 13:
     print(f'SET theta range to {math.degrees(theta_min)} to {math.degrees(theta_max)} deg')
     for angle in angles:
         theta, phi = angle[0], angle[1]
-        if math.pi / 6 < phi < (2 * math.pi - math.pi / 6): continue  # restrict to one sector
+        if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
         if abs(phi) > 0.001 and abs(theta - theta_min) < 0.001: continue  # allow only one ring at thetaMin
         x = math.sin(theta) * math.cos(phi)
         y = math.sin(theta) * math.sin(phi)

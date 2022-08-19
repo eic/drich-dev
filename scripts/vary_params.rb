@@ -8,15 +8,24 @@ require 'awesome_print'
 require 'nokogiri'
 require 'fileutils'
 require 'open3'
+require 'timeout'
 require 'pry'
 
+### environment check
+if ENV['DETECTOR'].nil? or ENV['DETECTOR_PATH'].nil?
+  $stderr.puts "ERROR: source environ.sh"
+  exit 1
+end
 
-### SETTINGS *************************************
-Detector      = 'epic'                          # path to detector repository
-CompactFile   = "#{Detector}/compact/drich.xml" # compact file to vary
-Cleanup       = true                            # if true, remove transient files from `#{Detector}/`
-MultiThreaded = true                            # if true, run one simulation job per thread
-PoolSize      = [`nproc`.to_i-2,1].max          # number of parallel threads to run (`if MultiThreaded`)
+### GLOBAL SETTINGS **********************************
+Detector     = ENV['DETECTOR']                     # detector name
+DetectorPath = ENV['DETECTOR_PATH']                # detector installation prefix path
+CompactFile  = "#{DetectorPath}/compact/drich.xml" # dRICH compact file
+# ***
+Cleanup       = true                   # if true, remove transient files
+MultiThreaded = true                   # if true, run one simulation job per thread
+PoolSize      = [`nproc`.to_i-2,1].max # number of parallel threads to run (`if MultiThreaded`)
+TimeLimit     = 300                    # terminate a pipeline if it takes longer than `TimeLimit` seconds (set to `0` to disable)
 
 
 ### ARGUMENTS ****************************************
@@ -108,7 +117,7 @@ end
 #   (xml parsers tend to re-format the syntax)
 xml = Nokogiri::XML File.open(CompactFile)
 compact_drich_orig = [OutputDir,'compact',File.basename(CompactFile)].join '/'
-puts compact_drich_orig
+puts "write parsed XML tree to #{compact_drich_orig}"
 File.open(compact_drich_orig,'w') { |out| out.puts xml.to_xml }
 
 # build array of variants, the results of the variation functions
@@ -191,10 +200,10 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
     node.set_attribute var[:attribute], var[:value]
   end
 
-  # create drich compact file `compact_drich`, by writing `xml_clone`
+  # create drich compact file variant `compact_drich`, by writing `xml_clone`
   # - this is a modification of `CompactFile`, with this variant's attributes set
-  # - `compact_drich` is written to `#{Detector}/compact`, and copied to `OutputDir`
-  basename = File.basename(CompactFile,'.xml') + "_variant#{variant_id}"
+  # - `compact_drich` is written to `#{DetectorPath}/compact`, and copied to `OutputDir`
+  basename      = "#{File.basename(CompactFile,'.xml')}_variant#{variant_id}"
   compact_drich = "#{File.dirname(CompactFile)}/#{basename}.xml"
   print_status "produce compact file variant #{compact_drich}"
   File.open(compact_drich,'w') { |out| out.puts xml_clone.to_xml }
@@ -210,13 +219,13 @@ variant_settings_list.each_with_index do |variant_settings,variant_id|
     out.puts <<~EOF
       features:
         pid:
-          drich: #{compact_drich.gsub(/^#{Detector}\//,'')}
+          drich: #{compact_drich}
     EOF
   end
 
   # render the full detector compact file, `compact_detector`
   # - it will include `compact_drich` instead of the default `CompactFile`
-  compact_detector = "#{Detector}/#{Detector}_#{basename}.xml"
+  compact_detector = "#{DetectorPath}/#{Detector}_#{basename}.xml"
   print_status "jinja2 render template to #{compact_detector}"
   render = [
     "#{Detector}/bin/make_detector_configuration",
@@ -258,18 +267,48 @@ def execute_thread(sim)
   print_thread_status.call "BEGIN"
   # print settings for this variant to log file
   File.open("#{sim[:log]}.info",'w') do |out|
-    out.puts "VARIANT #{sim[:id]}"
+    out.puts "VARIANT #{sim[:id]}:"
     out.write sim[:variant_info].ai(plain: true)
+    out.puts "\n"
+    out.puts "PIPELINE:"
+    out.puts sim[:pipelines].map{ |p| p.join(' ') }.ai(plain: true)
   end
   # loop over pipelines
+  timed_out = false
   sim[:pipelines].each do |simulation_pipeline|
-    # execute pipeline, with logging
+    # execute pipeline, with logging, and timeout control
     print_thread_status.call simulation_pipeline.map(&:first).join(' | ')
-    Open3.pipeline(
-      *simulation_pipeline,
-      :out=>["#{sim[:log]}.out",'a'],
-      :err=>["#{sim[:log]}.err",'a'],
-    )
+    pipeline_waiters = []
+    begin
+      Timeout::timeout(TimeLimit) do
+        # use `pipeline_start`, so calling thread is in control (allows Timeout::timeout to work)
+        pipeline_waiters = Open3.pipeline_start(
+          *simulation_pipeline,
+          :out=>["#{sim[:log]}.out",'a'],
+          :err=>["#{sim[:log]}.err",'a'],
+        )
+        Process.waitall # wait for all pipeline_waiters to finish
+      end
+    rescue Timeout::Error
+      timed_out = true
+      # print timeout error
+      print_thread_status.call "TIMEOUT: #{simulation_pipeline.map(&:first).join(' | ')}"
+      File.open("#{sim[:log]}.err",'a') do |out|
+        out.puts '='*30
+        out.puts "TIMEOUT LIMIT REACHED, terminate pipeline:"
+        out.puts simulation_pipeline.join(' ')
+        out.puts '='*30
+      end
+      # kill the timed-out pipeline
+      pipeline_waiters.each do |waiter|
+        print_thread_status.call "KILL #{waiter}"
+        begin
+          Process.kill('KILL',waiter.pid)
+        rescue Errno::ESRCH
+        end
+      end
+    end
+    return if timed_out # do not run the next pipeline, if timed out
   end
   print_thread_status.call "END"
 end
@@ -282,6 +321,7 @@ ap simulations.first
 print_status 'begin simulation '.upcase + '='*40
 if MultiThreaded
   print_status "running multi-threaded with PoolSize = #{PoolSize}"
+  print_status "all pipelines have TimeLimit = #{TimeLimit} seconds"
   simulations.each_slice(PoolSize) do |slice|
     pool = slice.map do |simulation|
       Thread.new{ execute_thread simulation }

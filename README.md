@@ -210,11 +210,14 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
       - materials etc. are referenced by name in `compact/drich.xml`
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
-    - the full detector compact file is `epic.xml`, which is generated via
+    - the full detector compact file is `$DETECTOR_PATH/epic.xml`, which is generated via
       Jinja during `cmake` (run `build_epic.sh`), along with a dRICH-only
-      compact file `epic_drich_only.xml`; these compact files are used by many
-      scripts, such as `npsim` (whereas `compact/drich.xml` is *only* for the
-      dRICH implementation itself)
+      compact file `$DETECTOR_PATH/epic_drich_only.xml`
+      - these compact files are used by many scripts, such as `npsim`, whereas
+        `compact/drich.xml` is *only* for the dRICH implementation itself
+      - `build_epic.sh` (`cmake`) will also copy local `epic/compact/*.xml`
+        files to `$DETECTOR_PATH`, since the generated compact files (`$DETECTOR_PATH/epic*.xml`) 
+        reference compact files in `$DETECTOR_PATH`
     - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
       - relies on constants from the compact files
       - builds the dRICH
@@ -223,10 +226,10 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
       - see comments within the code for documentation
 
 ## Viewing the Geometry and Parameter Values
-- run `./run_dd_web_display.sh` to produce the geometry ROOT file
-  - by default, it will use the compact file for the *full* detector
-  - run `./run_dd_web_display.sh d` to run on dRICH only
-  - output ROOT file will be in `geo/`
+- run `./run_dd_web_display.sh` to produce the `TGeo` geometry ROOT file
+  - follow the usage guide to specify whether to draw the full EPIC
+    detector, or just the dRICH
+  - output ROOT file will be in `geo/`, by default
 - open the resulting ROOT file in `jsroot` geoviewer, using either:
   - [CERN host](https://root.cern/js/) (recommended)
   - Local host (advanced, but offers better control) - see [setup guide](doc/jsroot.md)

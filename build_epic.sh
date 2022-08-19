@@ -12,10 +12,13 @@ if [ $clean -eq 1 ]; then
   echo "--- CLEAN: clean build dir..."
   mkdir -p build
   rm -rv build
-  echo "--- CLEAN: remove locally rendered compact files..."
+  echo "--- CLEAN: locally rendered top-level compact files..."
   rm -vf epic*.xml
-  echo "--- CLEAN: remove variant drich compact files..."
+  echo "--- CLEAN: transient files from scripts/vary_params.rb..."
+  rm -vf epic_drich_variant*.xml
   rm -vf compact/drich_variant*.xml
+  rm -vf ${DETECTOR_PATH}/epic_drich_variant*.xml
+  rm -vf ${DETECTOR_PATH}/compact/drich_variant*.xml
 fi
 
 cmake -B build -S . \

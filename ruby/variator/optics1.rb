@@ -10,22 +10,22 @@ class Variator < VariatorBase
         :xpath     => '//mirror',
         :attribute => 'focus_tune_x',
         :function  => @@center_delta,
-        :args      => [0, 20],
-        :count     => 3,
+        :args      => [10, 20],
+        :count     => 5,
       },
       {
         :xpath     => '//mirror',
         :attribute => 'focus_tune_z',
         :function  => @@center_delta,
         :args      => [30, 30],
-        :count     => 3,
+        :count     => 5,
       },
       {
         :xpath     => '//sensors//sphere',
         :attribute => 'radius',
-        :function  => @@center_delta,
-        :args      => [140, 40],
-        :count     => 3,
+        :function  => @@min_max,
+        :args      => [80, 160],
+        :count     => 5,
         :label     => :sensor_sphere_radius,
       },
     ]
@@ -42,11 +42,20 @@ class Variator < VariatorBase
 
     # best variants:
     #
-    # 3:  sensorsphere radius 100, focus tune (x,z)=(-20,30)
-    # 9:  sensorsphere radius 100, focus tune (x,z)=(0,0)
+    # 0
+    # 6 <- best
+    # 7
+    # 12
+    # 18
+    # 32
+    # 52
+    # 57
     #
-    # 7:  sensorsphere radius 140, focus tune (x,z)=(-20,60)
-    # 13: sensorsphere radius 140, focus tune (x,z)=(0,30)
+    # 6 is the best:
+    # focus_tune_x          = -10.0
+    # focus_tune_z          = 15.0
+    # sensor_sphere_radius  = 100.0
+    # sensor_sphere_centerz = -50.0
 
   end
 end
