@@ -38,9 +38,8 @@ class VariatorBase
       ### draw geometry
       [[
         './run_dd_web_display.sh',
-        'c',
-        settings[:compact_detector], 
-        settings[:output].sub(/root$/,'geometry.root'),
+        "-c #{settings[:compact_detector]}", 
+        "-o #{settings[:output].sub(/root$/,'geometry.root')}",
       ]],
       ### run simulation to check hit rings at varying theta
       [[

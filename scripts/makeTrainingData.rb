@@ -12,7 +12,7 @@ outputDir = 'out/trainingSample'
 hepmcFile = 'hepmc/pythia8NCDIS_10x100_minQ2=1_beamEffects_xAngle=-0.025_hiDiv_vtxfix_1_000.hepmc'
 gunTests = {
   1 => 'single',
-  8 => 'spray',
+  5 => 'spray',
 }
 numEvents = {
   :forHepmc => 1000,
