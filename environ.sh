@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# drich-dev path
+if [ -z "${BASH_SOURCE[0]}" ]; then
+  export DRICH_DEV=$(dirname $(realpath $0))
+else
+  export DRICH_DEV=$(dirname $(realpath ${BASH_SOURCE[0]}))
+fi
+
 # obtain number of CPUs
 # - set it manually, if you prefer, or if auto detection fails
 export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
@@ -13,13 +20,14 @@ export PRIMARY_PREFIX=$EIC_SHELL_PREFIX
 export IRT_ROOT=$PRIMARY_PREFIX  # overrides container version with local version
 export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
 
-# source environment from reconstruction_benchmarks
-if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
-  pushd reconstruction_benchmarks
-  source .local/bin/env.sh
-  popd
-fi
-export LOCAL_DATA_PATH=$(pwd)
+# # source environment from reconstruction_benchmarks
+# if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
+#   pushd reconstruction_benchmarks
+#   source .local/bin/env.sh
+#   popd
+# fi
+
+export LOCAL_DATA_PATH=$DRICH_DEV
 
 # source common upstream environment (nightly jug_xl build)
 source /opt/detector/setup.sh
@@ -30,11 +38,8 @@ source /opt/detector/setup.sh
 [ -f $PRIMARY_PREFIX/setup.sh ] && source $PRIMARY_PREFIX/setup.sh
 
 # environment overrides:
-# - prefer local compact files
-export DETECTOR_PATH=$(pwd)/epic
 # - prefer local juggler build
 export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
-export JUGGLER_DETECTOR_PATH=$DETECTOR_PATH
 export JUGGLER_N_THREADS=$BUILD_NPROC
 # - update prompt
 export PS1="${PS1:-}"
@@ -46,7 +51,7 @@ export LD_LIBRARY_PATH=$PRIMARY_PREFIX/lib:$LD_LIBRARY_PATH # redundant, if sour
 export PYTHONPATH=$PRIMARY_PREFIX/python:$PYTHONPATH
 
 # use local rbenv ruby shims, if installed
-export RBENV_ROOT=$(pwd)/.rbenv
+export RBENV_ROOT=$DRICH_DEV/.rbenv
 if [ -d "$RBENV_ROOT" ]; then
   export PATH=$RBENV_ROOT/bin:$PATH
   eval "$(.rbenv/bin/rbenv init - bash)"
@@ -56,7 +61,7 @@ fi
 # additional comfort settings; add your own here
 # - PATH additions
 export PATH=.:$PATH                                   # ./
-export PATH=$(pwd)/bin:$PATH                          # drich-dev/bin
+export PATH=$DRICH_DEV/bin:$PATH                      # drich-dev/bin
 [ -d "${HOME}/bin" ] && export PATH=$PATH:${HOME}/bin # ~/bin
 # - shell settings and aliases
 shopt -s autocd # enable autocd (`alias <dirname>='cd <dirname>'`)
@@ -88,6 +93,7 @@ Packages:
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
   JUGGLER_DETECTOR         = $JUGGLER_DETECTOR
+  JUGGLER_DETECTOR_PATH    = $JUGGLER_DETECTOR_PATH
   JUGGLER_DETECTOR_CONFIG  = $JUGGLER_DETECTOR_CONFIG
   JUGGLER_DETECTOR_VERSION = $JUGGLER_DETECTOR_VERSION
   JUGGLER_DETECTOR_PATH    = $JUGGLER_DETECTOR_PATH
@@ -98,7 +104,9 @@ LD_LIBRARY_PATH:
   $(echo $LD_LIBRARY_PATH | sed 's/:/\n  /g')
 
 Common:
-  BUILD_NPROC    = $BUILD_NPROC
-  PRIMARY_PREFIX = $PRIMARY_PREFIX
+  DRICH_DEV       = $DRICH_DEV
+  BUILD_NPROC     = $BUILD_NPROC
+  PRIMARY_PREFIX  = $PRIMARY_PREFIX
+  DETECTOR_PATH   = $DETECTOR_PATH
 
 """

@@ -3,5 +3,6 @@
 # pass an argument to rebuild everything cleanly
 set -e
 ./build_eicd.sh $*
-#./build_irt.sh $* # temporarily disabled
+./build_irt.sh $*
 ./build_epic.sh $*
+./build_juggler.sh $*

@@ -19,7 +19,8 @@ if [ $clean -eq 1 ]; then
 fi
 
 cmake -B build -S . \
-  -DCMAKE_INSTALL_PREFIX=$PRIMARY_PREFIX
+  -DCMAKE_INSTALL_PREFIX=$PRIMARY_PREFIX \
+  -DIRT_AUXFILE=ON
 cmake --build build -j$BUILD_NPROC -- install
 
 popd

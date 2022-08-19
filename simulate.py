@@ -151,9 +151,9 @@ else:
 
 ### get env vars
 
-detMain = 'epic'
-detPath = os.environ['DETECTOR_PATH']
-localDir = os.environ['LOCAL_DATA_PATH']
+detMain  = os.environ['DETECTOR']
+detPath  = os.environ['DETECTOR_PATH']
+localDir = os.environ['DRICH_DEV']
 
 ### set compact file
 compactFileFull = detPath + '/' + detMain + '.xml'
@@ -466,6 +466,7 @@ cmd = [
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName}',
+        "--part.userParticleHandler=''", # necessary for opticalphotons truth output
         # '--random.seed 1',
         # '--part.keepAllParticles True',
         ]
