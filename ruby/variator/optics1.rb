@@ -43,13 +43,19 @@ class Variator < VariatorBase
     # best variants:
     #
     # 0
-    # 6 <- best: focus_tune_x=-10.0, focus_tune_z=15.0, sensor_sphere_radius=100.0, sensor_sphere_centerz=-50.0
+    # 6 <- best
     # 7
     # 12
     # 18
     # 32
     # 52
     # 57
+    #
+    # 6 is the best:
+    # focus_tune_x          = -10.0
+    # focus_tune_z          = 15.0
+    # sensor_sphere_radius  = 100.0
+    # sensor_sphere_centerz = -50.0
 
   end
 end
