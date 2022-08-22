@@ -27,7 +27,27 @@ export EICD_ROOT=$EIC_SHELL_PREFIX # overrides container version with local vers
 export LOCAL_DATA_PATH=$DRICH_DEV
 
 # source common upstream environment (nightly jug_xl build)
-source /opt/detector/setup.sh
+# source /opt/detector/setup.sh ### not in unstable image
+##############################################################
+### from  /opt/detector/setup.sh in nightly image #############
+#
+export DETECTOR=epic
+export DETECTOR_PATH=$EIC_SHELL_PREFIX/share/epic
+export DETECTOR_CONFIG=epic
+export DETECTOR_VERSION=main
+#
+export BEAMLINE_PATH=$EIC_SHELL_PREFIX/share/ip6
+export BEAMLINE_CONFIG=ip6
+export BEAMLINE_CONFIG_VERSION=master
+#
+export JUGGLER_DETECTOR=$DETECTOR
+export JUGGLER_DETECTOR_CONFIG=$DETECTOR_CONFIG
+export JUGGLER_DETECTOR_VERSION=$DETECTOR_VERSION
+export JUGGLER_DETECTOR_PATH=$DETECTOR_PATH
+export JUGGLER_BEAMLINE_CONFIG=$BEAMLINE_CONFIG
+export JUGGLER_BEAMLINE_CONFIG_VERSION=$BEAMLINE_CONFIG_VERSION
+export JUGGLER_INSTALL_PREFIX=/usr/local
+##############################################################
 
 # source local environment (a build target from `epic`)
 # - overrides upstream `$DETECTOR*` vars
