@@ -13,12 +13,9 @@ export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 echo "detected $BUILD_NPROC cpus"
 
-# local installation prefix
-export PRIMARY_PREFIX=$EIC_SHELL_PREFIX
-
 # cmake packages
-export IRT_ROOT=$PRIMARY_PREFIX  # overrides container version with local version
-export EICD_ROOT=$PRIMARY_PREFIX # overrides container version with local version
+export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
+export EICD_ROOT=$EIC_SHELL_PREFIX # overrides container version with local version
 
 # # source environment from reconstruction_benchmarks
 # if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
@@ -34,12 +31,12 @@ source /opt/detector/setup.sh
 
 # source local environment (a build target from `epic`)
 # - overrides upstream `$DETECTOR*` vars
-# - prioritizes `$PRIMARY_PREFIX/lib` in `$LD_LIBRARY_PATH`
-[ -f $PRIMARY_PREFIX/setup.sh ] && source $PRIMARY_PREFIX/setup.sh
+# - prioritizes `$EIC_SHELL_PREFIX/lib` in `$LD_LIBRARY_PATH`
+[ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
 # environment overrides:
 # - prefer local juggler build
-export JUGGLER_INSTALL_PREFIX=$PRIMARY_PREFIX
+export JUGGLER_INSTALL_PREFIX=$EIC_SHELL_PREFIX
 export JUGGLER_N_THREADS=$BUILD_NPROC
 # - update prompt
 export PS1="${PS1:-}"
@@ -47,8 +44,8 @@ export PS1="drich${PS1_SIGIL}>${PS1#*>}"
 unset branch
 
 # prioritize local build targets
-export LD_LIBRARY_PATH=$PRIMARY_PREFIX/lib:$LD_LIBRARY_PATH # redundant, if sourced `$PRIMARY_PREFIX/setup.sh`
-export PYTHONPATH=$PRIMARY_PREFIX/python:$PYTHONPATH
+export LD_LIBRARY_PATH=$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH # redundant, if sourced `$EIC_SHELL_PREFIX/setup.sh`
+export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
 
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$DRICH_DEV/.rbenv
@@ -104,9 +101,9 @@ LD_LIBRARY_PATH:
   $(echo $LD_LIBRARY_PATH | sed 's/:/\n  /g')
 
 Common:
-  DRICH_DEV       = $DRICH_DEV
-  BUILD_NPROC     = $BUILD_NPROC
-  PRIMARY_PREFIX  = $PRIMARY_PREFIX
-  DETECTOR_PATH   = $DETECTOR_PATH
+  DRICH_DEV        = $DRICH_DEV
+  BUILD_NPROC      = $BUILD_NPROC
+  EIC_SHELL_PREFIX = $EIC_SHELL_PREFIX
+  DETECTOR_PATH    = $DETECTOR_PATH
 
 """
