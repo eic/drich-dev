@@ -106,9 +106,9 @@ of branches for varying configurations.
     building and running multi-threaded
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
-  - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
-    - by default, it should be `<path to eic-shell>/local`
-    - change it, if you prefer
+  - `$EIC_SHELL_PREFIX` is the main directory where module builds will be installed
+    - by default, it is `<path to eic-shell>/local`
+    - change it, if you prefer a different directory
   - you can find documentation for many other variables in the corresponding
     module repositories
   - there are some additional "comfort" settings, which depend on your host
