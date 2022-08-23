@@ -88,6 +88,15 @@ of branches for varying configurations.
     git clone git@eicweb.phy.anl.gov:EIC/eicd.git
     git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     ```
+  - Checkout the appropriate branches of each repository, depending on your needs
+    - see [Branches and Pull Requests](doc/branches.md)
+    - for example, currently the IRT code runs in `juggler` and relies on a
+      custom data model in `eicd`, neither of which have been merged to the
+      main branches; the "IRT Development" branches are recommended for running
+      the IRT code for now, until IRT is integrated with the new reconstruction
+      framework
+    - see also the [project page](https://github.com/orgs/eic/projects/4/views/1)
+      for more up-to-date information
   - Follow directions below to build each module
 
 ## Environment
@@ -99,9 +108,9 @@ of branches for varying configurations.
     building and running multi-threaded
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
-  - `$PRIMARY_PREFIX` is the main prefix where modules will be installed
-    - by default, it should be `<path to eic-shell>/local`
-    - change it, if you prefer
+  - `$EIC_SHELL_PREFIX` is the main directory where module builds will be installed
+    - by default, it is `<path to eic-shell>/local`
+    - change it, if you prefer a different directory
   - you can find documentation for many other variables in the corresponding
     module repositories
   - there are some additional "comfort" settings, which depend on your host
