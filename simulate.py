@@ -14,8 +14,8 @@ from numpy import linspace
 ################################################################
 use_npdet_info = False  # use np_det_info to get envelope dimensions
 restrict_sector = True  # for tests with phi-dependence, restrict to 1 sector
-rMinBuffer = 5   # acceptance test rMin = vessel rMin + rMinBuffer [cm]
-rMaxBuffer = 20  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
+rMinBuffer = 5  # acceptance test rMin = vessel rMin + rMinBuffer [cm]
+rMaxBuffer = 5  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
 ################################################################
