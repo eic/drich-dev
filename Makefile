@@ -5,8 +5,15 @@ FLAGS = -g -Wno-deprecated -fPIC -m64 -fno-inline -Wno-write-strings
 DEPS += $(shell root-config --cflags)
 LIBS += $(shell root-config --glibs)
 
-# PODIO
-LIBS += -L/usr/local/lib -lDD4pod -lpodio -lpodioRootIO -ledm4hep
+# image libs
+LIBS += -L/usr/local/lib
+LIBS += -lDDCore
+LIBS += -lDD4pod -lpodio -lpodioRootIO -ledm4hep
+
+# local libs
+LIBS += -L${EIC_SHELL_PREFIX}/lib
+LIBS += -lIRT
+DEPS += -I${EIC_SHELL_PREFIX}/include/IRT
 
 #--------------------------------------------
 
