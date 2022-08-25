@@ -8,6 +8,7 @@
 // DD4Hep
 #include "DD4hep/Detector.h"
 #include "DDRec/CellIDPositionConverter.h"
+#include "DD4hep/DD4hepUnits.h"
 
 // IRT
 #include "CherenkovDetectorCollection.h"
@@ -24,58 +25,93 @@ using std::string;
 int main(int argc, char** argv) {
 
   // compact file name
-  string det_path = string(getenv("DETECTOR_PATH"));
-  string det_name = string(getenv("DETECTOR")) + "_drich_only";
-  string compact_file = det_path + "/" + det_name + ".xml";
+  string DETECTOR_PATH = string(getenv("DETECTOR_PATH"));
+  string DETECTOR = string(getenv("DETECTOR"));
+  // string DETECTOR = string(getenv("DETECTOR")) + "_drich_only";
+  string compactFile = DETECTOR_PATH + "/" + DETECTOR + ".xml";
 
   // irt auxfile name
-  string irt_auxfile_name = string("geo/irt-drich.root");
+  string irtAuxFileName = string("geo/irt-drich.root");
 
   // arguments
-  if(argc>1) compact_file     = string(argv[1]);
-  if(argc>2) irt_auxfile_name = string(argv[2]);
-  cout << "compact_file = " << compact_file << endl;
+  if(argc>1) compactFile    = string(argv[1]);
+  if(argc>2) irtAuxFileName = string(argv[2]);
+  cout << "compactFile = " << compactFile << endl;
 
   // full detector handle
   auto det = &(dd4hep::Detector::getInstance());
-  det->fromCompact(compact_file);
+  det->fromXML(compactFile);
 
   // managers
-  auto volman  = det->volumeManager();
-  auto surfman = det->surfaceManager();
+  // auto volman  = det->volumeManager();
+  // auto surfman = det->surfaceManager();
   // det->apply("DD4hepVolumeManager",0,0);
 
   // cellID decoder
   auto decoder = std::make_shared<const dd4hep::rec::CellIDPositionConverter>(*det);
-  auto id2secmod = [](int id){ return std::pair<int,int>(id&0x7,id>>3); }; // FIXME: use `decoder`
 
   // dRICH handle
-  const string rich_name = "DRICH";
-  auto det_rich = det->detector(rich_name);
-  auto pos_rich = det_rich.placement().position();
+  const string richName = "DRICH";
+  auto detRich = det->detector(richName);
+  auto posRich = detRich.placement().position();
 
   // start auxfile
-  auto irt_auxfile = new TFile(irt_auxfile_name.c_str(),"RECREATE");
-  auto irt_geo = new CherenkovDetectorCollection();
-  auto irt_det = irt_geo->AddNewDetector(rich_name.c_str());
+  auto irtAuxFile  = new TFile(irtAuxFileName.c_str(),"RECREATE");
+  auto irtGeometry = new CherenkovDetectorCollection();
+  auto irtDetector = irtGeometry->AddNewDetector(richName.c_str());
 
-
-  // set IRT container volume
-  // FIXME: Z-location does not really matter here, right?; but Z-axis orientation does;
-  // FIXME: have no connection to GEANT G4LogicalVolume pointers; however all is needed 
-  // is to make them unique so that std::map works internally; resort to using integers, 
-  // who cares; material pointer can seemingly be '0', and the effective refractive index 
-  // for all radiators will be assigned at the end by hand; FIXME: should assign it on 
-  // per-photon basis, at birth, like standalone GEANT code does;
-  int nSectors = 6;
-  TVector3 nx(1,0,0);
-  TVector3 ny(0,-1,0);
-  for(int isec=0; isec<nSectors; isec++) { // FIXME: do we need a sector loop? probably not...
-    irt_geo->SetContainerVolume(
-        irt_det, "GasVolume", isec,
-        (G4LogicalVolume*)(0x0), 0, new FlatSurface(TVector3(0,0,0), nx, ny)
-        );
+  // helpers
+  auto id2secmod = [](int id){
+    return std::pair<int,int>(id&0x7,id>>3); // FIXME: use `decoder`
   };
+  auto starts_with = [](std::string str, const char *pat) {
+    return str.find(string(pat)) != string::npos; // true if `str` starts with `pat`
+  };
+  auto loop_de = [&detRich,&starts_with](const char *pat, std::function<void(dd4hep::DetElement)> block) {
+    for(auto const& [de_name, de] : detRich.children()) {
+      if(starts_with(de_name,pat)) {
+        cout << "found " << de_name << endl;
+        block(de);
+      }
+    }
+  };
+
+
+  // begin envelope
+  /* FIXME: have no connection to GEANT G4LogicalVolume pointers; however all is needed
+   * is to make them unique so that std::map work internally; resort to using integers,
+   * who cares; material pointer can seemingly be '0', and effective refractive index
+   * for all radiators will be assigned at the end by hand; FIXME: should assign it on
+   * per-photon basis, at birth, like standalone GEANT code does;
+   */
+  int nSectors = 6;
+  TVector3 normX(1, 0, 0); // normal vectors
+  TVector3 normY(0, -1, 0);
+
+  auto vesselZmin = det->constant<double>("DRICH_zmin");
+  string gasvolMatName;
+  auto get_gasvolMatName = [&gasvolMatName] (dd4hep::DetElement gasvol) {
+    gasvolMatName = gasvol.volume().material().name();
+  };
+  loop_de("gasvol",get_gasvolMatName);
+  cout << gasvolMatName << endl;
+
+  auto surfEntrance = new FlatSurface(
+      (1 / dd4hep::mm) * TVector3(0, 0, vesselZmin),
+      normX,
+      normY
+      );
+  for (int sec = 0; sec < nSectors; sec++) {
+    auto rad = irtGeometry->SetContainerVolume(
+        irtDetector,             // Cherenkov detector
+        "GasVolume",             // name
+        sec,                     // path
+        (G4LogicalVolume*)(0x0), // G4LogicalVolume (inaccessible? use an integer instead)
+        nullptr,                 // G4RadiatorMaterial (inaccessible?)
+        surfEntrance             // surface
+        );
+    rad->SetAlternativeMaterialName(gasvolMatName.c_str());
+  }
 
 
   //////////////////////////////////
@@ -86,19 +122,19 @@ int main(int argc, char** argv) {
   
 
   // FIXME: Get access to the readout structure decoder
-  // irt_det->SetReadoutCellMask( ... )
+  // irtDetector->SetReadoutCellMask( ... )
 
   // set IRT sensors // FIXME: '0' stands for the unknown (and irrelevant) G4LogicalVolume;
   auto pd = new CherenkovPhotonDetector(0, 0);
-  irt_geo->AddPhotonDetector(irt_det, 0, pd);
+  irtGeometry->AddPhotonDetector(irtDetector, 0, pd);
   
   // loop over RICH detector elements
   bool radClosed = false;
-  for(auto const& [richDEname, richDE] : det_rich.children()) {
+  for(auto const& [richDEname, richDE] : detRich.children()) {
 
     // get element attributes
     //if(debug_geosvc) info() << "FOUND RICH element: " << richDEname << endmsg;
-    auto dePos = pos_rich + richDE.placement().position();
+    auto dePos = posRich + richDE.placement().position();
     int deID = richDE.id();
 
     // aerogel and filter ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,11 +150,11 @@ int main(int argc, char** argv) {
       }
       if(isec<nSectors) { // FIXME: need sector loop?
         if(richDEname.find("aerogel")!=std::string::npos) {
-          auto aerogelSurf = new FlatSurface( (1/mm)*TVector3(0,0,dePos.z()), nx, ny);
-          irt_geo->AddFlatRadiator(irt_det, "Aerogel", isec, (G4LogicalVolume*)(0x1), 0, aerogelSurf, thickness/mm);
+          auto aerogelSurf = new FlatSurface( (1/mm)*TVector3(0,0,dePos.z()), normX, normY);
+          irtGeometry->AddFlatRadiator(irtDetector, "Aerogel", isec, (G4LogicalVolume*)(0x1), 0, aerogelSurf, thickness/mm);
         } else { // elif filter
-          auto filterSurf = new FlatSurface( (1/mm)*TVector3(0,0,dePos.z()), nx, ny); // NOTE: there is an airgap in geometry
-          irt_geo->AddFlatRadiator(irt_det, "Filter", isec, (G4LogicalVolume*)(0x2), 0, filterSurf, thickness/mm);
+          auto filterSurf = new FlatSurface( (1/mm)*TVector3(0,0,dePos.z()), normX, normY); // NOTE: there is an airgap in geometry
+          irtGeometry->AddFlatRadiator(irtDetector, "Filter", isec, (G4LogicalVolume*)(0x2), 0, filterSurf, thickness/mm);
         }
       }
     }
@@ -155,7 +191,7 @@ int main(int argc, char** argv) {
           (1/mm)*TVector3(sphPos.x(),sphPos.y(),sphPos.z()),
           mirrorRadius/mm
           );
-      irt_det->AddOpticalBoundary(isec, new OpticalBoundary(irt_det->GetContainerVolume(), mirrorSurf, false));
+      irtDetector->AddOpticalBoundary(isec, new OpticalBoundary(irtDetector->GetContainerVolume(), mirrorSurf, false));
     }
 
     // sensors ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -173,17 +209,17 @@ int main(int argc, char** argv) {
                << endmsg;
       }
 
-      // FIXME: why not `dePos.x(), dePos.y(), dePos.z()`? why the orientation `nx.cross(ny)`, rather than along sphere radius?
-      auto sensorSurf = new FlatSurface( (1/mm)*TVector3(0.0, 0.0, dePos.z()), nx, ny);
-      irt_det->CreatePhotonDetectorInstance(0, pd, ielem, sensorSurf);
+      // FIXME: why not `dePos.x(), dePos.y(), dePos.z()`? why the orientation `normX.cross(normY)`, rather than along sphere radius?
+      auto sensorSurf = new FlatSurface( (1/mm)*TVector3(0.0, 0.0, dePos.z()), normX, normY);
+      irtDetector->CreatePhotonDetectorInstance(0, pd, ielem, sensorSurf);
 
       // close IRT gas radiator by hand (once) // FIXME: why don't we do this after this DetElement loop?
       if(!radClosed && zDirection==-1) { // FIXME: needs to be done for dRICH too
-        irt_det->GetRadiator("GasVolume")->m_Borders[0].second = dynamic_cast<ParametricSurface*>(sensorSurf);
+        irtDetector->GetRadiator("GasVolume")->m_Borders[0].second = dynamic_cast<ParametricSurface*>(sensorSurf);
         radClosed = true;
       }
     }
 
     */
-  irt_auxfile->Close();
+  irtAuxFile->Close();
 }
