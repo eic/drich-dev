@@ -74,7 +74,7 @@ of branches for varying configurations.
     - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
     - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
-    - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`, for the data model; see also
+    - [eicd](https://github.com/eic/eicd) to `./eicd`, for the data model; see also
       [EDM4hep](https://github.com/key4hep/EDM4hep) for the common data model, which is included
       in the EIC software image
     - [juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`, for the reconstruction
@@ -83,7 +83,7 @@ of branches for varying configurations.
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/irt.git
-    git clone git@eicweb.phy.anl.gov:EIC/eicd.git
+    git clone git@github.com:eic/eicd.git
     git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     ```
   - Checkout the appropriate branches of each repository, depending on your needs
