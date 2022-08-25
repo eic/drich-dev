@@ -18,7 +18,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:                         | ---                         | ---                                                                                                      |
 | `drich-dev`                 | `main`                      |                                                                                                          |
 | `epic`                      | `main`                      |                                                                                                          |
-| `eicd`                      | `irt-data-model`            | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
+| `eicd`                      | `irt-data-model`            | https://github.com/eic/eicd/pull/3                                                                       |
 | `irt`                       | `edm4hep-refactoring`       | https://github.com/eic/irt/pull/2                                                                        |
 | `juggler`                   | `73-add-rich-irt-algorithm` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                              |
 | `reconstruction_benchmarks` | `irt-benchmark`             | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222) |
