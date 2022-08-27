@@ -9,6 +9,7 @@
 #include "DD4hep/Detector.h"
 #include "DDRec/CellIDPositionConverter.h"
 #include "DD4hep/DD4hepUnits.h"
+#include "DD4hep/Printout.h"
 
 // IRT
 #include "CherenkovDetectorCollection.h"
@@ -37,6 +38,10 @@ int main(int argc, char** argv) {
   // irt auxfile name
   string irtAuxFileName = string("geo/irt-drich.root");
 
+  // constant names
+  const string richName    = "DRICH";
+  const string readoutName = "DRICHHits";
+
   // arguments
   if(argc>1) compactFile    = string(argv[1]);
   if(argc>2) irtAuxFileName = string(argv[2]);
@@ -46,7 +51,6 @@ int main(int argc, char** argv) {
   det->fromXML(compactFile);
 
   // dRICH handle
-  const string richName = "DRICH";
   auto detRich = det->detector(richName);
   auto posRich = detRich.placement().position();
 
@@ -54,33 +58,6 @@ int main(int argc, char** argv) {
   auto irtAuxFile  = new TFile(irtAuxFileName.c_str(),"RECREATE");
   auto irtGeometry = new CherenkovDetectorCollection();
   auto irtDetector = irtGeometry->AddNewDetector(richName.c_str());
-
-  //// unused
-  // auto volman  = det->volumeManager();
-  // auto surfman = det->surfaceManager();
-  // det->apply("DD4hepVolumeManager",0,0);
-  // auto decoder = std::make_shared<const dd4hep::rec::CellIDPositionConverter>(*det);
-  // auto id2secmod = [](int id){
-  //   return std::pair<int,int>(id&0x7,id>>3); // FIXME: use `decoder`
-  // };
-
-  // helpers
-  // auto starts_with = [](std::string str, const char *pat) {
-  //   return str.find(string(pat)) != string::npos; // true if `str` starts with `pat`
-  // };
-  // auto loop_de = [&detRich,&starts_with](const char *pat, std::function<void(DetElement)> block) {
-  //   for(auto const& [de_name, de] : detRich.children()) {
-  //     if(starts_with(de_name,pat)) {
-  //       cout << "found " << de_name << endl;
-  //       block(de);
-  //     }
-  //   }
-  // };
-  //   auto get_gasvolMatName = [&gasvolMaterial] (DetElement gasvol) {
-  //     gasvolMaterial = gasvol.volume().material().name();
-  //   };
-  //   loop_de("gasvol",get_gasvolMatName);
-  //   cout << gasvolMaterial << endl;
 
   // begin envelope
   /* FIXME: have no connection to GEANT G4LogicalVolume pointers; however all is needed
@@ -107,15 +84,9 @@ int main(int argc, char** argv) {
     cv->SetAlternativeMaterialName(gasvolMaterial.c_str());
   }
 
-  // readout decoder
-  // FIXME: copied from `epic:src/DRICH_geo.cpp`; is there an easier way?
-  auto        decoder    = desc.readout(readoutName).idSpec().decoder();
-  const auto& moduleBits = (*decoder)["module"];
-  const auto& sectorBits = (*decoder)["sector"];
-  uint64_t    cellMask   = moduleBits.mask() | sectorBits.mask();
-
   // photon detector
   // - FIXME: args (G4Solid,G4Material) inaccessible?
+  auto cellMask = uint64_t(std::stoull(det->constant<string>("DRICH_RECON_cellMask")));
   CherenkovPhotonDetector* irtPhotonDetector = new CherenkovPhotonDetector(nullptr, nullptr);
   irtDetector->SetReadoutCellMask(cellMask);
   irtGeometry->AddPhotonDetector(
@@ -123,6 +94,7 @@ int main(int argc, char** argv) {
       nullptr,          // G4LogicalVolume (inaccessible?)
       irtPhotonDetector // photon detector
       );
+  printout(ALWAYS, "IRTLOG", "cellMask = 0x%X", cellMask);
 
   // aerogel + filter
   /* AddFlatRadiator will create a pair of flat refractive surfaces internally;
@@ -156,13 +128,13 @@ int main(int argc, char** argv) {
         filterFlatSurface,       // surface
         filterThickness / mm     // surface thickness
         );
-    aerogelFlatRadiator->SetAlternativeMaterialName(aerogelMaterial);
-    filterFlatRadiator->SetAlternativeMaterialName(filterMaterial);
+    aerogelFlatRadiator->SetAlternativeMaterialName(aerogelMaterial.c_str());
+    filterFlatRadiator->SetAlternativeMaterialName(filterMaterial.c_str());
   }
-  // printout(ALWAYS, "IRTLOG", "aerogelZpos = %f cm", aerogelZpos);
-  // printout(ALWAYS, "IRTLOG", "filterZpos  = %f cm", filterZpos);
-  // printout(ALWAYS, "IRTLOG", "aerogel thickness = %f cm", aerogelThickness);
-  // printout(ALWAYS, "IRTLOG", "filter thickness  = %f cm", filterThickness);
+  printout(ALWAYS, "IRTLOG", "aerogelZpos = %f cm", aerogelZpos);
+  printout(ALWAYS, "IRTLOG", "filterZpos  = %f cm", filterZpos);
+  printout(ALWAYS, "IRTLOG", "aerogel thickness = %f cm", aerogelThickness);
+  printout(ALWAYS, "IRTLOG", "filter thickness  = %f cm", filterThickness);
 
   // sector loop
   for (int isec = 0; isec < nSectors; isec++) {
@@ -180,12 +152,12 @@ int main(int argc, char** argv) {
         false                              // bool refractive
         );
     irtDetector->AddOpticalBoundary(isec, mirrorOpticalBoundary);
-    // printout(ALWAYS, "IRTLOG", "");
-    // printout(ALWAYS, "IRTLOG", "  SECTOR %d MIRROR:", isec);
-    // printout(ALWAYS, "IRTLOG", "    mirror x = %f cm", mirrorCenterX);
-    // printout(ALWAYS, "IRTLOG", "    mirror y = %f cm", mirrorCenterY);
-    // printout(ALWAYS, "IRTLOG", "    mirror z = %f cm", mirrorCenterZ);
-    // printout(ALWAYS, "IRTLOG", "    mirror R = %f cm", mirrorRadius);
+    printout(ALWAYS, "IRTLOG", "");
+    printout(ALWAYS, "IRTLOG", "  SECTOR %d MIRROR:", isec);
+    printout(ALWAYS, "IRTLOG", "    mirror x = %f cm", mirrorCenterX);
+    printout(ALWAYS, "IRTLOG", "    mirror y = %f cm", mirrorCenterY);
+    printout(ALWAYS, "IRTLOG", "    mirror z = %f cm", mirrorCenterZ);
+    printout(ALWAYS, "IRTLOG", "    mirror R = %f cm", mirrorRadius);
 
     // complete the radiator volume description; this is the rear side of the container gas volume
     irtDetector->GetRadiator("GasVolume")->m_Borders[isec].second = mirrorSphericalSurface;
@@ -196,7 +168,7 @@ int main(int argc, char** argv) {
       if(de_name.find("sensor_sec"+std::to_string(isec))!=std::string::npos) {
         auto pvSensor  = detSensor.placement();
         auto posSensor = posRich + pvSensor.position();
-        double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()}
+        double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()};
         auto imodsec = detSensor.id(); // FIXME check this
 
         // FIXME: is this correct? could this be causing lower than expected NPE?
@@ -205,8 +177,8 @@ int main(int argc, char** argv) {
         double sensorLocalNormX[3] = {1.0, 0.0, 0.0};
         double sensorLocalNormY[3] = {0.0, 1.0, 0.0};
         double sensorGlobalNormX[3], sensorGlobalNormY[3];
-        pvSensor.LocalToMasterVect(sensorLocalNormX, sensorGlobalNormX);
-        pvSensor.LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
+        pvSensor.ptr()->LocalToMasterVect(sensorLocalNormX, sensorGlobalNormX);
+        pvSensor.ptr()->LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
 
         // create the optical surface
         auto sensorFlatSurface = new FlatSurface(
@@ -254,6 +226,9 @@ int main(int argc, char** argv) {
 
   /*
   
+  // auto id2secmod = [](int id){
+  //   return std::pair<int,int>(id&0x7,id>>3); // FIXME: use `decoder`
+  // };
 
   // FIXME: Get access to the readout structure decoder
   // irtDetector->SetReadoutCellMask( ... )
