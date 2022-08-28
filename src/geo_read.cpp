@@ -165,12 +165,15 @@ int main(int argc, char** argv) {
     // sensors
     // search the detector tree for sensors for this sector
     for(auto const& [de_name, detSensor] : detRich.children()) {
-      if(de_name.find("sensor_sec"+std::to_string(isec))!=std::string::npos) {
+      if(de_name.find("sensor_de_sec"+std::to_string(isec))!=std::string::npos) {
+
+        // get sensor position
         auto pvSensor  = detSensor.placement();
         auto posSensor = posRich + pvSensor.position();
         double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()};
-        auto imodsec = detSensor.id(); // FIXME check this
+        auto imodsec = detSensor.id();
 
+        // get surface normal
         // FIXME: is this correct? could this be causing lower than expected NPE?
         // get sensor flat surface normX and normY
         // - ignore vessel transformation, since it is a pure translation
@@ -192,12 +195,13 @@ int main(int argc, char** argv) {
             imodsec,           // copy number
             sensorFlatSurface  // surface
             );
-        // if(imod==0) {
-        //   printout(ALWAYS, "IRTLOG", "");
-        //   printout(ALWAYS, "IRTLOG", "  SECTOR %d SENSORS:", isec);
-        // }
-        // printout(ALWAYS, "IRTLOG", "    sensor (imodsec,x,y,z) = 0x%08x  %5.2f  %5.2f  %5.2f cm",
-        //     imodsec, sensorGlobalPos[0], sensorGlobalPos[1], sensorGlobalPos[2]);
+        printout(ALWAYS, "IRTLOG",
+            "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
+            imodsec,
+            sensorGlobalPos[0],   sensorGlobalPos[1],   sensorGlobalPos[2],
+            sensorGlobalNormX[0], sensorGlobalNormX[1], sensorGlobalNormX[2],
+            sensorGlobalNormY[0], sensorGlobalNormY[1], sensorGlobalNormY[2]
+            );
       }
     } // search for sensors
 
