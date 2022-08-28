@@ -164,6 +164,7 @@ int main(int argc, char** argv) {
 
     // sensors
     // search the detector tree for sensors for this sector
+    bool once = true;
     for(auto const& [de_name, detSensor] : detRich.children()) {
       if(de_name.find("sensor_de_sec"+std::to_string(isec))!=std::string::npos) {
 
@@ -183,6 +184,23 @@ int main(int argc, char** argv) {
         pvSensor.ptr()->LocalToMasterVect(sensorLocalNormX, sensorGlobalNormX);
         pvSensor.ptr()->LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
 
+        // validate sensor position and normal
+        double sectorRotation = isec * 2*M_PI / nSectors;
+        double sphereRadius  = 100.0;
+        double sphereCenterZ = -50.0 + vesselZmin;
+        double sphereCenterR = 180.0;
+        double sphereCenterX = sphereCenterR * std::cos(sectorRotation);
+        double sphereCenterY = sphereCenterR * std::sin(sectorRotation);
+        if(once) {
+          printout(ALWAYS, "IRTLOG", "  SECTOR %d SENSOR SPHERE:", isec);
+          printout(ALWAYS, "IRTLOG", "    sphere x = %f cm", sphereCenterX);
+          printout(ALWAYS, "IRTLOG", "    sphere y = %f cm", sphereCenterY);
+          printout(ALWAYS, "IRTLOG", "    sphere z = %f cm", sphereCenterZ);
+          printout(ALWAYS, "IRTLOG", "    sphere R = %f cm", sphereRadius);
+        }
+        TVector3 validCenter = TVector3(sphereCenterX,sphereCenterY,sphereCenterZ);
+        TVector3 validRadius = TVector3(sensorGlobalPos) - validCenter;
+
         // create the optical surface
         auto sensorFlatSurface = new FlatSurface(
             (1 / mm) * TVector3(sensorGlobalPos),
@@ -195,13 +213,15 @@ int main(int argc, char** argv) {
             imodsec,           // copy number
             sensorFlatSurface  // surface
             );
-        printout(ALWAYS, "IRTLOG",
-            "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
-            imodsec,
-            sensorGlobalPos[0],   sensorGlobalPos[1],   sensorGlobalPos[2],
-            sensorGlobalNormX[0], sensorGlobalNormX[1], sensorGlobalNormX[2],
-            sensorGlobalNormY[0], sensorGlobalNormY[1], sensorGlobalNormY[2]
-            );
+        // printout(ALWAYS, "IRTLOG",
+        //     "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
+        //     imodsec,
+        //     sensorGlobalPos[0],   sensorGlobalPos[1],   sensorGlobalPos[2],
+        //     sensorGlobalNormX[0], sensorGlobalNormX[1], sensorGlobalNormX[2],
+        //     sensorGlobalNormY[0], sensorGlobalNormY[1], sensorGlobalNormY[2]
+        //     );
+
+        once = false;
       }
     } // search for sensors
 
