@@ -138,14 +138,17 @@ int main(int argc, char** argv) {
 
   // sector loop
   for (int isec = 0; isec < nSectors; isec++) {
+    std::string secName = "sec" + std::to_string(isec);
 
     // mirrors
     auto mirrorRadius = det->constant<double>("DRICH_RECON_mirrorRadius");
-    auto mirrorCenterX = det->constant<double>("DRICH_RECON_mirrorCenterX_sec"+std::to_string(isec));
-    auto mirrorCenterY = det->constant<double>("DRICH_RECON_mirrorCenterY_sec"+std::to_string(isec));
-    auto mirrorCenterZ = det->constant<double>("DRICH_RECON_mirrorCenterZ_sec"+std::to_string(isec));
+    Position mirrorCenter(
+      det->constant<double>("DRICH_RECON_mirrorCenterX_"+secName),
+      det->constant<double>("DRICH_RECON_mirrorCenterY_"+secName),
+      det->constant<double>("DRICH_RECON_mirrorCenterZ_"+secName)
+      );
     auto mirrorSphericalSurface  = new SphericalSurface(
-        (1 / mm) * TVector3(mirrorCenterX, mirrorCenterY, mirrorCenterZ), mirrorRadius / mm);
+        (1 / mm) * TVector3(mirrorCenter.x(), mirrorCenter.y(), mirrorCenter.z()), mirrorRadius / mm);
     auto mirrorOpticalBoundary = new OpticalBoundary(
         irtDetector->GetContainerVolume(), // CherenkovRadiator radiator
         mirrorSphericalSurface,            // surface
@@ -154,19 +157,30 @@ int main(int argc, char** argv) {
     irtDetector->AddOpticalBoundary(isec, mirrorOpticalBoundary);
     printout(ALWAYS, "IRTLOG", "");
     printout(ALWAYS, "IRTLOG", "  SECTOR %d MIRROR:", isec);
-    printout(ALWAYS, "IRTLOG", "    mirror x = %f cm", mirrorCenterX);
-    printout(ALWAYS, "IRTLOG", "    mirror y = %f cm", mirrorCenterY);
-    printout(ALWAYS, "IRTLOG", "    mirror z = %f cm", mirrorCenterZ);
+    printout(ALWAYS, "IRTLOG", "    mirror x = %f cm", mirrorCenter.x());
+    printout(ALWAYS, "IRTLOG", "    mirror y = %f cm", mirrorCenter.y());
+    printout(ALWAYS, "IRTLOG", "    mirror z = %f cm", mirrorCenter.z());
     printout(ALWAYS, "IRTLOG", "    mirror R = %f cm", mirrorRadius);
 
     // complete the radiator volume description; this is the rear side of the container gas volume
     irtDetector->GetRadiator("GasVolume")->m_Borders[isec].second = mirrorSphericalSurface;
 
-    // sensors
-    // search the detector tree for sensors for this sector
-    bool once = true;
+    // sensor sphere (only used for validation of sensor normals)
+    auto sensorSphRadius  = det->constant<double>("DRICH_RECON_sensorSphRadius");
+    Position sensorSphCenter(
+      det->constant<double>("DRICH_RECON_sensorSphCenterX_"+secName),
+      det->constant<double>("DRICH_RECON_sensorSphCenterY_"+secName),
+      det->constant<double>("DRICH_RECON_sensorSphCenterZ_"+secName)
+      );
+    printout(ALWAYS, "IRTLOG", "  SECTOR %d SENSOR SPHERE:", isec);
+    printout(ALWAYS, "IRTLOG", "    sphere x = %f cm", sensorSphCenter.x());
+    printout(ALWAYS, "IRTLOG", "    sphere y = %f cm", sensorSphCenter.y());
+    printout(ALWAYS, "IRTLOG", "    sphere z = %f cm", sensorSphCenter.z());
+    printout(ALWAYS, "IRTLOG", "    sphere R = %f cm", sensorSphRadius);
+
+    // sensor modules: search the detector tree for sensors for this sector
     for(auto const& [de_name, detSensor] : detRich.children()) {
-      if(de_name.find("sensor_de_sec"+std::to_string(isec))!=std::string::npos) {
+      if(de_name.find("sensor_de_"+secName)!=std::string::npos) {
 
         // get sensor position
         auto pvSensor  = detSensor.placement();
@@ -185,25 +199,25 @@ int main(int argc, char** argv) {
         pvSensor.ptr()->LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
 
         // validate sensor position and normal
-        double sectorRotation = isec * 2*M_PI / nSectors;
-        double sphereRadius  = 100.0;
-        double sphereCenterZ = -50.0 + vesselZmin;
-        double sphereCenterR = 180.0;
-        double sphereCenterX = sphereCenterR * std::cos(sectorRotation);
-        double sphereCenterY = sphereCenterR * std::sin(sectorRotation);
-        if(once) {
-          printout(ALWAYS, "IRTLOG", "  SECTOR %d SENSOR SPHERE:", isec);
-          printout(ALWAYS, "IRTLOG", "    sphere x = %f cm", sphereCenterX);
-          printout(ALWAYS, "IRTLOG", "    sphere y = %f cm", sphereCenterY);
-          printout(ALWAYS, "IRTLOG", "    sphere z = %f cm", sphereCenterZ);
-          printout(ALWAYS, "IRTLOG", "    sphere R = %f cm", sphereRadius);
+        Direction radialDir = posSensor - sensorSphCenter;
+        Direction normXdir, normYdir;
+        normXdir.SetCoordinates(sensorGlobalNormX);
+        normYdir.SetCoordinates(sensorGlobalNormY);
+        auto normalDir  = normXdir.Cross(normYdir);
+        auto testOrtho  = normXdir.Dot(normYdir);
+        auto testRadial = radialDir.Cross(normalDir).Mag2();
+        if(abs(testOrtho)>1e-6 || abs(testRadial)>1e-6) {
+          printout(FATAL, "IRTLOG",
+              "sensor normal is wrong: normX.normY = %f   |radialDir x normalDir|^2 = %f",
+              testOrtho,
+              testRadial
+              );
+          return 1;
         }
-        TVector3 validCenter = TVector3(sphereCenterX,sphereCenterY,sphereCenterZ);
-        TVector3 validRadius = TVector3(sensorGlobalPos) - validCenter;
 
         // create the optical surface
         auto sensorFlatSurface = new FlatSurface(
-            (1 / mm) * TVector3(sensorGlobalPos),
+            (1 / mm) * TVector3(posSensor.x(), posSensor.y(), posSensor.z()),
             TVector3(sensorGlobalNormX),
             TVector3(sensorGlobalNormY)
             );
@@ -216,12 +230,10 @@ int main(int argc, char** argv) {
         // printout(ALWAYS, "IRTLOG",
         //     "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
         //     imodsec,
-        //     sensorGlobalPos[0],   sensorGlobalPos[1],   sensorGlobalPos[2],
-        //     sensorGlobalNormX[0], sensorGlobalNormX[1], sensorGlobalNormX[2],
-        //     sensorGlobalNormY[0], sensorGlobalNormY[1], sensorGlobalNormY[2]
+        //     posSensor.x(), posSensor.y(), posSensor.z()
+        //     normXdir.x(),  normXdir.y(),  normXdir.z(),
+        //     normYdir.x(),  normYdir.y(),  normYdir.z(),
         //     );
-
-        once = false;
       }
     } // search for sensors
 
