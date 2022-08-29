@@ -6,7 +6,7 @@ set -e
 if [ -z "$BUILD_NPROC" ]; then export BUILD_NPROC=1; fi
 if [ -z "$DRICH_DEV" ]; then echo "ERROR: source environ.sh"; exit 1; fi
 
-pushd eicd
+pushd EDM4eic
 
 if [ $clean -eq 1 ]; then
   echo "clean build dir..."
