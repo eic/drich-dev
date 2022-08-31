@@ -12,7 +12,7 @@ NumEvents = 300                 # number of events per fixed momentum
 PoolSize  = 4                   # number of parallel threads to run
 OutputDir = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
 DrawOnly  = false               # if true, do not run simulation, only draw the result
-MaxCounts = 80                  # vertical axis limit of the counts vs. momentum plot
+MaxCounts = 320                 # vertical axis limit of the counts vs. momentum plot
 
 ## list of particles to test
 particle_a = [

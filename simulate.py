@@ -26,7 +26,7 @@ standalone = False
 compactFileCustom = ''
 zDirection = 1
 particle = 'pi+'
-energy = '8.0 GeV'
+energy = '40.0 GeV'
 runType = 'run'
 numEvents = 50
 outputImageType = ''
@@ -459,7 +459,7 @@ m.close()
 
 ### simulation executable and arguments
 cmd = [
-        'npsim',
+        f'{localDir}/NPDet/install/bin/npsim',
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName_npsim}',

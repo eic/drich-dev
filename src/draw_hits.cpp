@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
       { "numHitsVsThrownP","number of dRICH hits vs. thrown momentum", 
-      65,0,65, 100,0,80 },
+      65,0,65, 100,0,400 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
 
