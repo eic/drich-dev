@@ -460,6 +460,7 @@ m.close()
 ### simulation executable and arguments
 cmd = [
         f'npsim',
+        # f'{localDir}/NPDet/install/bin/npsim', # call local npsim
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName_npsim}',
