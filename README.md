@@ -393,12 +393,12 @@ evaluate.sh
 
 ## Upstream Development Support
 This section contains notes for building upstream repositories. Clone relevant repositories
-to this top-level directory. The general procedure is:
+to this top-level directory. The general build procedure is:
 ```bash
 source environ.sh
 scripts/build_DD4hep.sh
 source scripts/this_DD4hep.sh
 scripts/build_NPDet.sh
-source scripts/this_NPDet.sh
+source scripts/this_NPDet.sh  # note: you may prefer to directly call scripts in NPDet/install/bin
 rebuild_all.sh
 ```
