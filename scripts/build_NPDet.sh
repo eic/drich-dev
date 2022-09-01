@@ -22,3 +22,5 @@ cmake -B build -S . \
 cmake --build build -j$BUILD_NPROC -- install
 
 popd
+
+printf "\nDone. To use, run:  source scripts/this_NPDet.sh\n\n"

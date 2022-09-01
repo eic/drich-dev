@@ -459,7 +459,7 @@ m.close()
 
 ### simulation executable and arguments
 cmd = [
-        f'{localDir}/NPDet/install/bin/npsim',
+        f'npsim',
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName_npsim}',

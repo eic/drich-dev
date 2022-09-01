@@ -390,3 +390,15 @@ evaluate.sh
   - some scripts are in Ruby; follow [this guide](doc/ruby.md) to install gems
   (dependencies)
 - `deprecated/` contains some old scripts which may also be helpful
+
+## Upstream Development Support
+This section contains notes for building upstream repositories. Clone relevant repositories
+to this top-level directory. The general procedure is:
+```bash
+source environ.sh
+scripts/build_DD4hep.sh
+source scripts/this_DD4hep.sh
+scripts/build_NPDet.sh
+source scripts/this_NPDet.sh
+rebuild_all.sh
+```

@@ -31,4 +31,4 @@ cmake --build build -j$BUILD_NPROC -- install
 
 popd
 
-printf "\nDone. To use, run:  source scripts/local_dd4hep.sh\n\n"
+printf "\nDone. To use, run:  source scripts/this_DD4hep.sh\n\n"
