@@ -19,7 +19,7 @@ standalone = False
 zDirection = 1
 particle = 'pi+'
 energy = '8.0 GeV'
-runType = 'run'
+runType = 'vis'
 numEvents = 10
 outputFileName = ''
 
@@ -376,8 +376,8 @@ elif testNum == 12:
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
     for rVal in list(linspace(rMin, rMax, 5)):  # number of beams within theta acceptance
-        m.write(f'/gps/ang/rot1 -{zMax} 0 {rVal}\n')
         m.write(f'/gps/pos/rot1 -{zMax} 0 {rVal}\n')
+        m.write(f'/gps/ang/rot1 -{zMax} 0 {rVal}\n')
         m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width
         m.write(f'/run/beamOn {numEvents}\n')
 
@@ -407,6 +407,33 @@ elif testNum == 13:
         m.write(f'/gps/direction {x} {y} {z}\n')
         m.write(f'/run/beamOn {numEvents}\n')
 
+elif testNum == 14:
+    m.write(f'\n# opticalphoton parallel-to-point focusing, full coverage\n')
+    m.write(f'/vis/scene/endOfEventAction accumulate\n')
+    m.write(f'/vis/scene/endOfRunAction accumulate\n')
+    m.write(f'/gps/pos/type Beam\n')
+    m.write(f'/gps/ang/type beam1d\n')
+
+    theta_min = thetaMin # minimum polar angle                                                                                                                                                                                               
+    theta_max = thetaMax # maximum polar angle                                                                                                                                                                        
+
+    num_rings = 250
+
+    hit_density = 10
+    from scripts import createAngles
+    angles = createAngles.makeAngles(theta_min, theta_max, num_rings, hit_density)
+    for angle in angles:
+        theta, phi = angle[0], angle[1]
+        if math.pi / 6 < phi < (2 * math.pi - math.pi / 6): continue  # restrict to one sector                                                                                         
+        if abs(phi) > 0.001 and abs(theta - theta_min) < 0.001: continue  # allow only one ring at thetaMin                                                                                                
+        x = math.sin(theta) * math.cos(phi)
+        y = math.sin(theta) * math.sin(phi)
+        z = math.cos(theta) * zDirection
+        #m.write(f'/gps/pos/rot1 -{zMax} 0 0 \n')
+        m.write(f'/gps/direction {x} {y} {z} \n')
+        m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width                                                                                                                                                                         
+        m.write(f'/run/beamOn {numEvents}\n')                
+    
 elif testNum > 0:
     print("ERROR: unknown test number\n")
     m.close()
