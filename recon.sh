@@ -59,7 +59,7 @@ case $method in
     printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
     ;;
   reader)
-    root -b -q irt/scripts/reader_2.C'("'$sim_file'","'$aux_file'")'
+    root -b -q irt/scripts/reader.C'("'$sim_file'","'$aux_file'")'
     ;;
   *)
     echo "ERROR: unspecified reconstruction method" >&2
