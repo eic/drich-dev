@@ -9,19 +9,19 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:                         | ---      |
 | `drich-dev`                 | `main`   |
 | `epic`                      | `main`   |
-| `eicd`                      | `master` |
+| `EDM4eic`                   | `master` |
 | `irt`                       | `main`   |
 | `juggler`                   | `master` |
 
 ## IRT Development
-| Repository                  | Branch                      | Pull Request                                                                                             |
-| --:                         | ---                         | ---                                                                                                      |
-| `drich-dev`                 | `main`                      |                                                                                                          |
-| `epic`                      | `main`                      |                                                                                                          |
-| `eicd`                      | `irt-data-model`            | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/eicd/-/merge_requests/70)                                  |
-| `irt`                       | `edm4hep-refactoring`       | https://github.com/eic/irt/pull/2                                                                        |
-| `juggler`                   | `73-add-rich-irt-algorithm` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                              |
-| `reconstruction_benchmarks` | `irt-benchmark`             | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222) |
+| Repository                  | Branch                                                          | Pull Request                                                                                             |
+| --:                         | ---                                                             | ---                                                                                                      |
+| `drich-dev`                 | `main`                                                          |                                                                                                          |
+| `epic`                      | `main`                                                          |                                                                                                          |
+| `EDM4eic`                   | `irt-data-model`                                                | https://github.com/eic/EDM4eic/pull/1                                                                    |
+| `irt`                       | `edm4hep-refactoring`                                           | https://github.com/eic/irt/pull/2                                                                        |
+| `juggler`                   | `73-add-rich-irt-algorithm` (main) and `irt-hepmc-jugpid` (dev) | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377)                              |
+| `reconstruction_benchmarks` | `irt-benchmark`                                                 | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/222) |
 
 **REFERENCE**: changes to `IRTAlgorithm` for `edm4hep`: <https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/449/diffs>
 
@@ -30,5 +30,5 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:         | ---                                                 | ---                                                                                                          |
 | `drich-dev` | `main`                                              |                                                                                                              |
 | `epic`      | `12-drich-sensor-material-should-not-be-airoptical` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) - **TODO: convert to PR**  |
-| `eicd`      | `master`                                            |                                                                                                              |
+| `EDM4eic`   | `master`                                            |                                                                                                              |
 | `irt`       | `main`                                              |                                                                                                              |

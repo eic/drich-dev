@@ -76,8 +76,8 @@ of branches for varying configurations.
     - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
     - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
-    - [eicd](https://eicweb.phy.anl.gov/EIC/eicd) to `./eicd`, for the data model; see also
-      [EDM4hep](https://github.com/key4hep/EDM4hep) for the common data model, which is included
+    - [EDM4eic](https://github.com/eic/EDM4eic) to `./EDM4eic`, for the data model; this extends
+      [EDM4hep](https://github.com/key4hep/EDM4hep), the common data model, which is included
       in the EIC software image
     - [juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`, for the reconstruction
       framework used in ATHENA, and supported while we migrate to the new reconstruction framework in EPIC
@@ -85,13 +85,13 @@ of branches for varying configurations.
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/irt.git
-    git clone git@eicweb.phy.anl.gov:EIC/eicd.git
+    git clone git@github.com:eic/EDM4eic.git
     git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     ```
   - Checkout the appropriate branches of each repository, depending on your needs
     - see [Branches and Pull Requests](doc/branches.md)
     - for example, currently the IRT code runs in `juggler` and relies on a
-      custom data model in `eicd`, neither of which have been merged to the
+      custom data model in `EDM4eic`, neither of which have been merged to the
       main branches; the "IRT Development" branches are recommended for running
       the IRT code for now, until IRT is integrated with the new reconstruction
       framework
@@ -124,7 +124,7 @@ of branches for varying configurations.
   [flowchart](doc/docDiagram.pdf) dependency graph)
   - build scripts, in recommended order:
   ```bash
-  ./build_eicd.sh
+  ./build_EDM4eic.sh
   ./build_irt.sh
   ./build_epic.sh
   ./build_juggler.sh
@@ -148,8 +148,8 @@ of branches for varying configurations.
     (`eic-shell --upgrade`)
 - be mindful of which branch you are on in each repository, especially if you
   have several active pull requests
-  - for example, `irt` requires the new `eicd` components and datatypes, which
-    at the time of writing this have not been merged to `eicd` `master`
+  - for example, `irt` requires the new `EDM4eic` components and datatypes, which
+    at the time of writing this have not been merged to `EDM4eic` `master`
   - use `./check_branches.sh` to quickly check which branches you are on in all
     repositories
   - use `./check_status.sh` to run `git status` in each repository, which is
@@ -288,7 +288,9 @@ corresponding executables and install them to `bin/`
 
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage guidance
-  - `npsim` is the main script for running Geant4 simulations with DD4hep
+  - `npsim` is the main script for running Geant4 simulations with DD4hep; it
+    wraps DD4hep's `ddsim` with some extra settings for Cherenkov detectors,
+    such as the sensitive detector action
   - basically copied to `reconstruction_benchmarks`, but stored here as well for
     backup
 - example simulation analysis code is found in `src/examples`

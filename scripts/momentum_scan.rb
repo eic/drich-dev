@@ -122,8 +122,9 @@ particle_h.each do |particle,h|
   plot.SetMarkerSize  1.5
   plot.GetYaxis.SetRangeUser 0, MaxCounts
   plot.Draw 'SAME E X0'
-  plot.GetXaxis.SetTitle 'Thrown Momentum [GeV]'
-  plot.GetYaxis.SetTitle 'Number of dRICH hits'
+  plot.GetXaxis.SetTitle 'Thrown momentum [GeV]'
+  plot.GetYaxis.SetTitle 'Average number of hits'
+  plot.SetTitle 'Average ' + plot.GetTitle
   leg_hits.AddEntry plot, particle, 'PE'
 end
 pad_leg.cd

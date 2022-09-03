@@ -185,10 +185,10 @@ int main(int argc, char** argv) {
       );
 
   // pixel hits
-  Double_t pixelXmin = dilation * 110;
-  Double_t pixelXmax = dilation * 180;
-  Double_t pixelYmin = dilation * -55;
-  Double_t pixelYmax = dilation * 55;
+  Double_t pixelXmin = dilation * 100;
+  Double_t pixelXmax = dilation * 190;
+  Double_t pixelYmin = dilation * -70;
+  Double_t pixelYmax = dilation * 70;
   auto pixelHits = dfFinal.Histo3D(
       { "pixelHits","pixel hits;x;y;sector",
         (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
