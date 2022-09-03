@@ -286,7 +286,9 @@ corresponding executables and install them to `bin/`
 
 - `simulate.py`: runs `npsim` with settings for the dRICH and pfRICH
   - run with no arguments for usage guidance
-  - `npsim` is the main script for running Geant4 simulations with DD4hep
+  - `npsim` is the main script for running Geant4 simulations with DD4hep; it
+    wraps DD4hep's `ddsim` with some extra settings for Cherenkov detectors,
+    such as the sensitive detector action
   - basically copied to `reconstruction_benchmarks`, but stored here as well for
     backup
 - example simulation analysis code is found in `src/examples`
