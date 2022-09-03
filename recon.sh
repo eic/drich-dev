@@ -2,9 +2,11 @@
 
 # default settings
 method=""
-sim_file="out/sim.root"
-rec_file="out/rec.root"
-aux_file="geo/irt-drich.root"
+#sim_file="out/irt.edm4hep.root"
+sim_file=$2
+#rec_file="out/rec.root"
+rec_file=$3
+aux_file="./irt-drich.root"
 
 # usage
 function usage {
@@ -30,6 +32,7 @@ USAGE:
   exit 2
 }
 if [ $# -eq 0 ]; then usage; fi
+if [ $# -neq 3 ]; then echo "bash recon.sh -<method> simfile outfile"i; fi
 
 # parse options
 while getopts "hjri:o:x:" opt; do
@@ -55,7 +58,7 @@ case $method in
     export JUGGLER_SIM_FILE=$sim_file
     export JUGGLER_REC_FILE=$rec_file
     export JUGGLER_IRT_AUXFILE=$aux_file
-    gaudirun.py juggler/JugPID/tests/options/irt.py
+    gaudirun.py irt.py
     printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
     ;;
   reader)
