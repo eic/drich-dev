@@ -15,8 +15,8 @@ source deprecated/environ_athena.sh   # overrides for ATHENA
 
 Build the ATHENA geometry, then re-build Juggler:
 ```bash
-deprecated/build_athena.sh clean
-build_juggler.sh clean
+build.sh athena clean
+build.sh juggler clean
 ```
 
 Revert to EPIC
@@ -24,6 +24,6 @@ Revert to EPIC
 To switch your environment back to EPIC:
 ```bash
 source environ.sh
-build_epic.sh clean
-build_juggler.sh clean
+build.sh epic clean
+build.sh juggler clean
 ```

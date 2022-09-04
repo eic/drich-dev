@@ -27,7 +27,7 @@ USAGE:
      
     For -e,-d,-p, compact files are assumed to be at
      \$DETECTOR_PATH = $DETECTOR_PATH
-     (rendered by build_epic.sh)
+     (rendered by build.sh epic)
 
   OPTIONS
     -o <output_root_file>
