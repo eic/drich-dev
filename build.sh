@@ -117,7 +117,7 @@ cmakeInstall="cmake --install $buildSys"
 printf """
 CMAKE COMMANDS:
 ========================================\n
-[ generate ]\n$cmakeGen\n
+[ generate buildsystem ]\n$cmakeGen\n
 [ build ]\n$cmakeBuild\n
 [ install ]\n$cmakeInstall\n
 ========================================\n
