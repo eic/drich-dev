@@ -390,3 +390,19 @@ evaluate.sh
   - some scripts are in Ruby; follow [this guide](doc/ruby.md) to install gems
   (dependencies)
 - `deprecated/` contains some old scripts which may also be helpful
+
+## Upstream Development Support
+This section contains notes for building upstream repositories. Clone the repositories
+that you want to test to this top-level directory. The general build procedure is:
+```bash
+source environ.sh
+scripts/build_DD4hep.sh
+source scripts/this_DD4hep.sh
+scripts/build_NPDet.sh
+source scripts/this_NPDet.sh  # note: you may prefer to directly call scripts in NPDet/install/bin
+rebuild_all.sh
+```
+Only build these repositories if you want to override the versions installed in
+`eic-shell`. To revert back to the `eic-shell` versions, restart your
+`eic-shell` instance and run `source environ.sh`; you may also need to run
+`rebuild_all.sh` (or `rebuild_all.sh clean`).
