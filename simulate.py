@@ -363,14 +363,17 @@ elif testNum == 6:
     m.write(f'/gps/ang/maxphi {math.pi + 0.01} rad\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
-elif testNum == 7:
+elif testNum == 7 or testNum == 8:
     m.write(f'\n# momentum scan\n')
     thetaMid = (thetaMin+thetaMax)/2.0
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection
     m.write(f'/gps/direction {x} {y} {z}\n')
-    for en in list(linspace(1, 60, 10)):
+    momMax = 60
+    if testNum == 7:
+        momMax = 20
+    for en in list(linspace(1, momMax, 30)):
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
 

@@ -7,12 +7,8 @@ R__LOAD_LIBRARY(fmt)
 
 #include "podio/EventStore.h"
 #include "podio/ROOTReader.h"
-#include "fmt/format.h"
-
 #include "edm4hep/utils/kinematics.h"
-// #include "edm4hep/MCParticleCollection.h"
-// #include "edm4hep/SimTrackerHitCollection.h"
-// #include "edm4eic/CherenkovParticleIDCollection.h"
+#include "fmt/format.h"
 
 // radiators
 enum rad_enum {kAgl=0, kGas=1};
@@ -36,18 +32,15 @@ void momentum_scan_draw(
 
   // radiators
   std::string radiator_name;
-  double      theta_max;
-  int         nphot_max;
+  double mom_max;
   switch(which_radiator) {
     case kAgl:
       radiator_name = "Aerogel";
-      theta_max     = 260.0;
-      nphot_max     = 500;
+      mom_max       = 22;
       break;
     case kGas:
       radiator_name = "Gas";
-      theta_max     = 50.0;
-      nphot_max     = 400;
+      mom_max       = 65;
       break;
     default:
       fmt::print(stderr,"ERROR: unknown which_radiator={}\n",which_radiator);
@@ -55,8 +48,9 @@ void momentum_scan_draw(
   }
 
   // plot limits
+  const double theta_max = 260.0;
+  const int    nphot_max = 500;
   const int    npe_max   = 0.3*nphot_max;
-  const double mom_max   = 65.0;
 
   // define histograms
   std::map<std::string,TH2D*> scans;
@@ -94,7 +88,7 @@ void momentum_scan_draw(
     scan->Fill(x,y);
   };
 
-  // event loop
+  // event loop =================================================================
   for(unsigned e=0; e<reader.getEntries(); e++) {
 
     // get next event
@@ -141,7 +135,7 @@ void momentum_scan_draw(
       }
     }
 
-  } // end event loop
+  } // end event loop =================================================================
   store.clear();
   reader.endOfEvent();
   reader.closeFile();
@@ -150,7 +144,7 @@ void momentum_scan_draw(
   std::map<std::string,TProfile*> scan_profs;
   std::map<std::string,TCanvas*> scan_canvs;
   for(const auto& [name,scan] : scans) {
-    auto prof = scan->ProfileX("_pfx",1,-1,"s"); // errors are std_dev
+    auto prof = scan->ProfileX("_pfx",1,-1,"");
     prof->SetLineColor(kBlack);
     prof->SetLineWidth(3);
     scan_profs.insert({name,prof});
@@ -163,7 +157,7 @@ void momentum_scan_draw(
   }
 
   // write output
-  auto WriteScans = [](auto vec) { for(const auto& [name,obj] : vec) obj->Write(); };
+  auto WriteScans = [] (auto vec) { for(const auto& [name,obj] : vec) obj->Write(); };
   WriteScans(scans);
   WriteScans(scan_profs);
   WriteScans(scan_canvs);
