@@ -7,8 +7,9 @@ require 'fileutils'
 require 'pycall/import'
 
 ## settings
-NumEvents = 300                 # number of events per fixed momentum
-PoolSize  = 4                   # number of parallel threads to run
+NumEvents = 100                 # number of events per fixed momentum
+NumPoints = 10                  # number of momenta to sample
+PoolSize  = 6                   # number of parallel threads to run
 OutputDir = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
 RunSimRec = false               # if false, do not run simulation+reconstruction, only draw the result
 
@@ -58,6 +59,7 @@ particle_a.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         '-s',
         "-p#{particle}",
         "-n#{NumEvents}",
+        "-k#{NumPoints}",
         "-o#{sim_file}",
       ]
       cmds << [

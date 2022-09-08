@@ -29,6 +29,7 @@ particle = 'pi+'
 energy = '40.0 GeV'
 runType = 'run'
 numEvents = 50
+numTestSamples = 0
 outputImageType = ''
 outputFileName = ''
 useEDM4hepFormat = True
@@ -48,7 +49,8 @@ helpStr = f'''
                 4: polar scan test
                 5: azimuthal + polar scan test
                 6: spray pions in one sector
-                7: momentum scan
+                7: momentum scan, for aerogel
+                8: momentum scan, for gas
             >> optics tests:
                 10:   focal point, in RICH acceptance
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=1 )
@@ -76,6 +78,11 @@ helpStr = f'''
                     - opticalphoton
                 -n [numEvents]: number of events to process (default={numEvents})
                    (if using TEST_NUM, this is usually the number of events PER fixed momentum)
+                -k [numTestSamples]: some tests throw particles in multiple different directions,
+                   such as "polar scan test"; for this test, use [numTestSamples] to control
+                   how many directions are tested
+                   - many tests offer a similar usage of [numTestSamples]
+                   - these tests also have default [numTestSamples] values
                 -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
@@ -94,7 +101,7 @@ if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:n:e:rvm:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:n:k:e:rvm:o:f')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr)
     sys.exit(2)
@@ -106,6 +113,7 @@ for opt, arg in opts:
     if (opt == '-c'): compactFileCustom = arg.lstrip()
     if (opt == '-p'): particle = arg.lstrip()
     if (opt == '-n'): numEvents = int(arg)
+    if (opt == '-k'): numTestSamples = int(arg)
     if (opt == '-e'): energy = arg.lstrip() + " GeV"
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
@@ -184,6 +192,7 @@ print(f'inputFileName  = {inputFileName}')
 print(f'testNum        = {testNum}')
 print(f'particle       = {particle}')
 print(f'numEvents      = {numEvents}')
+print(f'numTestSamples = {numTestSamples}')
 print(f'runType        = {runType}')
 print(f'direction      = toward {xRICH}')
 print(f'outputFileName = {outputFileName}')
@@ -225,7 +234,7 @@ if (runType == 'vis'):
 m.write(f'/gps/verbose 2\n')
 m.write(f'/gps/particle {particle}\n')
 m.write(f'/gps/number 1\n')
-if (testNum != 7): m.write(f'/gps/ene/mono {energy}\n')
+if (testNum != 7 and testNum != 8): m.write(f'/gps/ene/mono {energy}\n')
 # m.write(f'/gps/ene/type Gauss\n')
 # m.write(f'/gps/ene/sigma 3.0 GeV\n')
 
@@ -320,7 +329,7 @@ elif testNum == 3:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 4:
-    numTheta = 4  # number of theta steps
+    numTheta = 4 if numTestSamples==0 else numTestSamples  # number of theta steps
     m.write(f'\n# polar scan test\n')
     if (runType == "vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
@@ -333,7 +342,7 @@ elif testNum == 4:
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 5:
-    numTheta = 4 # number of theta steps
+    numTheta = 4 if numTestSamples==0 else numTestSamples # number of theta steps
     numPhi = 24  # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
     m.write(f'\n# polar+azimuthal scan test\n')
     if (runType == "vis"):
@@ -364,6 +373,7 @@ elif testNum == 6:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 7 or testNum == 8:
+    numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
     m.write(f'\n# momentum scan\n')
     thetaMid = (thetaMin+thetaMax)/2.0
     x = math.sin(thetaMid)
@@ -373,7 +383,7 @@ elif testNum == 7 or testNum == 8:
     momMax = 60
     if testNum == 7:
         momMax = 20
-    for en in list(linspace(1, momMax, 30)):
+    for en in list(linspace(1, momMax, numMomPoints)):
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
 
@@ -402,12 +412,13 @@ elif testNum == 11:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 12:
+    numBeams = 5 if numTestSamples==0 else numTestSamples  # number of beams within theta acceptance
     m.write(f'\n# opticalphoton parallel-to-point focusing\n')
     m.write(f'/vis/scene/endOfEventAction accumulate\n')
     m.write(f'/vis/scene/endOfRunAction accumulate\n')
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
-    for rVal in list(linspace(rMin, rMax, 5)):  # number of beams within theta acceptance
+    for rVal in list(linspace(rMin, rMax, numBeams)):
         m.write(f'/gps/ang/rot1 -{zMax} 0 {rVal}\n')
         m.write(f'/gps/pos/rot1 -{zMax} 0 {rVal}\n')
         m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width
@@ -424,7 +435,7 @@ elif testNum == 13:
     theta_max = thetaMax # maximum polar angle
     # theta_min = math.radians(3.8) # default, maybe outdated values (use if `npdet_info` fails)
     # theta_max = math.radians(32.0)
-    num_rings = 120  # number of concentric rings, type=int
+    num_rings = 120 if numTestSamples==0 else numTestSamples  # number of concentric rings, type=int
     hit_density = 80  # amount of photon hits for the smallest polar angle, type=int
     angles = createAngles.makeAngles(theta_min, theta_max, num_rings, hit_density)  # list of angles
 
