@@ -7,28 +7,30 @@ require 'fileutils'
 require 'pycall/import'
 
 ## settings
-NumEvents = 100                 # number of events per fixed momentum
-NumPoints = 10                  # number of momenta to sample
-PoolSize  = 6                   # number of parallel threads to run
-OutputDir = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
-RunSimRec = false               # if false, do not run simulation+reconstruction, only draw the result
+NumEvents      = 100                 # number of events per fixed momentum
+NumPoints      = 20                  # number of momenta to sample
+PoolSize       = 6                   # number of parallel threads to run
+OutputDir      = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
+RunSimRec      = true                # if false, do not run simulation+reconstruction, only draw the result
+UseRINDEXrange = false               # if true, use range of RINDEX values rather than a single reference value
 
 ## list of particles to test
-particle_a = [
-  'e-',
-  'pi+',
-  'kaon+',
-  'proton',
-  # 'e+',
-  # 'pi-',
-  # 'kaon-',
-  # 'anti_proton',
-]
+particle_h = {
+  'e-'          => { :mass=>0.00051, },
+  'pi+'         => { :mass=>0.13957, },
+  'kaon+'       => { :mass=>0.49368, },
+  'proton'      => { :mass=>0.93827, },
+  # 'e+'          => { :mass=>0.00051, },
+  # 'pi-'         => { :mass=>0.13957, },
+  # 'kaon-'       => { :mass=>0.49368, },
+  # 'anti_proton' => { :mass=>0.93827, },
+}
 
 ## radiators
+## FIXME: :rIndexRef values are averages? 
 radiator_h = {
-  :agl => { :id=>0, :testNum=>7, },
-  :gas => { :id=>1, :testNum=>8, },
+  :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], },
+  :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0008, :rIndexRange=>[1.00075,1.00084], },
 }
 
 ## warn if not doing simulation
@@ -43,8 +45,8 @@ def out_file(prefix,ext)
   "#{OutputDir}/#{prefix}.#{ext}"
 end
 
-## run momentum scan simulation for each particle in `particle_a`
-particle_a.product(radiator_h.keys).each_slice(PoolSize) do |slice|
+## run momentum scan simulation for each particle in `particle_h`
+particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
   pool = slice.map do |particle,rad_name|
     rad = radiator_h[rad_name]
     # preparation
@@ -68,13 +70,13 @@ particle_a.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         "-i #{sim_file}",
         "-o #{rec_file}",
       ]
+      # analysis
+      plot_file = out_file particle, "rec_plots.#{rad_name}.root"
+      cmds << [
+        'root', '-b', '-q',
+        "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",#{rad[:id]})"
+      ]
     end
-    # analysis
-    plot_file = out_file particle, "rec_plots.#{rad_name}.root"
-    cmds << [
-      'root', '-b', '-q',
-      "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",#{rad[:id]})"
-    ]
     # spawn thread
     Thread.new do
       cmds.each_with_index do |cmd,i|
@@ -98,7 +100,7 @@ end
 
 # print errors for one of the particles
 puts "ERRORS (for one particle) ======================="
-system "cat #{out_file particle_a.first, 'log.err'}"
+system "cat #{out_file particle_h.keys.first, 'log.err'}"
 puts "END ERRORS ======================================"
 
 
@@ -118,7 +120,7 @@ radiator_h.each do |rad_name,rad|
   ## draw settings
   default_color  = r.kBlack
   default_marker = r.kFullCircle
-  draw_h = particle_a.map do |particle|
+  draw_h = particle_h.keys.map do |particle|
     [
       particle,
       {
@@ -138,7 +140,7 @@ radiator_h.each do |rad_name,rad|
   draw_h['proton'][:marker] = r.kFullTriangleDown
 
   ## loop over plots (loop through the first particle's file, assume the rest have the same)
-  first_root_file = draw_h[particle_a.first][:root_file]
+  first_root_file = draw_h[particle_h.keys.first][:root_file]
   PyCall.iterable(first_root_file.GetListOfKeys).each do |tkey|
     plot_name = tkey.GetName
     next unless plot_name.match? /scan_pfx$/
@@ -154,10 +156,42 @@ radiator_h.each do |rad_name,rad|
     pad_plot.Draw
     pad_leg.Draw
 
-    ## loop over particles, add plot to canvas
+    ## loop over particles
+    rad[:maxTheta] = 0
     draw_h.each do |particle,h|
-      pad_plot.cd
+
+      ## get the plot
       plot = h[:root_file].Get plot_name
+
+      ## variables for this particle and radiator
+      mass   = particle_h[particle][:mass]
+      rindex = rad[:rIndexRef]
+
+      ## minimum momentum for Cherenkov emission
+      def calculate_mom_min(m,n)
+        m / Math.sqrt(n**2-1)
+      end
+      mom_min = calculate_mom_min mass, rindex
+
+      ## drop points with momentum < mom_min
+      (1..plot.GetNbinsX).each do |bn|
+        mom = plot.GetBinCenter bn
+        if mom < mom_min
+          plot.SetBinContent bn, 0
+          plot.SetBinError   bn, 0
+          plot.SetBinEntries bn, 0
+        end
+      end
+
+      ## saturation Cherenkov angle
+      def calculate_max_theta(n)
+        1000 * Math.acos(1/n)
+      end
+      max_theta = calculate_max_theta rindex
+      rad[:maxTheta] = [rad[:maxTheta],max_theta].max
+
+      ## add plot to canvas
+      pad_plot.cd
       plot.SetMarkerStyle h[:marker]
       plot.SetMarkerColor h[:color]
       plot.SetLineColor   h[:color]
@@ -166,6 +200,27 @@ radiator_h.each do |rad_name,rad|
       plot.GetYaxis.SetTitle 'Average ' + plot.GetTitle.sub(/ vs\..*/,'')
       plot.SetTitle          'Average ' + plot.GetTitle
       leg_hits.AddEntry plot, particle, 'PE'
+
+      ## expected Cherenkov angle curve
+      if plot_name.match?(/^theta_/)
+        rindex_list = UseRINDEXrange ? rad[:rIndexRange] : [rindex]
+        rindex_list.each_with_index do |n,i| 
+          ftn_theta = r.TF1.new(
+            "ftn_theta_#{particle}_#{rad_name}_#{i}",
+            "1000*TMath::ACos(TMath::Sqrt(x^2+#{mass}^2)/(#{n}*x))",
+            calculate_mom_min(mass,n),
+            plot.GetXaxis.GetXmax,
+          )
+          ftn_theta.SetLineColor h[:color]
+          ftn_theta.SetLineWidth 2
+          ftn_theta.Draw 'SAME'
+          # set plot maximum
+          rad[:maxTheta] = [rad[:maxTheta],calculate_max_theta(n)].max # max expected
+          rad[:maxTheta] = [rad[:maxTheta],plot.GetMaximum].max        # max point
+        end
+      end
+      plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta]) if plot_name.match?(/^theta_/)
+
     end
 
     ## save canvas to file
