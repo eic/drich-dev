@@ -82,7 +82,6 @@ case $module in
     ;;
   DD4hep)
     prefix=$module/install
-    genOpt CMAKE_INSTALL_PREFIX=install
     genOpt DD4HEP_USE_GEANT4=ON
     genOpt DD4HEP_USE_EDM4HEP=ON
     genOpt DD4HEP_USE_HEPMC3=ON
