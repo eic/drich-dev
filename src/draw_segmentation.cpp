@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
   const auto readoutCoder = det->readout(readoutName).idSpec().decoder();
   auto decodeCellID = [&readoutCoder] (std::string fieldName) {
     return [&readoutCoder,&fieldName] (RVecUL cellIDvec) {
-      RVecUL result;
+      RVecL result;
       for(const auto& cellID : cellIDvec) {
         auto val = readoutCoder->get(cellID,fieldName); // get BitFieldElement value
         result.emplace_back(val);
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
    *     `imodsec` can be converted to `imod` by decoding `imodsec` the same way
    *     we would decode `cellID`
    */
-  std::map<ULong_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
+  std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
     if(de_name.find("sensor_de_sec0")!=std::string::npos) {
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
   }
 
   // convert vector of `imod`s to vector of hitmap X or Y
-  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecUL imodVec, int c) {
+  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecL imodVec, int c) {
     RVecL result;
     Long64_t pos;
     for(auto imod : imodVec) {
@@ -143,11 +143,11 @@ int main(int argc, char** argv) {
     }
     return result;
   };
-  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecUL cellIDvec) { return imod2hitmapXY_get(cellIDvec,0); };
-  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecUL cellIDvec) { return imod2hitmapXY_get(cellIDvec,1); };
+  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,0); };
+  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,1); };
 
   // convert vector of hitmap X (or Y) + vector of segmentation X (or Y) to vector of pixel X (or Y)
-  auto pixelCoord = [] (RVecL hitmapXvec, RVecUL segXvec) {
+  auto pixelCoord = [] (RVecL hitmapXvec, RVecL segXvec) {
     RVecL result = hitmapXvec + segXvec;
     return result;
   };
@@ -230,9 +230,8 @@ int main(int argc, char** argv) {
   auto expectedBox = new TBox(0,0,numPx,numPx);
   expectedBox->SetFillStyle(0);
   expectedBox->SetLineColor(kBlack);
-  expectedBox->SetLineWidth(8);
+  expectedBox->SetLineWidth(4);
   expectedBox->Draw("same");
-  segXY->Draw("colz same");
 
   // draw pixel hitmap
   if(singleCanvas) { c = new TCanvas(); c->Divide(3,2); };
