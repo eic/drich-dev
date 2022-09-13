@@ -9,6 +9,7 @@ LIBS += $(shell root-config --glibs)
 LIBS += -L/usr/local/lib
 LIBS += -lDDCore
 LIBS += -lDD4pod -lpodio -lpodioRootIO -ledm4hep
+LIBS += -lfmt
 
 # local libs
 LIBS += -L${EIC_SHELL_PREFIX}/lib

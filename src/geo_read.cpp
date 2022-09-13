@@ -27,8 +27,8 @@ using namespace dd4hep;
 int main(int argc, char** argv) {
 
   // compact file name
-  string DETECTOR_PATH = string(getenv("DETECTOR_PATH"));
-  string DETECTOR      = string(getenv("DETECTOR"));
+  string DETECTOR_PATH(getenv("DETECTOR_PATH"));
+  string DETECTOR(getenv("DETECTOR"));
   if(DETECTOR_PATH.empty() || DETECTOR.empty()) {
     cerr << "ERROR: source environ.sh" << endl;
     return 1;
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
   // sector loop
   for (int isec = 0; isec < nSectors; isec++) {
-    std::string secName = "sec" + std::to_string(isec);
+    string secName = "sec" + std::to_string(isec);
 
     // mirrors
     auto mirrorRadius = det->constant<double>("DRICH_RECON_mirrorRadius");
@@ -180,12 +180,12 @@ int main(int argc, char** argv) {
 
     // sensor modules: search the detector tree for sensors for this sector
     for(auto const& [de_name, detSensor] : detRich.children()) {
-      if(de_name.find("sensor_de_"+secName)!=std::string::npos) {
+      if(de_name.find("sensor_de_"+secName)!=string::npos) {
 
         // get sensor position
         auto pvSensor  = detSensor.placement();
         auto posSensor = posRich + pvSensor.position();
-        double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()};
+        double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()}; // FIXME: unused
         auto imodsec = detSensor.id();
 
         // get surface normal
@@ -241,7 +241,7 @@ int main(int argc, char** argv) {
 
   // set refractive indices
   // FIXME: are these (weighted) averages? can we automate this?
-  std::map<std::string, double> rIndices;
+  std::map<string, double> rIndices;
   rIndices.insert({"GasVolume", 1.0008});
   rIndices.insert({"Aerogel", 1.0190});
   rIndices.insert({"Filter", 1.5017});

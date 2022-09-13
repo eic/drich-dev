@@ -4,6 +4,7 @@
 #include <bitset>
 #include <map>
 #include <vector>
+#include <fmt/format.h>
 
 // ROOT
 #include "TSystem.h"
@@ -12,14 +13,13 @@
 #include "TApplication.h"
 #include "TBox.h"
 #include "ROOT/RDataFrame.hxx"
-//#include "ROOT/RDFHelpers.hxx" // for RDF::RunGraphs
+#include "ROOT/RVec.hxx"
 
-using std::cout;
-using std::cerr;
-using std::endl;
+// DD4Hep
+#include "DD4hep/Detector.h"
 
 using namespace ROOT;
-using lvec = VecOps::RVec<Long64_t>;
+using namespace dd4hep;
 
 int main(int argc, char** argv) {
 
@@ -37,10 +37,12 @@ int main(int argc, char** argv) {
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
-  Long64_t dilation = 4;
+  const Int_t dilation = 5;
 
+  // drawing
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
+  const Bool_t singleCanvas = false; // if true, draw all hitmaps on one canvas
 
 
   // setup
@@ -49,195 +51,209 @@ int main(int argc, char** argv) {
   // define application environment, to keep canvases open
   TApplication mainApp("mainApp",&argc,argv);
 
-  // enable multi-threading
-  EnableImplicitMT();
-
-  // read tree into dataframe
+  // main dataframe
   RDataFrame dfIn("events",infileN.Data());
 
-  // load sensor position LUT
-  std::map<Long64_t,std::pair<Long64_t,Long64_t>> modCoordMap;
-  TTree *modCoordTr = new TTree();
-  modCoordTr->ReadFile("text/sensorLUT.dat","module/L:x/F:y/F");
-  Long64_t moduleSens,xSens,ySens; Float_t xSensF,ySensF;
-  modCoordTr->SetBranchAddress("module",&moduleSens);
-  modCoordTr->SetBranchAddress("x",&xSensF);
-  modCoordTr->SetBranchAddress("y",&ySensF);
-  std::vector<TBox*> boxList;
-  for(Long64_t e=0; e<modCoordTr->GetEntries(); e++) {
-    modCoordTr->GetEntry(e);
-    xSens = (Long64_t)(dilation*xSensF+0.5);
-    ySens = (Long64_t)(dilation*ySensF+0.5);
-    modCoordMap.insert(std::pair<Long64_t,std::pair<Long64_t,Long64_t>>(
-          moduleSens, std::pair<Long64_t,Long64_t>(xSens,ySens)
-          ));
-    boxList.push_back(new TBox(
-          xSens,
-          ySens,
-          xSens + numPx,
-          ySens + numPx
-          ));
-    boxList.back()->SetLineColor(kGray);
-  };
-  
+  // compact file name
+  std::string DETECTOR_PATH(getenv("DETECTOR_PATH"));
+  std::string DETECTOR(getenv("DETECTOR"));
+  if(DETECTOR_PATH.empty() || DETECTOR.empty()) {
+    fmt::print(stderr,"ERROR: source environ.sh\n");
+    return 1;
+  }
+  std::string compactFile = DETECTOR_PATH + "/" + DETECTOR + ".xml";
 
-  // lambdas
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // get detector handle and some constants
+  const std::string richName    = "DRICH";
+  const std::string readoutName = "DRICHHits";
+  const auto det = &(Detector::getInstance());
+  det->fromXML(compactFile);
+  const auto detRich  = det->detector(richName);
+  const auto posRich  = detRich.placement().position();
+  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>("DRICH_RECON_cellMask")));
+  const auto nSectors = det->constant<int>("DRICH_RECON_nSectors");
 
-  // decode cellID vector, given offset and length
-  // TODO: replace with dd4hep::rec::CellIDPositionConverter 
-  // (see https://eicweb.phy.anl.gov/EIC/tutorials/ip6_tutorial_1/-/blob/master/scripts/tutorial1_hit_position.cxx)
-  auto decodeID = [] (lvec ids, int offset, int length) {
-    Long64_t div = (Long64_t) pow(2,offset);
-    Long64_t mask = (Long64_t) pow(2,length) - 1;
-    auto result = (ids/div) & mask;
-    return result;
-  };
-  // decoder for signed indicators (conversion may not be correct)
-  /*auto decodeIDsigned = [] (lvec ids, int offset, int length) {
-    Long64_t div = (Long64_t) pow(2,offset);
-    Long64_t mask = (Long64_t) pow(2,length) - 1;
-    lvec result;
-    for(auto i : ids) {
-      auto r = (i >> offset) & mask;
-      if(r>=pow(2,length-2)) r -= (Long64_t) pow(2,length-1);
-      result.emplace_back(r);
+  // cellID decoder
+  /* - `decodeCellID(fieldName)` returns a "decoder" for the field with name `fieldName`
+   * - this decoder is a function that maps an `RVecUL` of `cellID`s to an
+   *   `RVecUL` of correpsonding field element values
+   */
+  const auto readoutCoder = det->readout(readoutName).idSpec().decoder();
+  auto decodeCellID = [&readoutCoder] (std::string fieldName) {
+    return [&readoutCoder,&fieldName] (RVecUL cellIDvec) {
+      RVecUL result;
+      for(const auto& cellID : cellIDvec) {
+        auto val = readoutCoder->get(cellID,fieldName); // get BitFieldElement value
+        result.emplace_back(val);
+        // fmt::print("decode {}: {:64b} -> {}\n",fieldName,cellID,val);
+      }
+      return result;
     };
-    // debugging prints
-    for(auto b : ids) cout << std::bitset<64>(b) << endl;
-    cout << "(" << offset << "," << length << ") " << result << endl;
-    for(auto b : result) cout << std::bitset<16>(b) << endl;
-    return result;
-  };*/
-  // decoders: indicator -> cellID offset and length
-  auto detDecode = [&decodeID] (lvec ids) { return decodeID(ids,0,8); };
-  auto secDecode = [&decodeID] (lvec ids) { return decodeID(ids,8,3); };
-  auto modDecode = [&decodeID] (lvec ids) { return decodeID(ids,11,12); };
-  auto xDecode   = [&decodeID] (lvec ids) { return decodeID(ids,23,16); };
-  auto yDecode   = [&decodeID] (lvec ids) { return decodeID(ids,39,16); };
+  };
 
+  // build sensor position LUT `imod2hitmapXY`
+  /* - find the sector 0 sensors, and build a map of their module number `imod` to
+   *   X and Y coordinates to use in the hitmap
+   *   - these hitmap coordinates are from the sensor position X and Y, rescaled
+   *     by the factor `dilation` and rounded to the nearest integer
+   *   - also builds a list of `TBox`es, for drawing the sensors on the hitmap
+   * - the unique ID of the sensor `Detector`, called `imodsec`, includes `imod`
+   *   - `cellID & cellMask` should be equivalent to `imodsec`; therefore,
+   *     `imodsec` can be converted to `imod` by decoding `imodsec` the same way
+   *     we would decode `cellID`
+   */
+  std::map<ULong_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
+  std::vector<TBox*> boxList;
+  for(auto const& [de_name, detSensor] : detRich.children()) {
+    if(de_name.find("sensor_de_sec0")!=std::string::npos) {
+      // convert global position to hitmapX and Y
+      auto posSensor = posRich + detSensor.placement().position();
+      auto hitmapX   = Long64_t(dilation*posSensor.x() + 0.5);
+      auto hitmapY   = Long64_t(dilation*posSensor.y() + 0.5);
+      // convert unique cellID to module number, using the cellID decoder
+      auto imodsec = ULong_t(detSensor.id());
+      auto imod    = decodeCellID("module")(RVecUL({imodsec})).front();
+      // add to `imod2hitmapXY` and create sensor `TBox`
+      imod2hitmapXY.insert({imod,{hitmapX,hitmapY}});
+      boxList.push_back(new TBox(
+            hitmapX, 
+            hitmapY,
+            hitmapX + numPx,
+            hitmapY + numPx
+            ));
+      boxList.back()->SetLineColor(kGray);
+    }
+  }
 
-  // convert module number to module histogram position
-  auto modCoordLU = [&modCoordMap] (lvec mods, int c) {
-    lvec result;
-    Double_t pos;
-    for(auto m : mods) {
-      try { pos = (c==0) ? modCoordMap[m].first : modCoordMap[m].second; } 
+  // convert vector of `imod`s to vector of hitmap X or Y
+  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecUL imodVec, int c) {
+    RVecL result;
+    Long64_t pos;
+    for(auto imod : imodVec) {
+      try {
+        pos = (c==0) ?
+          imod2hitmapXY[imod].first :
+          imod2hitmapXY[imod].second;
+      }
       catch (const std::out_of_range &ex) {
-        cerr << "ERROR: cannot find module " << m << endl;
-        pos = 0;
+        fmt::print(stderr,"ERROR: cannot find module {}\n",imod);
+        pos = 0.0;
       };
       result.emplace_back(pos);
-    };
+    }
     return result;
   };
-  auto modCoordX = [&modCoordLU] (lvec ids) { return modCoordLU(ids,0); };
-  auto modCoordY = [&modCoordLU] (lvec ids) { return modCoordLU(ids,1); };
+  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecUL cellIDvec) { return imod2hitmapXY_get(cellIDvec,0); };
+  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecUL cellIDvec) { return imod2hitmapXY_get(cellIDvec,1); };
 
-  // convert (module,segment) to pixel histogram position
-  auto pixelCoord = [] (lvec modXs, lvec segXs) {
-    return modXs + segXs;
+  // convert vector of hitmap X (or Y) + vector of segmentation X (or Y) to vector of pixel X (or Y)
+  auto pixelCoord = [] (RVecL hitmapXvec, RVecUL segXvec) {
+    RVecL result = hitmapXvec + segXvec;
+    return result;
   };
 
 
-  // transformations
+  // dataframe transformations
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // decode cellID
-  auto dfDecoded = dfIn
-      .Alias("id","DRICHHits.cellID")
-      .Define("det", detDecode, {"id"})
-      .Define("sec", secDecode, {"id"})
-      .Define("mod", modDecode, {"id"})
-      .Define("segX", xDecode, {"id"})
-      .Define("segY", yDecode, {"id"})
+  auto dfOut = dfIn
+      .Alias("cellID","DRICHHits.cellID")
+      // decode cellID
+      .Define("system", decodeCellID("system"), {"cellID"})
+      .Define("sector", decodeCellID("sector"), {"cellID"})
+      .Define("module", decodeCellID("module"), {"cellID"})
+      .Define("x",      decodeCellID("x"),      {"cellID"})
+      .Define("y",      decodeCellID("y"),      {"cellID"})
+      // convert `module`s to hitmap positions
+      .Define("hitmapX", imod2hitmapX, {"module"})
+      .Define("hitmapY", imod2hitmapY, {"module"})
+      // convert (hitmap,`iseg`) positions to hitmap positions
+      .Define("pixelX", pixelCoord, {"hitmapX","x"})
+      .Define("pixelY", pixelCoord, {"hitmapY","y"})
       ;
 
-  // convert modules to histogram positions
-  auto dfModded = dfDecoded
-      .Define("modX", modCoordX, {"mod"})
-      .Define("modY", modCoordY, {"mod"})
-      ;
 
-  // convert (module,segment) positions to pixel histogram position
-  auto dfPixels = dfModded
-      .Define("pixelX", pixelCoord, {"modX","segX"})
-      .Define("pixelY", pixelCoord, {"modY","segY"})
-      ;
-
-  // final dataframe
-  auto dfFinal = dfPixels;
-
-
-  // actions
+  // histograms
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // book histograms
-  auto detHist = dfFinal.Histo1D("det");
-  auto secHist = dfFinal.Histo1D("sec");
-  auto modHist = dfFinal.Histo1D("mod");
-  auto xHist = dfFinal.Histo1D("segX");
-  auto yHist = dfFinal.Histo1D("segY");
-  auto sectorVsXY = dfFinal.Histo3D(
-      { "sectorVsXY","sector vs. xy;x;y;sec",
-      200,-2000,2000,200,-2000,2000,6,0,6 },
-      "DRICHHits.position.x","DRICHHits.position.y","sec"
+  // cellID field histograms
+  auto fieldHists = std::vector({
+    dfOut.Histo1D("system"),
+    dfOut.Histo1D("sector"),
+    dfOut.Histo1D("module"),
+    dfOut.Histo1D("x"),
+    dfOut.Histo1D("y")
+  });
+  const int segXmax = 10;
+  auto segXY = dfOut.Histo2D(
+      { "segXY", "CartesianGridXY;x;y",
+        2*segXmax, -segXmax, segXmax,
+        2*segXmax, -segXmax, segXmax },
+      "x","y"
       );
 
-  // pixel hits
+
+  // pixel hitmap
   Double_t pixelXmin = dilation * 100;
   Double_t pixelXmax = dilation * 190;
   Double_t pixelYmin = dilation * -70;
   Double_t pixelYmax = dilation * 70;
-  auto pixelHits = dfFinal.Histo3D(
-      { "pixelHits","pixel hits;x;y;sector",
+  auto pixelHitmap = dfOut.Histo3D(
+      { "pixelHitmap", "Pixel Hit Map;x;y;sector",
         (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
         (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
-        6,0,6 },
-      "pixelX","pixelY","sec"
+        nSectors,0,double(nSectors) },
+      "pixelX","pixelY","sector"
       );
 
-  // execute concurrently
-  //RDF::RunGraphs({ detHist, secHist, modHist, xHist, yHist, pixelHits });
-
-
-  // execution
+  // draw
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // draw segmentation indicators
-  TCanvas * c = new TCanvas();
+  // draw cellID field histograms
+  TCanvas *c = new TCanvas();
   c->Divide(3,2);
-  for(int pad=1; pad<=6; pad++) c->GetPad(pad)->SetLogy();
-  c->cd(1); detHist->Draw();
-  c->cd(2); secHist->Draw();
-  c->cd(3); modHist->Draw();
-  c->cd(4); xHist->Draw();
-  c->cd(5); yHist->Draw();
+  int pad=1;
+  for(auto hist : fieldHists) {
+    c->GetPad(pad)->SetLogy();
+    c->cd(pad);
+    if(TString(hist->GetName())!="module") hist->SetBarWidth(4);
+    hist->SetLineColor(kBlack);
+    hist->SetFillColor(kBlack);
+    hist->Draw("bar");
+    pad++;
+  }
 
+  // draw segmentation XY plot, along with expected box
+  c->cd(pad);
+  c->GetPad(pad)->SetGrid(1,1);
+  segXY->Draw("colz");
+  auto expectedBox = new TBox(0,0,numPx,numPx);
+  expectedBox->SetFillStyle(0);
+  expectedBox->SetLineColor(kBlack);
+  expectedBox->SetLineWidth(8);
+  expectedBox->Draw("same");
+  segXY->Draw("colz same");
 
-  // draw pixel hits
-  Bool_t singleCanvas = false;
+  // draw pixel hitmap
   if(singleCanvas) { c = new TCanvas(); c->Divide(3,2); };
-  Int_t secBin;
-  const Int_t nSec = 6;
-  TH2D *pixelHitsSec[nSec];
-  for(int sec=0; sec<6; sec++) {
+  int secBin;
+  TH2D *pixelHitmapSec[nSectors];
+  for(int sec=0; sec<nSectors; sec++) {
     if(singleCanvas) c->cd(sec+1); else c = new TCanvas();
-    secBin = pixelHits->GetZaxis()->FindBin((Float_t)sec);
-    pixelHits->GetZaxis()->SetRange(secBin,secBin);
-    pixelHitsSec[sec] = (TH2D*) pixelHits->Project3D("yx");
-    pixelHitsSec[sec]->SetName(Form("pixelHits_s%d",sec));
-    pixelHitsSec[sec]->SetTitle(Form("pixel hits sector %d",sec));
-    pixelHitsSec[sec]->Draw("colz"); // (or colz)
+    secBin = pixelHitmap->GetZaxis()->FindBin(Double_t(sec));
+    pixelHitmap->GetZaxis()->SetRange(secBin,secBin);
+    pixelHitmapSec[sec] = (TH2D*) pixelHitmap->Project3D("yx");
+    pixelHitmapSec[sec]->SetName(Form("pixelHitmap_s%d",sec));
+    pixelHitmapSec[sec]->SetTitle(Form("pixel hits sector %d",sec));
+    pixelHitmapSec[sec]->Draw("colz");
     for(auto box : boxList) {
       box->SetFillStyle(0);
       box->Draw("same");
     };
-    pixelHitsSec[sec]->Draw("colz same"); // (or colz)
+    pixelHitmapSec[sec]->Draw("colz same");
   };
 
-
-  cout << "\n\npress ^C to exit.\n\n";
+  fmt::print("\n\npress ^C to exit.\n\n");
   mainApp.Run();
   return 0;
 };
