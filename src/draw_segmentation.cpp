@@ -34,6 +34,10 @@ int main(int argc, char** argv) {
   // number of pixels along sensor side
   const Int_t numPx = 8;
 
+  // expected range of values of `x` and `y` `cellID` bit fields
+  const Int_t segXmin = 0;
+  const Int_t segXmax = numPx-1;
+
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
@@ -156,39 +160,52 @@ int main(int argc, char** argv) {
   // dataframe transformations
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  auto dfOut = dfIn
+  // decode cellID to bit field element values
+  auto dfDecoded = dfIn
       .Alias("cellID","DRICHHits.cellID")
-      // decode cellID
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
       .Define("module", decodeCellID("module"), {"cellID"})
       .Define("x",      decodeCellID("x"),      {"cellID"})
       .Define("y",      decodeCellID("y"),      {"cellID"})
-      // convert `module`s to hitmap positions
+      ;
+
+  // map `(module,x,y)` to pixel hitmap bins
+  auto dfHitmap = dfDecoded
       .Define("hitmapX", imod2hitmapX, {"module"})
       .Define("hitmapY", imod2hitmapY, {"module"})
-      // convert (hitmap,`iseg`) positions to hitmap positions
       .Define("pixelX", pixelCoord, {"hitmapX","x"})
       .Define("pixelY", pixelCoord, {"hitmapY","y"})
       ;
 
+  // count how many hits are inside the expected segmentation box
+  auto countInBox = [&segXmin,&segXmax] (RVecL xVec, RVecL yVec) {
+    return xVec[ xVec>=segXmin && xVec<=segXmax && yVec>=segXmin && yVec<=segXmax ].size();
+  };
+  auto countOutBox = [&segXmin,&segXmax] (RVecL xVec, RVecL yVec) {
+    return xVec[ xVec<segXmin  || xVec>segXmax  || yVec<segXmin  || yVec>segXmax  ].size();
+  };
+  auto numInBox  = dfDecoded.Define( "numInBox",  countInBox,  {"x","y"} ).Sum("numInBox").GetValue();
+  auto numOutBox = dfDecoded.Define( "numOutBox", countOutBox, {"x","y"} ).Sum("numOutBox").GetValue();
+  fmt::print("{:=<60}\nNUMBER OF HITS OUTSIDE EXPECTED BOX: {} / {} ({:.4f}%)\n{:=<60}\n",
+      "", numOutBox, numInBox+numOutBox, 100*Double_t(numOutBox)/Double_t(numInBox+numOutBox), "");
 
   // histograms
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   // cellID field histograms
   auto fieldHists = std::vector({
-    dfOut.Histo1D("system"),
-    dfOut.Histo1D("sector"),
-    dfOut.Histo1D("module"),
-    dfOut.Histo1D("x"),
-    dfOut.Histo1D("y")
+    dfHitmap.Histo1D("system"),
+    dfHitmap.Histo1D("sector"),
+    dfHitmap.Histo1D("module"),
+    dfHitmap.Histo1D("x"),
+    dfHitmap.Histo1D("y")
   });
-  const int segXmax = 10;
-  auto segXY = dfOut.Histo2D(
+  const int segXmaxPlot = 10;
+  auto segXY = dfHitmap.Histo2D(
       { "segXY", "CartesianGridXY;x;y",
-        2*segXmax, -segXmax, segXmax,
-        2*segXmax, -segXmax, segXmax },
+        2*segXmaxPlot, -segXmaxPlot, segXmaxPlot,
+        2*segXmaxPlot, -segXmaxPlot, segXmaxPlot },
       "x","y"
       );
 
@@ -198,7 +215,7 @@ int main(int argc, char** argv) {
   Double_t pixelXmax = dilation * 190;
   Double_t pixelYmin = dilation * -70;
   Double_t pixelYmax = dilation * 70;
-  auto pixelHitmap = dfOut.Histo3D(
+  auto pixelHitmap = dfHitmap.Histo3D(
       { "pixelHitmap", "Pixel Hit Map;x;y;sector",
         (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
         (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
@@ -227,7 +244,7 @@ int main(int argc, char** argv) {
   c->cd(pad);
   c->GetPad(pad)->SetGrid(1,1);
   segXY->Draw("colz");
-  auto expectedBox = new TBox(0,0,numPx,numPx);
+  auto expectedBox = new TBox(segXmin, segXmin, segXmax+1, segXmax+1);
   expectedBox->SetFillStyle(0);
   expectedBox->SetLineColor(kBlack);
   expectedBox->SetLineWidth(4);
