@@ -124,10 +124,10 @@ of branches for varying configurations.
   [flowchart](doc/docDiagram.pdf) dependency graph)
   - build scripts, in recommended order:
   ```bash
-  ./build_EDM4eic.sh
-  ./build_irt.sh
-  ./build_epic.sh
-  ./build_juggler.sh
+  ./build.sh EDM4eic
+  ./build.sh irt
+  ./build.sh epic
+  ./build.sh juggler
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
@@ -222,11 +222,11 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
       - most of these tables were obtained from the
         [common optics class](https://github.com/cisbani/dRICh/blob/main/share/source/g4dRIChOptics.hh)
     - the full detector compact file is `$DETECTOR_PATH/epic.xml`, which is generated via
-      Jinja during `cmake` (run `build_epic.sh`), along with a dRICH-only
+      Jinja during `cmake` (run `build.sh epic`), along with a dRICH-only
       compact file `$DETECTOR_PATH/epic_drich_only.xml`
       - these compact files are used by many scripts, such as `npsim`, whereas
         `compact/drich.xml` is *only* for the dRICH implementation itself
-      - `build_epic.sh` (`cmake`) will also copy local `epic/compact/*.xml`
+      - `build.sh epic` (`cmake`) will also copy local `epic/compact/*.xml`
         files to `$DETECTOR_PATH`, since the generated compact files (`$DETECTOR_PATH/epic*.xml`) 
         reference compact files in `$DETECTOR_PATH`
     - `src/DRICH_geo.cpp` is the C++ source file for the dRICH
@@ -396,9 +396,9 @@ This section contains notes for building upstream repositories. Clone the reposi
 that you want to test to this top-level directory. The general build procedure is:
 ```bash
 source environ.sh
-scripts/build_DD4hep.sh
+build.sh DD4hep
 source scripts/this_DD4hep.sh
-scripts/build_NPDet.sh
+build.sh NPDet
 source scripts/this_NPDet.sh  # note: you may prefer to directly call scripts in NPDet/install/bin
 rebuild_all.sh
 ```
