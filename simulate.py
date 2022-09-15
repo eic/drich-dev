@@ -478,7 +478,8 @@ cmd = [
         f'--runType {runType}',
         f'--compactFile {compactFile}',
         f'--outputFile {outputFileName_npsim}',
-        "--part.userParticleHandler=''", # necessary for opticalphotons truth output
+        # "--part.userParticleHandler=''", # necessary for opticalphotons truth output (REMOVE THIS?)
+        '--part.minimalKineticEnergy "0*eV"', # allow opticalphotons in trackers (dRICH) to be included in output
         # '--random.seed 1',
         # '--part.keepAllParticles True',
         ]

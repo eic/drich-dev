@@ -7,8 +7,8 @@ require 'fileutils'
 require 'pycall/import'
 
 ## settings
-NumEvents      = 100                 # number of events per fixed momentum
-NumPoints      = 20                  # number of momenta to sample
+NumEvents      = 50                  # number of events per fixed momentum
+NumPoints      = 10                  # number of momenta to sample
 PoolSize       = 6                   # number of parallel threads to run
 OutputDir      = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
 RunSimRec      = true                # if false, do not run simulation+reconstruction, only draw the result
