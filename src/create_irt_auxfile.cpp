@@ -229,6 +229,7 @@ int main(int argc, char** argv) {
 
 
         // create the optical surface
+        // FIXME: this position MUST be that of the surface, not the sensor centroid like it currently is; or can we use sensorThickness?
         auto sensorFlatSurface = new FlatSurface(
             (1 / mm) * TVector3(posSensor.x(), posSensor.y(), posSensor.z()),
             TVector3(sensorGlobalNormX),
