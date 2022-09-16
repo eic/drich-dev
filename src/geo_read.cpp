@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <fmt/format.h>
 
 // ROOT
 #include "TSystem.h"
@@ -18,9 +19,6 @@
 #include "OpticalBoundary.h"
 #include "ParametricSurface.h"
 
-using std::cout;
-using std::cerr;
-using std::endl;
 using std::string;
 using namespace dd4hep;
 
@@ -30,7 +28,7 @@ int main(int argc, char** argv) {
   string DETECTOR_PATH(getenv("DETECTOR_PATH"));
   string DETECTOR(getenv("DETECTOR"));
   if(DETECTOR_PATH.empty() || DETECTOR.empty()) {
-    cerr << "ERROR: source environ.sh" << endl;
+    fmt::print(stderr,"ERROR: source environ.sh\n");
     return 1;
   }
   string compactFile = DETECTOR_PATH + "/" + DETECTOR + ".xml";
@@ -108,7 +106,7 @@ int main(int argc, char** argv) {
   auto filterThickness    = det->constant<double>("DRICH_RECON_filterThickness");
   auto filterMaterial     = det->constant<string>("DRICH_RECON_filterMaterial");
   auto aerogelFlatSurface = new FlatSurface((1 / mm) * TVector3(0, 0, aerogelZpos), normX, normY);
-  auto filterFlatSurface  = new FlatSurface((1 / mm) * TVector3(0, 0, filterZpos), normX, normY);
+  auto filterFlatSurface  = new FlatSurface((1 / mm) * TVector3(0, 0, filterZpos),  normX, normY);
   for (int isec = 0; isec < nSectors; isec++) {
     auto aerogelFlatRadiator = irtGeometry->AddFlatRadiator(
         irtDetector,             // Cherenkov detector
@@ -167,6 +165,7 @@ int main(int argc, char** argv) {
 
     // sensor sphere (only used for validation of sensor normals)
     auto sensorSphRadius  = det->constant<double>("DRICH_RECON_sensorSphRadius");
+    auto sensorThickness  = det->constant<double>("DRICH_RECON_sensorThickness");
     Position sensorSphCenter(
       det->constant<double>("DRICH_RECON_sensorSphCenterX_"+secName),
       det->constant<double>("DRICH_RECON_sensorSphCenterY_"+secName),
@@ -199,21 +198,35 @@ int main(int argc, char** argv) {
         pvSensor.ptr()->LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
 
         // validate sensor position and normal
-        Direction radialDir = posSensor - sensorSphCenter;
+        Direction radialDir = posSensor - sensorSphCenter; // sensor sphere radius direction
         Direction normXdir, normYdir;
         normXdir.SetCoordinates(sensorGlobalNormX);
         normYdir.SetCoordinates(sensorGlobalNormY);
-        auto normalDir  = normXdir.Cross(normYdir);
-        auto testOrtho  = normXdir.Dot(normYdir);
-        auto testRadial = radialDir.Cross(normalDir).Mag2();
+        auto distSensor2center = sqrt((posSensor-sensorSphCenter).Mag2()); // distance between sensor sphere center and sensor position
+        auto normZdir = normXdir.Cross(normYdir); // sensor surface normal
+        // - test quantities
+        auto testOrtho  = normXdir.Dot(normYdir);           // should be zero, if normX and normY are orthogonal
+        auto testRadial = radialDir.Cross(normZdir).Mag2(); // should be zero, if sensor surface normal is parallel to sensor sphere radius
+        auto testDist   = abs(distSensor2center-(sensorSphRadius-sensorThickness/2.0)); // should be zero, if sensor position w.r.t. sensor sphere center is correct
         if(abs(testOrtho)>1e-6 || abs(testRadial)>1e-6) {
           printout(FATAL, "IRTLOG",
-              "sensor normal is wrong: normX.normY = %f   |radialDir x normalDir|^2 = %f",
+              "sensor normal is wrong: normX.normY = %f   |radialDir x normZdir|^2 = %f",
               testOrtho,
               testRadial
               );
           return 1;
         }
+        if(abs(testDist)>1e-6) {
+          printout(FATAL, "IRTLOG",
+              "sensor positioning is wrong: dist(sensor, sphere_center) = %f,  sphere_radius = %f,  sensor_thickness = %f,  |diff| = %g\n",
+              distSensor2center,
+              sensorSphRadius,
+              sensorThickness,
+              testDist
+              );
+          return 1;
+        }
+
 
         // create the optical surface
         auto sensorFlatSurface = new FlatSurface(
@@ -230,9 +243,9 @@ int main(int argc, char** argv) {
         // printout(ALWAYS, "IRTLOG",
         //     "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
         //     imodsec,
-        //     posSensor.x(), posSensor.y(), posSensor.z()
+        //     posSensor.x(), posSensor.y(), posSensor.z(),
         //     normXdir.x(),  normXdir.y(),  normXdir.z(),
-        //     normYdir.x(),  normYdir.y(),  normYdir.z(),
+        //     normYdir.x(),  normYdir.y(),  normYdir.z()
         //     );
       }
     } // search for sensors
@@ -254,4 +267,5 @@ int main(int argc, char** argv) {
   // write IRT auxiliary file
   irtGeometry->Write();
   irtAuxFile->Close();
+  fmt::print("\nWrote IRT Aux File: {}\n\n",irtAuxFileName);
 }

@@ -63,7 +63,6 @@ case $module in
     genOpt EVALUATION=OFF
     ;;
   epic)
-    genOpt IRT_AUXFILE=ON
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
