@@ -51,7 +51,7 @@ class Variator < VariatorBase
     # sensor_sphere_radius  = 100
     # sensor_sphere_centerz = -50
     # 
-    # corresponding mirror parameters (dumped from `scripts/create_irt_auxfile.sh`):
+    # corresponding mirror parameters (dumped from `create_irt_auxfile`):
     # SECTOR 0 MIRROR:
     #   mirror x = 113.888311 cm
     #   mirror y = 0.000000 cm

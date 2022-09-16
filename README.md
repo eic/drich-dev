@@ -340,11 +340,10 @@ until it is time to migrate to the new reconstruction framework.
 
 Procedure:
 
-- Create the auxiliary IRT configuration file; this uses a temporary "backdoor"
-  dependency on `irt` in `epic` to produce a ROOT file containing `libIRT`
+- Create the auxiliary IRT configuration file; this is a ROOT file containing `libIRT`
   objects, such as optical boundaries, based on the dRICH geometry description.
 ```bash
-scripts/create_irt_auxfile.sh
+bin/create_irt_auxfile
 ```
 
 - Run the simulation, for example:
