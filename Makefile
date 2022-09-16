@@ -19,43 +19,22 @@ DEPS += -I${EIC_SHELL_PREFIX}/include/IRT
 #--------------------------------------------
 
 INSTALL_PREFIX = bin
-SRC_MAIN := $(basename $(notdir $(wildcard src/*.cpp)))
-SRC_EXAMPLES := $(basename $(notdir $(wildcard src/examples/*.cpp)))
+EXECUTABLES := $(addprefix $(INSTALL_PREFIX)/, $(basename $(notdir $(wildcard src/*.cpp))))
 
 #--------------------------------------------
 
-all: 
-	@echo ""
-	@echo "BUILDING SOURCES ==========================================="
-	@echo "$(SRC_MAIN)"
-	@echo "============================================================"
-	make main
-	@echo ""
-	@echo "BUILDING EXAMPLES =========================================="
-	@echo "$(SRC_EXAMPLES)"
-	@echo "============================================================"
-	make examples
-
-main: $(SRC_MAIN)
-examples: $(SRC_EXAMPLES)
+all: $(EXECUTABLES)
 
 clean:
 	@echo "CLEAN ======================================================"
-	$(RM) $(addprefix $(INSTALL_PREFIX)/, $(SRC_MAIN))
-	$(RM) $(addprefix $(INSTALL_PREFIX)/, $(SRC_EXAMPLES))
+	$(RM) $(EXECUTABLES)
 
 #--------------------------------------------
 
-%: %.o
-	@echo "--- make executable $(INSTALL_PREFIX)/$@"
-	$(CXX) -o $(INSTALL_PREFIX)/$@ $< $(LIBS)
-
-%.o: src/%.cpp
+$(INSTALL_PREFIX)/%: src/%.cpp
 	mkdir -p $(INSTALL_PREFIX)
-	@echo "----- build $@ -----"
-	$(CXX) -c $^ -o $@ $(FLAGS) $(DEPS)
-
-%.o: src/examples/%.cpp
-	mkdir -p $(INSTALL_PREFIX)
-	@echo "----- build $@ -----"
-	$(CXX) -c $^ -o $@ $(FLAGS) $(DEPS)
+	@echo "----- build $@.o -----"
+	$(CXX) -c $^ -o $@.o $(FLAGS) $(DEPS)
+	@echo "--- make executable $@"
+	$(CXX) -o $@ $@.o $(LIBS)
+	$(RM) $@.o
