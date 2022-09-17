@@ -10,6 +10,8 @@ LIBS += -L/usr/local/lib
 LIBS += -lDDCore
 LIBS += -lDD4pod -lpodio -lpodioRootIO -ledm4hep
 LIBS += -lfmt
+LIBS += -lG4materials -lG4geometry -lG4persistency
+DEPS += -I/usr/local/include
 
 # local libs
 LIBS += -L${EIC_SHELL_PREFIX}/lib
