@@ -13,4 +13,4 @@ fi
 
 compact_file=$DETECTOR_PATH/$DETECTOR.xml
 echo "Searching compact file $compact_file"
-NPDet/install/bin/npdet_info search $1 --value $compact_file
+npdet_info search $1 --value $compact_file
