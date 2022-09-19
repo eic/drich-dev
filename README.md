@@ -305,10 +305,6 @@ corresponding executables and install them to `bin/`
 - `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
-  - relies on `text/sensorLUT.dat`, which must be up-to-date
-    - you can produce a new version of this file by uncommenting relevant lines
-      in `epic/src/DRICH_geo.cpp` (search for `generate LUT`), and running
-      something like `./rebuild_all.sh && ./run_dd_web_display.sh`
   - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
   - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
