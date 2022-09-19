@@ -1,0 +1,67 @@
+//
+// dRICH material properties, extracted from dRICH text file model, adapted for usage in EPIC
+//   authors: E. Cisbani, A. Del Dotto, C. Fanelli
+//   source:  git@github.com:cisbani/dRICh.git
+//   original dRICh simulation source code: github.com/EIC-eRD11/dualRICH_inMEIC
+//
+
+// gas ============================================================
+:P C2F6density 0.005734
+:MIXT_BY_NATOMS C2F6 $C2F6density 2
+  C 2
+  F 6
+:P C4F10density 0.009935
+:MIXT_BY_NATOMS C4F10 $C4F10density 2
+  C 4
+  F 10
+
+// aerogel ========================================================
+:P  aerogelDensity        0.1
+:P  airFractionInAerogel  (2.32-$aerogelDensity)/(2.32-0.00120479)
+:P  sio2FractionInAerogel (1.-$airFractionInAerogel)
+:MIXT_BY_VOLUME aerogel $aerogelDensity 2
+  G4_AIR             $airFractionInAerogel
+  G4_SILICON_DIOXIDE $sio2FractionInAerogel
+
+// filter =========================================================
+:P filterDensity 1.19
+:MIXT_BY_WEIGHT filter $filterDensity 2
+  G4_PLEXIGLASS        0.99
+  G4_POLYVINYL_ACETATE 0.01
+
+// mirror =========================================================
+:P mirrorDensity 1.19
+:MIXT_BY_WEIGHT mirror $mirrorDensity 2
+  G4_PLEXIGLASS        0.99
+  G4_POLYVINYL_ACETATE 0.01
+
+// photosensors ===================================================
+:PS sensorMatName G4_Si // just use Silicon
+
+
+///////////////////////////////////////////////////////////////////
+
+// Compatibility workaround:
+//   To use this text file for materials, we need to assign them to volumes. Since
+//   we only care about materials, create a swatch of dummy volumes: cubes placed
+//   linearly where each cube is assigned a material, all in a mother air volume.
+//   This allows us to use the lookups in `g4dRIChOptics` as is.
+:P world 1000.0*cm
+:P size  10.0*cm
+:P pitch (3*$size)
+// volumes:
+:VOLU mother     BOX $world $world $world G4_AIR
+:VOLU C2F6vol    BOX $size  $size  $size  C2F6
+:VOLU C4F10vol   BOX $size  $size  $size  C4F10
+:VOLU aerogelVol BOX $size  $size  $size  aerogel
+:VOLU filterVol  BOX $size  $size  $size  filter
+:VOLU mirrorVol  BOX $size  $size  $size  mirror
+:VOLU sensorVol  BOX $size  $size  $size  $sensorMatName
+// placements:
+:ROTM R0 0.0 0.0 0.0
+:PLACE C2F6vol    1 mother R0 0.0*cm 0.0*cm (0*$pitch)
+:PLACE C4F10vol   1 mother R0 0.0*cm 0.0*cm (1*$pitch)
+:PLACE aerogelVol 1 mother R0 0.0*cm 0.0*cm (2*$pitch)
+:PLACE filterVol  1 mother R0 0.0*cm 0.0*cm (3*$pitch)
+:PLACE mirrorVol  1 mother R0 0.0*cm 0.0*cm (4*$pitch)
+:PLACE sensorVol  1 mother R0 0.0*cm 0.0*cm (5*$pitch)

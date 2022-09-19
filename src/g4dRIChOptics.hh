@@ -227,7 +227,6 @@ public:
 
     const int nEntries = sizeof(aeroE)/sizeof(double);
 
-    printf("segfult here: need to use common text file to specify materials\n");
     double density = mat->GetDensity();
     printf("# Aerogel Density : %f g/cm3\n",density/(g/cm3));
     
