@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
   auto nSectors       = det->constant<int>("DRICH_RECON_nSectors");
   auto vesselZmin     = det->constant<double>("DRICH_RECON_zmin");
   auto gasvolMaterial = det->constant<string>("DRICH_RECON_gasvolMaterial");
-  TVector3 normX(1, 0, 0); // normal vectors
+  TVector3 normX(1, 0,  0); // normal vectors
   TVector3 normY(0, -1, 0);
   auto surfEntrance = new FlatSurface((1 / mm) * TVector3(0, 0, vesselZmin), normX, normY);
   for (int isec=0; isec<nSectors; isec++) {
@@ -181,33 +181,29 @@ int main(int argc, char** argv) {
     for(auto const& [de_name, detSensor] : detRich.children()) {
       if(de_name.find("sensor_de_"+secName)!=string::npos) {
 
-        // get sensor position
+        // get sensor info
+        auto imodsec = detSensor.id();
+        // - get sensor centroid position
         auto pvSensor  = detSensor.placement();
         auto posSensor = posRich + pvSensor.position();
-        double sensorGlobalPos[3] = {posSensor.x(), posSensor.y(), posSensor.z()}; // FIXME: unused
-        auto imodsec = detSensor.id();
-
-        // get surface normal
-        // FIXME: is this correct? could this be causing lower than expected NPE?
-        // get sensor flat surface normX and normY
-        // - ignore vessel transformation, since it is a pure translation
+        // - get sensor surface position
+        Direction radialDir   = posSensor - sensorSphCenter; // sensor sphere radius direction
+        auto posSensorSurface = posSensor + (radialDir.Unit() * (0.5*sensorThickness));
+        // - get surface normal and in-plane vectors
         double sensorLocalNormX[3] = {1.0, 0.0, 0.0};
         double sensorLocalNormY[3] = {0.0, 1.0, 0.0};
         double sensorGlobalNormX[3], sensorGlobalNormY[3];
-        pvSensor.ptr()->LocalToMasterVect(sensorLocalNormX, sensorGlobalNormX);
+        pvSensor.ptr()->LocalToMasterVect(sensorLocalNormX, sensorGlobalNormX); // ignore vessel transformation, since it is a pure translation
         pvSensor.ptr()->LocalToMasterVect(sensorLocalNormY, sensorGlobalNormY);
 
         // validate sensor position and normal
-        Direction radialDir = posSensor - sensorSphCenter; // sensor sphere radius direction
+        // - test normal vectors
         Direction normXdir, normYdir;
         normXdir.SetCoordinates(sensorGlobalNormX);
         normYdir.SetCoordinates(sensorGlobalNormY);
-        auto distSensor2center = sqrt((posSensor-sensorSphCenter).Mag2()); // distance between sensor sphere center and sensor position
-        auto normZdir = normXdir.Cross(normYdir); // sensor surface normal
-        // - test quantities
+        auto normZdir   = normXdir.Cross(normYdir);         // sensor surface normal
         auto testOrtho  = normXdir.Dot(normYdir);           // should be zero, if normX and normY are orthogonal
         auto testRadial = radialDir.Cross(normZdir).Mag2(); // should be zero, if sensor surface normal is parallel to sensor sphere radius
-        auto testDist   = abs(distSensor2center-(sensorSphRadius-sensorThickness/2.0)); // should be zero, if sensor position w.r.t. sensor sphere center is correct
         if(abs(testOrtho)>1e-6 || abs(testRadial)>1e-6) {
           printout(FATAL, "IRTLOG",
               "sensor normal is wrong: normX.normY = %f   |radialDir x normZdir|^2 = %f",
@@ -216,6 +212,9 @@ int main(int argc, char** argv) {
               );
           return 1;
         }
+        // - test sensor positioning
+        auto distSensor2center = sqrt((posSensorSurface-sensorSphCenter).Mag2()); // distance between sensor sphere center and sensor surface position
+        auto testDist          = abs(distSensor2center-sensorSphRadius);          // should be zero, if sensor position w.r.t. sensor sphere center is correct
         if(abs(testDist)>1e-6) {
           printout(FATAL, "IRTLOG",
               "sensor positioning is wrong: dist(sensor, sphere_center) = %f,  sphere_radius = %f,  sensor_thickness = %f,  |diff| = %g\n",
@@ -229,9 +228,8 @@ int main(int argc, char** argv) {
 
 
         // create the optical surface
-        // FIXME: this position MUST be that of the surface, not the sensor centroid like it currently is; or can we use sensorThickness?
         auto sensorFlatSurface = new FlatSurface(
-            (1 / mm) * TVector3(posSensor.x(), posSensor.y(), posSensor.z()),
+            (1 / mm) * TVector3(posSensorSurface.x(), posSensorSurface.y(), posSensorSurface.z()),
             TVector3(sensorGlobalNormX),
             TVector3(sensorGlobalNormY)
             );
@@ -244,7 +242,7 @@ int main(int argc, char** argv) {
         // printout(ALWAYS, "IRTLOG",
         //     "sensor: id=0x%08X pos=(%5.2f, %5.2f, %5.2f) normX=(%5.2f, %5.2f, %5.2f) normY=(%5.2f, %5.2f, %5.2f)",
         //     imodsec,
-        //     posSensor.x(), posSensor.y(), posSensor.z(),
+        //     posSensorSurface.x(), posSensorSurface.y(), posSensorSurface.z(),
         //     normXdir.x(),  normXdir.y(),  normXdir.z(),
         //     normYdir.x(),  normYdir.y(),  normYdir.z()
         //     );
