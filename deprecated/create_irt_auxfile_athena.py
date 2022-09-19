@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-# produce auxiliary ROOT file for the IRT algorithm
+# produce auxiliary ROOT file for the IRT algorithm; assumes the
+# production of `libIRT` objects is in the geometry `cpp` file
+# 
+# DEPRECATED for usage in EPIC; this script is preserved for 2 reasons:
+# 1. usage for ATHENA support
+# 2. example how to edit compact files on-the-fly with Python
 
 import shutil, os, sys, argparse
 import xml.etree.ElementTree as et

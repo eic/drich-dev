@@ -19,6 +19,11 @@ build.sh athena clean
 build.sh juggler clean
 ```
 
+For reconstruction, you may need to create an IRT auxfile, using
+```bash
+deprecated/create_irt_auxfile_athena.py
+```
+
 Revert to EPIC
 ==============
 To switch your environment back to EPIC:
