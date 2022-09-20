@@ -10,7 +10,7 @@ LIBS += -L/usr/local/lib
 LIBS += -lDDCore
 LIBS += -lDD4pod -lpodio -lpodioRootIO -ledm4hep
 LIBS += -lfmt
-LIBS += -lG4materials -lG4geometry -lG4persistency
+LIBS += -lG4global -lG4materials -lG4geometry -lG4persistency
 DEPS += -I/usr/local/include
 
 # local libs

@@ -8,12 +8,8 @@
  */
 
 #include <iostream>
-// #include "Geant4/G4PVDivision.hh"
-// #include "Geant4/G4RotationMatrix.hh"
+#include <functional>
 #include "Geant4/G4Material.hh"
-// #include "Geant4/G4Element.hh"
-// #include "Geant4/G4Color.hh"
-// #include "Geant4/G4VisAttributes.hh"
 #include "Geant4/G4SystemOfUnits.hh"
 #include "Geant4/G4MaterialPropertiesTable.hh"
 #include "Geant4/G4OpticalSurface.hh"
@@ -115,7 +111,32 @@ public:
   virtual int setOpticalParams(int ivalue) { return -1; };
   virtual int setOpticalParams(int ivalue, double dvalue) { return -1; };
   virtual int setOpticalParams(G4String svalue) { return -1; };
-  
+
+  // name accessors
+  G4String getMaterialName() { return materialName; };
+  G4String getLogicalVName() { return logicalVName; };
+
+  // get list of material property tables (that are in use)
+  std::vector<G4String> getMaterialPropertyNames() {
+    std::vector<G4String> validProps;
+    fmt::print("FIXME: pTable is not set for surfaces (mirror,sensor)\n"); return validProps;
+    for(const auto& propName : pTable->GetMaterialPropertyNames()) {
+      if(pTable->GetProperty(propName)!=nullptr) validProps.push_back(propName);
+    }
+    return validProps;
+  };
+
+  // execute lambda function `block(energy,value)` for each entry (energy,value) in the material property table
+  void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block) {
+    auto prop = pTable->GetProperty(propName);
+    if(prop==nullptr) return;
+    for(std::size_t i=0; i<prop->GetVectorLength(); ++i) {
+      auto energy = prop->Energy(i);
+      auto value  = prop->operator[](i);
+      block(energy,value);
+    }
+  }
+
 protected:
 
   G4String materialName, logicalVName;

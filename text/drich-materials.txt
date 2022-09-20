@@ -19,24 +19,21 @@
 :P  aerogelDensity        0.1
 :P  airFractionInAerogel  (2.32-$aerogelDensity)/(2.32-0.00120479)
 :P  sio2FractionInAerogel (1.-$airFractionInAerogel)
-:MIXT_BY_VOLUME aerogel $aerogelDensity 2
+:MIXT_BY_VOLUME Aerogel $aerogelDensity 2
   G4_AIR             $airFractionInAerogel
   G4_SILICON_DIOXIDE $sio2FractionInAerogel
 
-// filter =========================================================
-:P filterDensity 1.19
-:MIXT_BY_WEIGHT filter $filterDensity 2
+// acrylic filter =================================================
+:P acrylicDensity 1.19
+:MIXT_BY_WEIGHT Acrylic $acrylicDensity 2
   G4_PLEXIGLASS        0.99
   G4_POLYVINYL_ACETATE 0.01
 
 // mirror =========================================================
-:P mirrorDensity 1.19
-:MIXT_BY_WEIGHT mirror $mirrorDensity 2
-  G4_PLEXIGLASS        0.99
-  G4_POLYVINYL_ACETATE 0.01
+:PS mirrorMatName Acrylic
 
 // photosensors ===================================================
-:PS sensorMatName G4_Si // just use Silicon
+:PS sensorMatName G4_Si
 
 
 ///////////////////////////////////////////////////////////////////
@@ -50,18 +47,18 @@
 :P size  10.0*cm
 :P pitch (3*$size)
 // volumes:
-:VOLU mother     BOX $world $world $world G4_AIR
-:VOLU C2F6vol    BOX $size  $size  $size  C2F6
-:VOLU C4F10vol   BOX $size  $size  $size  C4F10
-:VOLU aerogelVol BOX $size  $size  $size  aerogel
-:VOLU filterVol  BOX $size  $size  $size  filter
-:VOLU mirrorVol  BOX $size  $size  $size  mirror
-:VOLU sensorVol  BOX $size  $size  $size  $sensorMatName
+:VOLU mother        BOX $world $world $world G4_AIR
+:VOLU C2F6Vol       BOX $size  $size  $size  C2F6
+:VOLU C4F10Vol      BOX $size  $size  $size  C4F10
+:VOLU AerogelVol    BOX $size  $size  $size  Aerogel
+:VOLU AcrylicVol    BOX $size  $size  $size  Acrylic
+:VOLU MirrorSurface BOX $size  $size  $size  $mirrorMatName
+:VOLU SensorSurface BOX $size  $size  $size  $sensorMatName
 // placements:
 :ROTM R0 0.0 0.0 0.0
-:PLACE C2F6vol    1 mother R0 0.0*cm 0.0*cm (0*$pitch)
-:PLACE C4F10vol   1 mother R0 0.0*cm 0.0*cm (1*$pitch)
-:PLACE aerogelVol 1 mother R0 0.0*cm 0.0*cm (2*$pitch)
-:PLACE filterVol  1 mother R0 0.0*cm 0.0*cm (3*$pitch)
-:PLACE mirrorVol  1 mother R0 0.0*cm 0.0*cm (4*$pitch)
-:PLACE sensorVol  1 mother R0 0.0*cm 0.0*cm (5*$pitch)
+:PLACE C2F6Vol       1 mother R0 0.0*cm 0.0*cm (0*$pitch)
+:PLACE C4F10Vol      1 mother R0 0.0*cm 0.0*cm (1*$pitch)
+:PLACE AerogelVol    1 mother R0 0.0*cm 0.0*cm (2*$pitch)
+:PLACE AcrylicVol    1 mother R0 0.0*cm 0.0*cm (3*$pitch)
+:PLACE MirrorSurface 1 mother R0 0.0*cm 0.0*cm (4*$pitch)
+:PLACE SensorSurface 1 mother R0 0.0*cm 0.0*cm (5*$pitch)

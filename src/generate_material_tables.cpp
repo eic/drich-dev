@@ -4,7 +4,44 @@
 
 #include "g4dRIChOptics.hh"
 
-using std::string;
+// ===========================================================================
+template<class MAT> class MaterialTable {
+  public:
+    MAT *mpt;
+    MaterialTable(MAT *mpt_) : mpt(mpt_) {};
+    ~MaterialTable() { if(mpt!=nullptr) delete mpt; };
+    
+    // print XML matrices, for `optical_materials.xml`
+    void PrintXML(bool isSurface=false, G4String detectorName="DRICH") {
+      // function to print a row
+      auto PrintRow = [] (int indentation, G4String units="") {
+        return [indentation,&units] (G4double energy, G4double value) {
+          fmt::print("{:{}}{:<#.5g}{} {:>#.5g}{}\n",
+              "",        indentation,
+              energy/eV, "*eV",
+              value,     units
+              );
+        };
+      };
+      if(isSurface) {
+        for(const auto& propName : mpt->getMaterialPropertyNames()) {
+          fmt::print("{:6}<property name=\"{}\" coldim=\"2\" values=\"\n", "", propName);
+          mpt->loopMaterialPropertyTable(propName,PrintRow(8));
+          fmt::print("{:8}\"/>\n","");
+        }
+      } else {
+        for(const auto& propName : mpt->getMaterialPropertyNames()) {
+          fmt::print("{:4}<matrix name=\"{}__{}_{}\" coldim=\"2\" values=\"\n",
+              "", propName, mpt->getMaterialName(), detectorName);
+          mpt->loopMaterialPropertyTable(propName,PrintRow(6,"*test"));
+          fmt::print("{:6}\"/>\n","");
+        }
+      }
+    } // PrintXML
+
+}; // class MaterialTable
+
+// ===========================================================================
 
 int main(int argc, char** argv) {
 
@@ -21,22 +58,36 @@ int main(int argc, char** argv) {
   G4VPhysicalVolume *vesselPhysVol = volmgr->ReadAndConstructDetector();
   fmt::print("[+] done construction\n");
 
-  // - aerogel
-  auto aeroPO = new g4dRIChAerogel("aerogel");
-  aeroPO->setOpticalParams(aerOptModel);
-  // - acrylic filter
-  auto acryPO = new g4dRIChFilter("filter");
-  acryPO->setOpticalParams(filter_thr);
-  // - gas radiator options
-  std::vector<G4String> gasMaterials = {"C2F6","C4F10"};
-  for(auto gasMaterial : gasMaterials) {
-    auto gasPO = new g4dRIChGas(gasMaterial);
-    gasPO->setOpticalParams();
-  }
-  // - mirror (similar to photosensor, but different params)
-  auto mirror = new g4dRIChMirror("mirrorVol");
-  mirror->setOpticalParams("ciDRICH");
-  // - photo sensors
-  auto photoSensor = new g4dRIChPhotosensor("sensorVol"); 
-  photoSensor->setOpticalParams("ciDRICH");
-}
+  // produce material property tables ///////////////////////
+
+  // aerogel
+  MaterialTable Aerogel(new g4dRIChAerogel("Aerogel"));
+  Aerogel.mpt->setOpticalParams(aerOptModel);
+  Aerogel.PrintXML();
+
+  // acrylic filter
+  MaterialTable Acrylic(new g4dRIChFilter("Acrylic"));
+  Acrylic.mpt->setOpticalParams(filter_thr);
+  Acrylic.PrintXML();
+
+  // gas
+  // - C2F6
+  MaterialTable C2F6(new g4dRIChGas("C2F6"));
+  C2F6.mpt->setOpticalParams();
+  C2F6.PrintXML();
+  // - C4F10
+  MaterialTable C4F10(new g4dRIChGas("C4F10"));
+  C4F10.mpt->setOpticalParams();
+  C4F10.PrintXML(false,"PFRICH");
+
+  // mirror surface
+  MaterialTable MirrorSurface(new g4dRIChMirror("MirrorSurface"));
+  MirrorSurface.mpt->setOpticalParams("ciDRICH");
+  MirrorSurface.PrintXML(true);
+
+  // photo sensor surface
+  MaterialTable SensorSurface(new g4dRIChPhotosensor("SensorSurface"));
+  SensorSurface.mpt->setOpticalParams("ciDRICH");
+  SensorSurface.PrintXML(true);
+
+} // main
