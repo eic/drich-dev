@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 #include "g4dRIChOptics.hh"
+#include "surfaceEnums.h"
 
 // ===========================================================================
 template<class MAT> class MaterialTable {
@@ -24,15 +25,29 @@ template<class MAT> class MaterialTable {
         };
       };
       if(isSurface) {
+        auto surf = mpt->getSurface();
+        fmt::print("{:4}<opticalsurface name=\"{}_{}\" model=\"{}\" finish=\"{}\" type=\"{}\">\n",
+            "",
+            mpt->getLogicalVName(),
+            detectorName,
+            surfaceEnum::GetModel(surf),
+            surfaceEnum::GetFinish(surf),
+            surfaceEnum::GetType(surf)
+            );
         for(const auto& propName : mpt->getMaterialPropertyNames()) {
           fmt::print("{:6}<property name=\"{}\" coldim=\"2\" values=\"\n", "", propName);
           mpt->loopMaterialPropertyTable(propName,PrintRow(8));
           fmt::print("{:8}\"/>\n","");
         }
+        fmt::print("{:4}</opticalsurface>\n","");
       } else {
         for(const auto& propName : mpt->getMaterialPropertyNames()) {
           fmt::print("{:4}<matrix name=\"{}__{}_{}\" coldim=\"2\" values=\"\n",
-              "", propName, mpt->getMaterialName(), detectorName);
+              "",
+              propName,
+              mpt->getMaterialName(),
+              detectorName
+              );
           mpt->loopMaterialPropertyTable(propName,PrintRow(6,"*test"));
           fmt::print("{:6}\"/>\n","");
         }

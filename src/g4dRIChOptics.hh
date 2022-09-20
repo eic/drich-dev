@@ -112,23 +112,36 @@ public:
   virtual int setOpticalParams(int ivalue, double dvalue) { return -1; };
   virtual int setOpticalParams(G4String svalue) { return -1; };
 
-  // name accessors
+  // accessors
   G4String getMaterialName() { return materialName; };
   G4String getLogicalVName() { return logicalVName; };
+  G4OpticalSurface *getSurface() { return pOps; };
+
+  // get the appropriate material property table
+  G4MaterialPropertiesTable *getMaterialPropertyTable() {
+    auto t = pTable;
+    if(t==nullptr && pOps!=nullptr) t = pOps->GetMaterialPropertiesTable();
+    if(t==nullptr) fmt::print(stderr,"ERROR: cannot find material property table for ({},{})\n",materialName,logicalVName);
+    return t;
+  }
 
   // get list of material property tables (that are in use)
   std::vector<G4String> getMaterialPropertyNames() {
     std::vector<G4String> validProps;
-    fmt::print("FIXME: pTable is not set for surfaces (mirror,sensor)\n"); return validProps;
-    for(const auto& propName : pTable->GetMaterialPropertyNames()) {
-      if(pTable->GetProperty(propName)!=nullptr) validProps.push_back(propName);
+    auto tab = getMaterialPropertyTable();
+    if(tab!=nullptr) {
+      for(const auto& propName : tab->GetMaterialPropertyNames()) {
+        if(tab->GetProperty(propName)!=nullptr) validProps.push_back(propName);
+      }
     }
     return validProps;
-  };
+  }
 
   // execute lambda function `block(energy,value)` for each entry (energy,value) in the material property table
   void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block) {
-    auto prop = pTable->GetProperty(propName);
+    auto tab = getMaterialPropertyTable();
+    if(tab==nullptr) return;
+    auto prop = tab->GetProperty(propName);
     if(prop==nullptr) return;
     for(std::size_t i=0; i<prop->GetVectorLength(); ++i) {
       auto energy = prop->Energy(i);
@@ -141,6 +154,7 @@ protected:
 
   G4String materialName, logicalVName;
   G4Material *mat;
+  G4OpticalSurface *pOps;
   G4LogicalVolume *logVolume; // used for skin surface
     
   G4MaterialPropertiesTable *pTable;
@@ -616,8 +630,10 @@ public:
 
     G4MaterialPropertiesTable * pT = addSkinPropTable(nEntries);
 
-    G4OpticalSurface * pOps = new G4OpticalSurface(surfaceName, unified, polishedfrontpainted, dielectric_dielectric); // to be parametrized
+    pOps = new G4OpticalSurface(surfaceName, unified, polishedfrontpainted, dielectric_dielectric); // to be parametrized
     pOps->SetMaterialPropertiesTable(pT);
+    printf("# Surface properties:\n");
+    pOps->DumpInfo();
     
     new G4LogicalSkinSurface(skinSurfaceName, logVolume, pOps);
 
@@ -676,8 +692,10 @@ public:
     
     G4MaterialPropertiesTable * pT = addSkinPropTable(3);
     
-    G4OpticalSurface * pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_metal);
+    pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_metal);
     pOps->SetMaterialPropertiesTable(pT);
+    printf("# Surface properties:\n");
+    pOps->DumpInfo();
     
     new G4LogicalSkinSurface(skinSurfaceName, logVolume, pOps); 
 
