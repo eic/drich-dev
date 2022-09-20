@@ -137,6 +137,9 @@ public:
     return validProps;
   }
 
+  // get the size of the material property table
+  int getMaterialPropertyTableSize() { return int(getMaterialPropertyNames().size()); }
+
   // execute lambda function `block(energy,value)` for each entry (energy,value) in the material property table
   void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block) {
     auto tab = getMaterialPropertyTable();
@@ -150,6 +153,16 @@ public:
     }
   }
 
+  // converters
+  static double wl2e(double wl) { // wavelength to energy
+    return 1239.84193 * eV / (wl/nm); 
+  };
+
+  static double e2wl(double e) { // energy to wavelength
+    return 1239.84193 *nm / (e / eV);
+  };
+
+
 protected:
 
   G4String materialName, logicalVName;
@@ -159,14 +172,6 @@ protected:
     
   G4MaterialPropertiesTable *pTable;
   
-  double wl2e(double wl) { // wavelength to energy
-    return 1239.84193 * eV / (wl/nm); 
-  };
-
-  double e2wl(double e) { // energy to wavelength
-    return 1239.84193 *nm / (e / eV);
-  };
-
   // add properties to the MaterialPropertiesTable and link to material
   void setMatPropTable(int nEntries) {
       
