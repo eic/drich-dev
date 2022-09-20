@@ -9,23 +9,44 @@
 #include "TGraph.h"
 #include "TAxis.h"
 
+
 // ===========================================================================
+// structures for preferred units
+class UnitDef {
+  public:
+    UnitDef(double divisor_, std::string name_) : divisor(divisor_), name(name_), xml(""), title("") {
+      if(name!="") {
+        xml   = "*" + name;
+        title = " [" + name + "]";
+      }
+    }
+    double divisor;
+    std::string name, xml, title;
+};
+const bool vsWavelength = false; // if true, make plots vs. wavelength
+
+
+// ===========================================================================
+// extends g4dRIChOptics class with plots and XML printing
 template<class MAT> class MaterialTable {
   public:
     MAT *mpt;
     std::string name;
-    MaterialTable(MAT *mpt_, std::string name_) : mpt(mpt_), name(name_) {};
+    MaterialTable(MAT *mpt_, std::string name_) : mpt(mpt_), name(name_) {
+      if(name=="C2F6" or name=="C4F10") PreferredUnits = &PreferredUnits2;
+      else PreferredUnits = &PreferredUnits1;
+    }
     ~MaterialTable() { if(mpt!=nullptr) delete mpt; };
     
     // print XML matrices, for `optical_materials.xml`
     void PrintXML(bool isSurface=false, G4String detectorName="DRICH") {
       // function to print a row
-      auto PrintRow = [] (int indentation, G4String units="") {
+      auto PrintRow = [] (int indentation, UnitDef units) {
         return [indentation,&units] (G4double energy, G4double value) {
-          fmt::print("{:{}}{:<#.5g}{} {:>#.5g}{}\n",
-              "",        indentation,
-              energy/eV, "*eV",
-              value,     units
+          fmt::print("{:{}}{:<#.5g}{}   {:>#.5g}{}\n",
+              "",                  indentation,
+              energy/eV,           "*eV",
+              value/units.divisor, units.xml
               );
         };
       };
@@ -41,7 +62,7 @@ template<class MAT> class MaterialTable {
             );
         for(const auto& propName : mpt->getMaterialPropertyNames()) {
           fmt::print("{:6}<property name=\"{}\" coldim=\"2\" values=\"\n", "", propName);
-          mpt->loopMaterialPropertyTable(propName,PrintRow(8));
+          mpt->loopMaterialPropertyTable(propName,PrintRow(8,PreferredUnits->at(propName)));
           fmt::print("{:8}\"/>\n","");
         }
         fmt::print("{:4}</opticalsurface>\n","");
@@ -53,7 +74,7 @@ template<class MAT> class MaterialTable {
               mpt->getMaterialName(),
               detectorName
               );
-          mpt->loopMaterialPropertyTable(propName,PrintRow(6,"*test"));
+          mpt->loopMaterialPropertyTable(propName,PrintRow(6,PreferredUnits->at(propName)));
           fmt::print("{:6}\"/>\n","");
         }
       }
@@ -71,17 +92,23 @@ template<class MAT> class MaterialTable {
       int pad=0;
       for(const auto& propName : mpt->getMaterialPropertyNames()) {
         fmt::print("Plotting property {}\n", propName);
+        auto units = PreferredUnits->at(propName);
         canv->cd(++pad);
         canv->GetPad(pad)->SetGrid(1,1);
         canv->GetPad(pad)->SetLeftMargin(0.2);
         canv->GetPad(pad)->SetRightMargin(0.15);
         auto graph = new TGraph();
         graph->SetName(TString("graph_"+name+"_"+propName));
-        graph->SetTitle(TString(name+" "+propName+" [units];wavelength [nm]"));
+        std::string xTitle = vsWavelength ? "wavelength [nm]" : "energy [eV]";
+        graph->SetTitle(TString(name+" "+propName+units.title+";"+xTitle));
         int cnt=0;
-        auto makeGraph = [&graph,&cnt] (G4double energy, G4double value) {
-          auto wavelength = g4dRIChOptics::e2wl(energy);
-          graph->SetPoint(cnt++,wavelength/nm,value);
+        auto makeGraph = [&graph,&cnt,&units] (G4double energy, G4double value) {
+          auto xval = vsWavelength ? g4dRIChOptics::e2wl(energy)/nm : energy/eV;
+          graph->SetPoint(
+              cnt++,
+              xval,
+              value / units.divisor
+              );
         };
         mpt->loopMaterialPropertyTable(propName,makeGraph);
         graph->SetMarkerStyle(kFullCircle);
@@ -93,6 +120,29 @@ template<class MAT> class MaterialTable {
       }
       canv->SaveAs(pngName); 
     }
+
+    // sets of preferred units
+    const std::map<G4String,UnitDef> *PreferredUnits;
+    const std::map<G4String,UnitDef> PreferredUnits1 = {
+      { "RINDEX",          UnitDef( 1.,    ""      )},
+      { "GROUPVEL",        UnitDef( mm/ns, "mm/ns" )},
+      { "RAYLEIGH",        UnitDef( cm,    "cm"    )},
+      { "ABSLENGTH",       UnitDef( cm,    "cm"    )},
+      { "REFLECTIVITY",    UnitDef( 1.,    ""      )},
+      { "REALRINDEX",      UnitDef( 1.,    ""      )},
+      { "IMAGINARYRINDEX", UnitDef( 1.,    ""      )},
+      { "EFFICIENCY",      UnitDef( 1.,    ""      )}
+    };
+    const std::map<G4String,UnitDef> PreferredUnits2 = {
+      { "RINDEX",          UnitDef( 1.,    ""      )},
+      { "GROUPVEL",        UnitDef( mm/ns, "mm/ns" )},
+      { "RAYLEIGH",        UnitDef( m,     "m"     )},
+      { "ABSLENGTH",       UnitDef( m,     "m"     )},
+      { "REFLECTIVITY",    UnitDef( 1.,    ""      )},
+      { "REALRINDEX",      UnitDef( 1.,    ""      )},
+      { "IMAGINARYRINDEX", UnitDef( 1.,    ""      )},
+      { "EFFICIENCY",      UnitDef( 1.,    ""      )}
+    };
 
 }; // class MaterialTable
 

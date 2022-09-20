@@ -16,7 +16,7 @@
   F 10
 
 // aerogel ========================================================
-:P  aerogelDensity        0.1
+:P  aerogelDensity        0.11 // increased from ECCE version (was 0.10)
 :P  airFractionInAerogel  (2.32-$aerogelDensity)/(2.32-0.00120479)
 :P  sio2FractionInAerogel (1.-$airFractionInAerogel)
 :MIXT_BY_VOLUME Aerogel $aerogelDensity 2
