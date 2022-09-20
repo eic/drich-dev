@@ -9,6 +9,16 @@
 #include "TGraph.h"
 #include "TAxis.h"
 
+///////////////////////////////////
+// SETTINGS
+const int    aerOptModel  = 3;      // aerogel optical model used to estimate the refractive Index
+const double filter_thr   = 300*nm; // wavelength filter cutoff
+const bool   vsWavelength = false;  // if true, make plots vs. wavelength
+const std::string xmlOutput = "out/optical_materials_drich.xml";
+///////////////////////////////////
+
+// other global vars
+std::FILE *xmlFile;
 
 // ===========================================================================
 // structures for preferred units
@@ -23,7 +33,6 @@ class UnitDef {
     double divisor;
     std::string name, xml, title;
 };
-const bool vsWavelength = false; // if true, make plots vs. wavelength
 
 
 // ===========================================================================
@@ -40,10 +49,11 @@ template<class MAT> class MaterialTable {
     
     // print XML matrices, for `optical_materials.xml`
     void PrintXML(bool isSurface=false, G4String detectorName="DRICH") {
+      fmt::print(xmlFile,"\n<!-- {:_^60} -->\n\n",name);
       // function to print a row
       auto PrintRow = [] (int indentation, UnitDef units) {
         return [indentation,&units] (G4double energy, G4double value) {
-          fmt::print("{:{}}{:<#.5g}{}   {:>#.5g}{}\n",
+          fmt::print(xmlFile,"{:{}}{:<#.5g}{}   {:>#.5g}{}\n",
               "",                  indentation,
               energy/eV,           "*eV",
               value/units.divisor, units.xml
@@ -52,7 +62,7 @@ template<class MAT> class MaterialTable {
       };
       if(isSurface) {
         auto surf = mpt->getSurface();
-        fmt::print("{:4}<opticalsurface name=\"{}_{}\" model=\"{}\" finish=\"{}\" type=\"{}\">\n",
+        fmt::print(xmlFile,"{:4}<opticalsurface name=\"{}_{}\" model=\"{}\" finish=\"{}\" type=\"{}\">\n",
             "",
             mpt->getLogicalVName(),
             detectorName,
@@ -61,21 +71,21 @@ template<class MAT> class MaterialTable {
             surfaceEnum::GetType(surf)
             );
         for(const auto& propName : mpt->getMaterialPropertyNames()) {
-          fmt::print("{:6}<property name=\"{}\" coldim=\"2\" values=\"\n", "", propName);
+          fmt::print(xmlFile,"{:6}<property name=\"{}\" coldim=\"2\" values=\"\n", "", propName);
           mpt->loopMaterialPropertyTable(propName,PrintRow(8,PreferredUnits->at(propName)));
-          fmt::print("{:8}\"/>\n","");
+          fmt::print(xmlFile,"{:8}\"/>\n","");
         }
-        fmt::print("{:4}</opticalsurface>\n","");
+        fmt::print(xmlFile,"{:4}</opticalsurface>\n","");
       } else {
         for(const auto& propName : mpt->getMaterialPropertyNames()) {
-          fmt::print("{:4}<matrix name=\"{}__{}_{}\" coldim=\"2\" values=\"\n",
+          fmt::print(xmlFile,"{:4}<matrix name=\"{}__{}_{}\" coldim=\"2\" values=\"\n",
               "",
               propName,
               mpt->getMaterialName(),
               detectorName
               );
           mpt->loopMaterialPropertyTable(propName,PrintRow(6,PreferredUnits->at(propName)));
-          fmt::print("{:6}\"/>\n","");
+          fmt::print(xmlFile,"{:6}\"/>\n","");
         }
       }
     } // PrintXML
@@ -150,9 +160,8 @@ template<class MAT> class MaterialTable {
 
 int main(int argc, char** argv) {
 
-  // settings
-  const int    aerOptModel = 3;      // aerogel optical model used to estimate the refractive Index
-  const double filter_thr  = 300*nm; // wavelength filter cutoff
+  // start XML file
+  xmlFile = std::fopen(xmlOutput.c_str(),"w");
 
   // build detector by text file
   fmt::print("[+] read model text file\n");
@@ -200,5 +209,9 @@ int main(int argc, char** argv) {
   SensorSurface.mpt->setOpticalParams("ciDRICH");
   SensorSurface.PrintXML(true);
   SensorSurface.DrawPlots();
+
+  // cleanup
+  std::fclose(xmlFile);
+  fmt::print("\nwrote XML nodes to {}\n\n",xmlOutput);
 
 } // main
