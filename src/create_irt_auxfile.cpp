@@ -254,7 +254,7 @@ int main(int argc, char** argv) {
   // set refractive indices
   // FIXME: are these (weighted) averages? can we automate this?
   std::map<string, double> rIndices;
-  rIndices.insert({"GasVolume", 1.0008});
+  rIndices.insert({"GasVolume", 1.00076});
   rIndices.insert({"Aerogel", 1.0190});
   rIndices.insert({"Filter", 1.5017});
   for (auto const& [rName, rIndex] : rIndices) {
