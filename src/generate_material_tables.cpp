@@ -13,7 +13,7 @@
 // SETTINGS
 const int    aerOptModel  = 3;      // aerogel optical model used to estimate the refractive Index
 const double filter_thr   = 300*nm; // wavelength filter cutoff
-const bool   vsWavelength = false;  // if true, make plots vs. wavelength
+const bool   vsWavelength = true;   // if true, make plots vs. wavelength
 const std::string xmlOutput = "out/optical_materials_drich.xml";
 ///////////////////////////////////
 
@@ -53,7 +53,7 @@ template<class MAT> class MaterialTable {
       // function to print a row
       auto PrintRow = [] (int indentation, UnitDef units) {
         return [indentation,&units] (G4double energy, G4double value) {
-          fmt::print(xmlFile,"{:{}}{:<#.5g}{}   {:>#.5g}{}\n",
+          fmt::print(xmlFile,"{:{}}{:<#.6g}{}   {:>#.6g}{}\n",
               "",                  indentation,
               energy/eV,           "*eV",
               value/units.divisor, units.xml
@@ -136,8 +136,8 @@ template<class MAT> class MaterialTable {
     const std::map<G4String,UnitDef> PreferredUnits1 = {
       { "RINDEX",          UnitDef( 1.,    ""      )},
       { "GROUPVEL",        UnitDef( mm/ns, "mm/ns" )},
-      { "RAYLEIGH",        UnitDef( cm,    "cm"    )},
-      { "ABSLENGTH",       UnitDef( cm,    "cm"    )},
+      { "RAYLEIGH",        UnitDef( mm,    "mm"    )},
+      { "ABSLENGTH",       UnitDef( mm,    "mm"    )},
       { "REFLECTIVITY",    UnitDef( 1.,    ""      )},
       { "REALRINDEX",      UnitDef( 1.,    ""      )},
       { "IMAGINARYRINDEX", UnitDef( 1.,    ""      )},

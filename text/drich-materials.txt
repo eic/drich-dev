@@ -1,6 +1,6 @@
 //
 // dRICH material properties, extracted from dRICH text file model, adapted for usage in EPIC
-//   authors: E. Cisbani, A. Del Dotto, C. Fanelli
+//   original authors: E. Cisbani, A. Del Dotto, C. Fanelli
 //   source:  git@github.com:cisbani/dRICh.git
 //   original dRICh simulation source code: github.com/EIC-eRD11/dualRICH_inMEIC
 //
@@ -16,8 +16,10 @@
   F 10
 
 // aerogel ========================================================
-:P  aerogelDensity        0.11 // increased from ECCE version (was 0.10)
-:P  airFractionInAerogel  (2.32-$aerogelDensity)/(2.32-0.00120479)
+:P aerogelDensity 0.110 // NOTE: increased from ECCE version (was 0.100)
+:P sio2Density    2.32
+:P airDensity     0.00120479
+:P  airFractionInAerogel  ($sio2Density-$aerogelDensity)/($sio2Density-$airDensity)
 :P  sio2FractionInAerogel (1.-$airFractionInAerogel)
 :MIXT_BY_VOLUME Aerogel $aerogelDensity 2
   G4_AIR             $airFractionInAerogel

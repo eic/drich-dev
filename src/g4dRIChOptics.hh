@@ -2,7 +2,9 @@
 #define G4E_CI_DRICH_MODEL_HH
 
 /* 
- * author: Evaristo Cisbani
+ * g4dRIChOptics class hierarchy
+ * -----------------------------
+ * original authors: E. Cisbani, A. Del Dotto, C. Fanelli
  * source: git@github.com:cisbani/dRICh.git
  * -> adapted for usage in EPIC
  */
