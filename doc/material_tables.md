@@ -9,7 +9,7 @@ Guide to generate material property tables for XML files for `DD4hep`.
 
 ### Code
 - `src/g4dRIChOptics.hh`: Common dRICH optics class, originally from
-  [cisbani/dRICh.git](https://github.com/cisbani/dRICh); this can be used
+  [cisbani/dRICh](https://github.com/cisbani/dRICh); this can be used
   standalone for any Geant4 simulations
 - `text/drich-materials.txt`: Geant4 text-file description of materials, needed
   along with `src/g4dRIChOptics.hh` for the generation of property tables
