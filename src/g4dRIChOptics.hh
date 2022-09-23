@@ -699,7 +699,7 @@ public:
     
     G4MaterialPropertiesTable * pT = addSkinPropTable(3);
     
-    pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_metal);
+    pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_dielectric);
     pOps->SetMaterialPropertiesTable(pT);
     printf("# Surface properties:\n");
     pOps->DumpInfo();
