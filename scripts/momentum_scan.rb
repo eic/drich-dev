@@ -29,8 +29,8 @@ particle_h = {
 ## radiators
 ## FIXME: :rIndexRef values are averages? 
 radiator_h = {
-  :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], },
-  :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0008, :rIndexRange=>[1.00075,1.00084], },
+  :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], },
+  :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], },
 }
 
 ## warn if not doing simulation
