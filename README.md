@@ -86,8 +86,14 @@ of branches for varying configurations.
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/irt.git
     git clone git@github.com:eic/EDM4eic.git
-    git clone git@eicweb.phy.anl.gov:EIC/juggler.git
     ```
+    Since `juggler` is not on Github, but is hosted on EICweb, it is recommended to clone
+    with HTTPS:
+    ```bash
+    git clone https://eicweb.phy.anl.gov/EIC/juggler.git
+    ```
+    We will soon be moving to [`EICRecon`](https://github.com/eic/EICrecon),
+    thus it is unlikely you will need to have SSH access to `juggler`.
   - Checkout the appropriate branches of each repository, depending on your needs
     - see [Branches and Pull Requests](doc/branches.md)
     - for example, currently the IRT code runs in `juggler` and relies on a
