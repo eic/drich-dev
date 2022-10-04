@@ -4,7 +4,7 @@ These are the branches we used for the ATHENA proposal:
 | Repository                  | New Branch                  | Old Proposal Branch |
 | --:                         | ---                         | ---                 |
 | `irt`                       | `irt-init-v02`              | `irt-init-v01`      |
-| `ip6`                       | `master`                    | `master`            |
+| `ip6`                       | `main`                      | `master`            |
 | `athena`                    | `144-irt-geometry`          | `irt-init-v01`      |
 | `eicd`                      | `irt-data-model`            | `irt-init-v01`      |
 | `juggler`                   | `73-add-rich-irt-algorithm` | `irt-init-v01`      |
