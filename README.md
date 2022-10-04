@@ -155,7 +155,7 @@ of branches for varying configurations.
 - be mindful of which branch you are on in each repository, especially if you
   have several active pull requests
   - for example, `irt` requires the new `EDM4eic` components and datatypes, which
-    at the time of writing this have not been merged to `EDM4eic` `master`
+    at the time of writing this have not been merged to `EDM4eic` `main`
   - use `./check_branches.sh` to quickly check which branches you are on in all
     repositories
   - use `./check_status.sh` to run `git status` in each repository, which is

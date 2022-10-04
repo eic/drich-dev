@@ -5,13 +5,13 @@ project or recommended configuration. Links to corresponding pull requests are p
 We intend to keep these tables up-to-date as development proceeds.
 
 ## Production
-| Repository                  | Branch   |
-| --:                         | ---      |
-| `drich-dev`                 | `main`   |
-| `epic`                      | `main`   |
-| `EDM4eic`                   | `master` |
-| `irt`                       | `main`   |
-| `juggler`                   | `master` |
+| Repository  | Branch |
+| --:         | ---    |
+| `drich-dev` | `main` |
+| `epic`      | `main` |
+| `EDM4eic`   | `main` |
+| `irt`       | `main` |
+| `juggler`   | `main` |
 
 ## IRT Development
 | Repository                  | Branch                                                          | Pull Request                                                                                             |
@@ -30,5 +30,5 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:         | ---                                                 | ---                                                                                                          |
 | `drich-dev` | `main`                                              |                                                                                                              |
 | `epic`      | `12-drich-sensor-material-should-not-be-airoptical` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) - **TODO: convert to PR**  |
-| `EDM4eic`   | `master`                                            |                                                                                                              |
+| `EDM4eic`   | `main`                                              |                                                                                                              |
 | `irt`       | `main`                                              |                                                                                                              |
