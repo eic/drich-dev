@@ -124,6 +124,7 @@ class Variator < VariatorBase
         ]],
         [[
           "bin/draw_hits",
+          "d",
           settings[:output],
         ]],
       ]

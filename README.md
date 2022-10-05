@@ -307,12 +307,9 @@ corresponding executables and install them to `bin/`
   - reads simulation output and draws raw hit positions and number of hits vs.
     momentum
   - build with `make`, execute as `bin/draw_hits [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 - `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
-  - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
 ## Automated Parameter Variation
 - use `scripts/vary_params.rb` to run simulation jobs while varying dRICH compact file parameters

@@ -2,6 +2,7 @@
 // (cf. draw_segmentation.cpp for readout)
 #include <cstdlib>
 #include <iostream>
+#include <fmt/format.h>
 
 // ROOT
 #include "TSystem.h"
@@ -16,10 +17,6 @@
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
 using namespace ROOT;
 using namespace ROOT::VecOps;
 using namespace edm4hep;
@@ -30,7 +27,33 @@ int main(int argc, char** argv) {
 
   // args
   TString infileN="out/sim.root";
-  if(argc>1) infileN = TString(argv[1]);
+  if(argc<=1) {
+    fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
+    fmt::print("    [d/p]: d for dRICH\n");
+    fmt::print("           p for pfRICH\n");
+    fmt::print("    [simulation_output_file]: output from `npsim` (`simulate.py`)\n");
+    fmt::print("                              default: {}\n",infileN);
+    return 2;
+  }
+  TString zDirectionStr = TString(argv[1]);
+  if(argc>2) infileN    = TString(argv[2]);
+
+  // detector-specific settings
+  int zDirection;
+  TString xRICH,XRICH;
+  if(zDirectionStr=="d") {
+    zDirection = 1;
+    xRICH = "dRICH";
+    XRICH = "DRICH";
+  } else if(zDirectionStr=="p") {
+    zDirection = -1;
+    xRICH = "pfRICH";
+    XRICH = "PFRICH";
+  } else {
+    fmt::print(stderr,"ERROR: unknown argument \"{}\"\n",zDirectionStr);
+    return 1;
+  }
+  std::string readoutName = std::string(XRICH)+"Hits";
 
   // setup
   //TApplication mainApp("mainApp",&argc,argv); // keep canvases open
@@ -50,18 +73,15 @@ int main(int argc, char** argv) {
   // calculate number of hits
   auto numHits = [](RVec<SimTrackerHitData> hits) { return hits.size(); };
   // calculate momentum magnitude for each particle (units=GeV)
-  // TODO: edm4hep::Vector3f really has no magnitude function!?
   auto momentum = [](RVec<MCParticleData> parts){
-    return Map(parts,[](auto p){
+    return Map(parts, [](auto p){
         auto mom = p.momentum;
         return sqrt( mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2] );
         });
   };
   // filter for thrown particles
   auto isThrown = [](RVec<MCParticleData> parts){
-    return Filter(parts,[](auto p){
-        return p.generatorStatus==1;
-        });
+    return Filter(parts, [](auto p){ return p.generatorStatus==1; } );
   };
   // get positions for each hit (units=cm)
   auto hitPos = [](RVec<SimTrackerHitData> hits){ return Map(hits,[](auto h){ return h.position; }); };
@@ -74,8 +94,8 @@ int main(int argc, char** argv) {
   auto df1 = dfIn
     .Define("thrownParticles",isThrown,{"MCParticles"})
     .Define("thrownP",momentum,{"thrownParticles"})
-    .Define("numHits",numHits,{"DRICHHits"})
-    .Define("hitPos",hitPos,{"DRICHHits"})
+    .Define("numHits",numHits,{readoutName})
+    .Define("hitPos",hitPos,{readoutName})
     .Define("hitX",hitPosX,{"hitPos"})
     .Define("hitY",hitPosY,{"hitPos"})
     ;
@@ -84,12 +104,12 @@ int main(int argc, char** argv) {
 
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
-      { "hitPositions","dRICH hit positions (units=cm)",
+      { "hitPositions",xRICH+" hit positions (units=cm)",
       1000,-200,200, 1000,-200,200 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
-      { "numHitsVsThrownP","number of dRICH hits vs. thrown momentum", 
+      { "numHitsVsThrownP","number of "+xRICH+" hits vs. thrown momentum", 
       65,0,65, 100,0,400 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
@@ -99,8 +119,13 @@ int main(int argc, char** argv) {
   TCanvas *canv;
   canv = CreateCanvas("hits",0,0,1);
   hitPositionHist->Draw("colz");
-  hitPositionHist->GetXaxis()->SetRangeUser(100,300);
-  hitPositionHist->GetYaxis()->SetRangeUser(-100,100);
+  if(zDirection>0) {
+    hitPositionHist->GetXaxis()->SetRangeUser(100,300);
+    hitPositionHist->GetYaxis()->SetRangeUser(-100,100);
+  } else {
+    hitPositionHist->GetXaxis()->SetRangeUser(-70,70);
+    hitPositionHist->GetYaxis()->SetRangeUser(-70,70);
+  }
   canv->Print(outfileN+"hits.png");
   canv->Write();
   //
@@ -118,10 +143,10 @@ int main(int argc, char** argv) {
 
 
   // exit
-  //cout << "\n\npress ^C to exit.\n\n";
+  //fmt::print("\n\npress ^C to exit.\n\n");
   //mainApp.Run(); // keep canvases open
   return 0;
-};
+}
 
 
 TCanvas *CreateCanvas(TString name, Bool_t logx, Bool_t logy, Bool_t logz) {
@@ -131,5 +156,5 @@ TCanvas *CreateCanvas(TString name, Bool_t logx, Bool_t logy, Bool_t logz) {
   if(logy) c->SetLogy(1);
   if(logz) c->SetLogz(1);
   return c;
-};
+}
 

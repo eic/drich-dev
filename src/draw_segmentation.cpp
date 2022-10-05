@@ -4,6 +4,7 @@
 #include <bitset>
 #include <map>
 #include <vector>
+#include <algorithm>
 #include <fmt/format.h>
 
 // ROOT
@@ -26,7 +27,46 @@ int main(int argc, char** argv) {
   // arguments
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   TString infileN="out/sim.root";
-  if(argc>1) infileN = TString(argv[1]);
+  if(argc<=1) {
+    fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
+    fmt::print("    [d/p]: d for dRICH\n");
+    fmt::print("           p for pfRICH\n");
+    fmt::print("    [simulation_output_file]: output from `npsim` (`simulate.py`)\n");
+    fmt::print("                              default: {}\n",infileN);
+    return 2;
+  }
+  TString zDirectionStr = TString(argv[1]);
+  if(argc>2) infileN    = TString(argv[2]);
+
+  // detector-specific settings
+  int zDirection;
+  std::string xRICH,XRICH;
+  std::string sensorNamePattern;
+  Double_t plotXmin, plotXmax, plotYmin, plotYmax;
+  if(zDirectionStr=="d") {
+    zDirection = 1;
+    xRICH = "dRICH";
+    XRICH = "DRICH";
+    sensorNamePattern = "sensor_de_sec0";
+    plotXmin = 100;
+    plotXmax = 190;
+    plotYmin = -70;
+    plotYmax = 70;
+  } else if(zDirectionStr=="p") {
+    zDirection = -1;
+    xRICH = "pfRICH";
+    XRICH = "PFRICH";
+    sensorNamePattern = "sensor_de";
+    plotXmin = -70;
+    plotXmax = 70;
+    plotYmin = -70;
+    plotYmax = 70;
+  } else {
+    fmt::print(stderr,"ERROR: unknown argument \"{}\"\n",zDirectionStr);
+    return 1;
+  }
+  const std::string readoutName = std::string(XRICH)+"Hits";
+
 
   // settings
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,14 +108,13 @@ int main(int argc, char** argv) {
   std::string compactFile = DETECTOR_PATH + "/" + DETECTOR + ".xml";
 
   // get detector handle and some constants
-  const std::string richName    = "DRICH";
-  const std::string readoutName = "DRICHHits";
+  const std::string richName    = XRICH;
   const auto det = &(Detector::getInstance());
   det->fromXML(compactFile);
   const auto detRich  = det->detector(richName);
   const auto posRich  = detRich.placement().position();
-  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>("DRICH_RECON_cellMask")));
-  const auto nSectors = det->constant<int>("DRICH_RECON_nSectors");
+  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(XRICH+"_RECON_cellMask")));
+  const auto nSectors = zDirection>0 ? det->constant<int>(XRICH+"_RECON_nSectors") : 1;
 
   // cellID decoder
   /* - `decodeCellID(fieldName)` returns a "decoder" for the field with name `fieldName`
@@ -86,10 +125,16 @@ int main(int argc, char** argv) {
   auto decodeCellID = [&readoutCoder] (std::string fieldName) {
     return [&readoutCoder,&fieldName] (RVecUL cellIDvec) {
       RVecL result;
+      bool found=false;
+      for(auto elem : readoutCoder->fields())
+        if(fieldName == elem.name()) { found = true; break; }
+      if(!found) fmt::print("- skipping missing bit field \"{}\"\n",fieldName);
       for(const auto& cellID : cellIDvec) {
-        auto val = readoutCoder->get(cellID,fieldName); // get BitFieldElement value
-        result.emplace_back(val);
-        // fmt::print("decode {}: {:64b} -> {}\n",fieldName,cellID,val);
+        if(found) {
+          auto val = readoutCoder->get(cellID,fieldName); // get BitFieldElement value
+          result.emplace_back(val);
+          // fmt::print("decode {}: {:64b} -> {}\n",fieldName,cellID,val);
+        } else result.emplace_back(0);
       }
       return result;
     };
@@ -109,7 +154,7 @@ int main(int argc, char** argv) {
   std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
-    if(de_name.find("sensor_de_sec0")!=std::string::npos) {
+    if(de_name.find(sensorNamePattern)!=std::string::npos) {
       // convert global position to hitmapX and Y
       auto posSensor = posRich + detSensor.placement().position();
       auto hitmapX   = Long64_t(dilation*posSensor.x() + 0.5);
@@ -162,7 +207,7 @@ int main(int argc, char** argv) {
 
   // decode cellID to bit field element values
   auto dfDecoded = dfIn
-      .Alias("cellID","DRICHHits.cellID")
+      .Alias("cellID", readoutName+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
       .Define("module", decodeCellID("module"), {"cellID"})
@@ -211,10 +256,10 @@ int main(int argc, char** argv) {
 
 
   // pixel hitmap
-  Double_t pixelXmin = dilation * 100;
-  Double_t pixelXmax = dilation * 190;
-  Double_t pixelYmin = dilation * -70;
-  Double_t pixelYmax = dilation * 70;
+  Double_t pixelXmin = dilation * plotXmin;
+  Double_t pixelXmax = dilation * plotXmax;
+  Double_t pixelYmin = dilation * plotYmin;
+  Double_t pixelYmax = dilation * plotYmax;
   auto pixelHitmap = dfHitmap.Histo3D(
       { "pixelHitmap", "Pixel Hit Map;x;y;sector",
         (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
