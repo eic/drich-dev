@@ -17,6 +17,9 @@
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
 
+// local
+#include "WhichRICH.h"
+
 using namespace ROOT;
 using namespace ROOT::VecOps;
 using namespace edm4hep;
@@ -35,25 +38,10 @@ int main(int argc, char** argv) {
     fmt::print("                              default: {}\n",infileN);
     return 2;
   }
-  TString zDirectionStr = TString(argv[1]);
-  if(argc>2) infileN    = TString(argv[2]);
-
-  // detector-specific settings
-  int zDirection;
-  TString xRICH,XRICH;
-  if(zDirectionStr=="d") {
-    zDirection = 1;
-    xRICH = "dRICH";
-    XRICH = "DRICH";
-  } else if(zDirectionStr=="p") {
-    zDirection = -1;
-    xRICH = "pfRICH";
-    XRICH = "PFRICH";
-  } else {
-    fmt::print(stderr,"ERROR: unknown argument \"{}\"\n",zDirectionStr);
-    return 1;
-  }
-  std::string readoutName = std::string(XRICH)+"Hits";
+  std::string zDirectionStr = argv[1];
+  if(argc>2) infileN = TString(argv[2]);
+  WhichRICH wr(zDirectionStr);
+  if(!wr.valid) return 1;
 
   // setup
   //TApplication mainApp("mainApp",&argc,argv); // keep canvases open
@@ -94,8 +82,8 @@ int main(int argc, char** argv) {
   auto df1 = dfIn
     .Define("thrownParticles",isThrown,{"MCParticles"})
     .Define("thrownP",momentum,{"thrownParticles"})
-    .Define("numHits",numHits,{readoutName})
-    .Define("hitPos",hitPos,{readoutName})
+    .Define("numHits",numHits,{wr.readoutName})
+    .Define("hitPos",hitPos,{wr.readoutName})
     .Define("hitX",hitPosX,{"hitPos"})
     .Define("hitY",hitPosY,{"hitPos"})
     ;
@@ -104,12 +92,12 @@ int main(int argc, char** argv) {
 
   // actions
   auto hitPositionHist = dfFinal.Histo2D(
-      { "hitPositions",xRICH+" hit positions (units=cm)",
+      { "hitPositions",TString(wr.xRICH)+" hit positions (units=cm)",
       1000,-200,200, 1000,-200,200 },
       "hitX","hitY"
       );
   auto numHitsVsThrownP = dfFinal.Histo2D(
-      { "numHitsVsThrownP","number of "+xRICH+" hits vs. thrown momentum", 
+      { "numHitsVsThrownP","number of "+TString(wr.xRICH)+" hits vs. thrown momentum", 
       65,0,65, 100,0,400 },
       "thrownP","numHits"
       ); // TODO: cut opticalphotons (may not be needed, double check PID)
@@ -119,7 +107,7 @@ int main(int argc, char** argv) {
   TCanvas *canv;
   canv = CreateCanvas("hits",0,0,1);
   hitPositionHist->Draw("colz");
-  if(zDirection>0) {
+  if(wr.zDirection>0) {
     hitPositionHist->GetXaxis()->SetRangeUser(100,300);
     hitPositionHist->GetYaxis()->SetRangeUser(-100,100);
   } else {

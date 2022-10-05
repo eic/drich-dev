@@ -19,6 +19,9 @@
 // DD4Hep
 #include "DD4hep/Detector.h"
 
+// local
+#include "WhichRICH.h"
+
 using namespace ROOT;
 using namespace dd4hep;
 
@@ -35,38 +38,10 @@ int main(int argc, char** argv) {
     fmt::print("                              default: {}\n",infileN);
     return 2;
   }
-  TString zDirectionStr = TString(argv[1]);
-  if(argc>2) infileN    = TString(argv[2]);
-
-  // detector-specific settings
-  int zDirection;
-  std::string xRICH,XRICH;
-  std::string sensorNamePattern;
-  Double_t plotXmin, plotXmax, plotYmin, plotYmax;
-  if(zDirectionStr=="d") {
-    zDirection = 1;
-    xRICH = "dRICH";
-    XRICH = "DRICH";
-    sensorNamePattern = "sensor_de_sec0";
-    plotXmin = 100;
-    plotXmax = 190;
-    plotYmin = -70;
-    plotYmax = 70;
-  } else if(zDirectionStr=="p") {
-    zDirection = -1;
-    xRICH = "pfRICH";
-    XRICH = "PFRICH";
-    sensorNamePattern = "sensor_de";
-    plotXmin = -70;
-    plotXmax = 70;
-    plotYmin = -70;
-    plotYmax = 70;
-  } else {
-    fmt::print(stderr,"ERROR: unknown argument \"{}\"\n",zDirectionStr);
-    return 1;
-  }
-  const std::string readoutName = std::string(XRICH)+"Hits";
-
+  std::string zDirectionStr = argv[1];
+  if(argc>2) infileN = TString(argv[2]);
+  WhichRICH wr(zDirectionStr);
+  if(!wr.valid) return 1;
 
   // settings
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,20 +83,20 @@ int main(int argc, char** argv) {
   std::string compactFile = DETECTOR_PATH + "/" + DETECTOR + ".xml";
 
   // get detector handle and some constants
-  const std::string richName    = XRICH;
+  const std::string richName = wr.XRICH;
   const auto det = &(Detector::getInstance());
   det->fromXML(compactFile);
   const auto detRich  = det->detector(richName);
   const auto posRich  = detRich.placement().position();
-  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(XRICH+"_RECON_cellMask")));
-  const auto nSectors = zDirection>0 ? det->constant<int>(XRICH+"_RECON_nSectors") : 1;
+  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(wr.XRICH+"_RECON_cellMask")));
+  const auto nSectors = wr.zDirection>0 ? det->constant<int>(wr.XRICH+"_RECON_nSectors") : 1;
 
   // cellID decoder
   /* - `decodeCellID(fieldName)` returns a "decoder" for the field with name `fieldName`
    * - this decoder is a function that maps an `RVecUL` of `cellID`s to an
    *   `RVecUL` of correpsonding field element values
    */
-  const auto readoutCoder = det->readout(readoutName).idSpec().decoder();
+  const auto readoutCoder = det->readout(wr.readoutName).idSpec().decoder();
   auto decodeCellID = [&readoutCoder] (std::string fieldName) {
     return [&readoutCoder,&fieldName] (RVecUL cellIDvec) {
       RVecL result;
@@ -154,7 +129,7 @@ int main(int argc, char** argv) {
   std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
-    if(de_name.find(sensorNamePattern)!=std::string::npos) {
+    if(de_name.find(wr.sensorNamePattern)!=std::string::npos) {
       // convert global position to hitmapX and Y
       auto posSensor = posRich + detSensor.placement().position();
       auto hitmapX   = Long64_t(dilation*posSensor.x() + 0.5);
@@ -207,7 +182,7 @@ int main(int argc, char** argv) {
 
   // decode cellID to bit field element values
   auto dfDecoded = dfIn
-      .Alias("cellID", readoutName+".cellID")
+      .Alias("cellID", wr.readoutName+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
       .Define("module", decodeCellID("module"), {"cellID"})
@@ -256,10 +231,10 @@ int main(int argc, char** argv) {
 
 
   // pixel hitmap
-  Double_t pixelXmin = dilation * plotXmin;
-  Double_t pixelXmax = dilation * plotXmax;
-  Double_t pixelYmin = dilation * plotYmin;
-  Double_t pixelYmax = dilation * plotYmax;
+  Double_t pixelXmin = dilation * wr.plotXmin;
+  Double_t pixelXmax = dilation * wr.plotXmax;
+  Double_t pixelYmin = dilation * wr.plotYmin;
+  Double_t pixelYmax = dilation * wr.plotYmax;
   auto pixelHitmap = dfHitmap.Histo3D(
       { "pixelHitmap", "Pixel Hit Map;x;y;sector",
         (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
