@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # run momentum scan test for various particles
 
-require 'pry'
 require 'open3'
 require 'fileutils'
 require 'pycall/import'
