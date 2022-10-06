@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
       bool found=false;
       for(auto elem : readoutCoder->fields())
         if(fieldName == elem.name()) { found = true; break; }
-      if(!found) fmt::print("- skipping missing bit field \"{}\"\n",fieldName);
+      // if(!found) fmt::print("- skipping missing bit field \"{}\"\n",fieldName);
       for(const auto& cellID : cellIDvec) {
         if(found) {
           auto val = readoutCoder->get(cellID,fieldName); // get BitFieldElement value
