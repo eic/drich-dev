@@ -352,9 +352,9 @@ simulate.py -t 1 -s -n 50
 
 - Run the reconstruction via Juggler, or try the stand-alone reader macro:
 ```bash
-recon.sh -j   # to use Juggler (IRTAlgorithm)
-recon.sh -r   # to use standalone reader (irt/scripts/reader*.C)
-recon.sh -h   # for usage guide, such as how to specify input/output files
+recon.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
+recon.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
+recon.sh         # for usage guide, such as how to specify input/output files
 ```
 
 - Run the evaluation code (use `-h` for usage):
