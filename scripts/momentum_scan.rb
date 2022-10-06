@@ -6,11 +6,44 @@ require 'open3'
 require 'fileutils'
 require 'pycall/import'
 
+## args
+if ARGV.length<1
+  $stderr.puts """
+  USAGE: #{$0} [d/p]
+     d: test dRICH
+     p: test pfRICH
+  """
+  exit 2
+end
+
+## detector-specific settings
+## FIXME: :rIndexRef values are averages? 
+case ARGV[0]
+when "d"
+  zDirection = 1
+  xRICH      = "dRICH"
+  xrich      = "drich"
+  radiator_h = {
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], },
+  }
+when "p"
+  zDirection = -1
+  xRICH      = "pfRICH"
+  xrich      = "pfrich"
+  radiator_h = {
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   },
+  }
+else
+  $stderr.puts "ERROR: unknown argument #{ARGV[0]}"
+end
+
 ## settings
 NumEvents      = 50                  # number of events per fixed momentum
 NumPoints      = 10                  # number of momenta to sample
 PoolSize       = 6                   # number of parallel threads to run
-OutputDir      = 'out/momentum_scan' # output directory ( ! will be overwritten ! )
+OutputDir      = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
 RunSimRec      = true                # if false, do not run simulation+reconstruction, only draw the result
 UseRINDEXrange = false               # if true, use range of RINDEX values rather than a single reference value
 
@@ -24,13 +57,6 @@ particle_h = {
   # 'pi-'         => { :mass=>0.13957, },
   # 'kaon-'       => { :mass=>0.49368, },
   # 'anti_proton' => { :mass=>0.93827, },
-}
-
-## radiators
-## FIXME: :rIndexRef values are averages? 
-radiator_h = {
-  :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], },
-  :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], },
 }
 
 ## warn if not doing simulation
@@ -59,6 +85,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         './simulate.py',
         "-t#{rad[:testNum]}",
         '-s',
+        "-d#{zDirection}",
         "-p#{particle}",
         "-n#{NumEvents}",
         "-k#{NumPoints}",
@@ -66,6 +93,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
       ]
       cmds << [
         './recon.sh',
+        "-#{xrich[0]}",
         "-j",
         "-i #{sim_file}",
         "-o #{rec_file}",
@@ -74,7 +102,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
       plot_file = out_file particle, "rec_plots.#{rad_name}.root"
       cmds << [
         'root', '-b', '-q',
-        "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",#{rad[:id]})"
+        "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
       ]
     end
     # spawn thread

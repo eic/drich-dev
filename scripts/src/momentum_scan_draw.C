@@ -18,6 +18,7 @@ enum rad_enum {kAgl=0, kGas=1};
 void momentum_scan_draw(
     std::string rec_file_name  = "out/rec.root",
     std::string out_file_name  = "out/rec.scan_plots.root",
+    std::string det_name       = "DRICH", // or PFRICH
     unsigned    which_radiator = 0 // see `rad_enum` above
     )
 {
@@ -100,8 +101,8 @@ void momentum_scan_draw(
 
     // get collections
     const auto& mcParts = store.get<edm4hep::MCParticleCollection>("MCParticles");
-    const auto& hits    = store.get<edm4hep::SimTrackerHitCollection>("DRICHHits");
-    const auto& cpids   = store.get<edm4eic::CherenkovParticleIDCollection>("DRICHPID");
+    const auto& hits    = store.get<edm4hep::SimTrackerHitCollection>(det_name+"Hits");
+    const auto& cpids   = store.get<edm4eic::CherenkovParticleIDCollection>(det_name+"PID");
 
     // thrown momentum
     int nthrown = 0;
