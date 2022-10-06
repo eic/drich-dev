@@ -2,6 +2,7 @@
 // settings specific to each RICH
 
 #include <string>
+#include <fmt/format.h>
 
 class WhichRICH {
   public:
@@ -9,7 +10,7 @@ class WhichRICH {
     // detector-specific settings
     bool valid;
     int zDirection;
-    std::string xRICH,XRICH;
+    std::string xrich,xRICH,XRICH;
     std::string sensorNamePattern;
     double plotXmin, plotXmax, plotYmin, plotYmax;
     std::string readoutName;
@@ -19,6 +20,7 @@ class WhichRICH {
       if(spec=="d") {
         valid = true;
         zDirection = 1;
+        xrich = "drich";
         xRICH = "dRICH";
         XRICH = "DRICH";
         sensorNamePattern = "sensor_de_sec0";
@@ -29,6 +31,7 @@ class WhichRICH {
       } else if(spec=="p") {
         valid = true;
         zDirection = -1;
+        xrich = "pfrich";
         xRICH = "pfRICH";
         XRICH = "PFRICH";
         sensorNamePattern = "sensor_de";

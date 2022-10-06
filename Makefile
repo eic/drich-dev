@@ -17,26 +17,38 @@ DEPS += -I/usr/local/include
 LIBS += -L${EIC_SHELL_PREFIX}/lib
 LIBS += -lIRT
 DEPS += -I${EIC_SHELL_PREFIX}/include/IRT
+DEPS += -Isrc
 
 #--------------------------------------------
 
-INSTALL_PREFIX = bin
-EXECUTABLES := $(addprefix $(INSTALL_PREFIX)/, $(basename $(notdir $(wildcard src/*.cpp))))
+LIB_TARGET = lib
+IRTGEO_LIB_NAME = IrtGeo
+IRTGEO_LIB = $(LIB_TARGET)/lib$(IRTGEO_LIB_NAME).so
+
+BIN_TARGET = bin
+EXECUTABLES := $(addprefix $(BIN_TARGET)/, $(basename $(notdir $(wildcard src/*.cpp))))
+
+IRTGEO_SOURCES := $(wildcard src/irtgeo/*.cc)
+IRTGEO_HEADERS := $(wildcard src/irtgeo/*.h)
 
 #--------------------------------------------
 
-all: $(EXECUTABLES)
+all: $(IRTGEO_LIB) $(EXECUTABLES)
+
+$(IRTGEO_LIB): $(IRTGEO_HEADERS) $(IRTGEO_SOURCES)
+	mkdir -p $(LIB_TARGET)
+	@echo "----- build $@ -----"
+	$(CXX) $(IRTGEO_SOURCES) -shared -o $@ $(FLAGS) $(DEPS) $(LIBS)
+
+$(BIN_TARGET)/%: src/%.cpp $(IRTGEO_LIB)
+	mkdir -p $(BIN_TARGET)
+	@echo "----- build $@.o -----"
+	$(CXX) -c $< -o $@.o $(FLAGS) $(DEPS)
+	@echo "--- make executable $@"
+	$(CXX) -o $@ $@.o $(LIBS) -L$(LIB_TARGET) -l$(IRTGEO_LIB_NAME)
+	$(RM) $@.o
 
 clean:
 	@echo "CLEAN ======================================================"
-	$(RM) $(EXECUTABLES)
+	$(RM) $(EXECUTABLES) $(IRTGEO_LIB)
 
-#--------------------------------------------
-
-$(INSTALL_PREFIX)/%: src/%.cpp
-	mkdir -p $(INSTALL_PREFIX)
-	@echo "----- build $@.o -----"
-	$(CXX) -c $^ -o $@.o $(FLAGS) $(DEPS)
-	@echo "--- make executable $@"
-	$(CXX) -o $@ $@.o $(LIBS)
-	$(RM) $@.o

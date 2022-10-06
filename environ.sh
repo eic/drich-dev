@@ -44,7 +44,7 @@ export PS1="drich${PS1_SIGIL}>${PS1#*>}"
 unset branch
 
 # prioritize local build targets
-export LD_LIBRARY_PATH=$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH # redundant, if sourced `$EIC_SHELL_PREFIX/setup.sh`
+export LD_LIBRARY_PATH=$DRICH_DEV/lib:$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
 
 # use local rbenv ruby shims, if installed
