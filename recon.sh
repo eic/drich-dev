@@ -1,5 +1,13 @@
 #!/bin/bash
 
+### FIXME: implement as an option
+eicrecon \
+  -Pplugins=irtgeo,irt,RICH \
+  -Ppodio:output_include_collections=IRT \
+  out/sim.root
+exit $?
+#################################
+
 # default settings
 which_rich=""
 method=""

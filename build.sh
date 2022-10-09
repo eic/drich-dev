@@ -21,8 +21,9 @@ if [ $# -eq 0 ]; then
 
   - [OPTIONS] will be passed to cmake
     - pass no OPTIONS to use the defaults set in $0
-    - if the first OPTION is \"clean\", the build and install
-      directories will be cleaned
+    - if the first OPTION is:
+      - \"clean\": the build and install directories will be cleaned
+      - \"fast\": skip buildsystem generation
   """
   exit 2
 fi
@@ -35,18 +36,20 @@ fi
 
 # determine if clean build, and set extraOpts
 clean=0
+fast=0
 extraOpts=""
 if [ $# -ge 1 ]; then
-  if [ "$1" == "clean" ]; then
-    clean=1
-    shift
-  fi
+  case $1 in
+    clean) clean=1; shift; ;;
+    fast)  fast=1;  shift; ;;
+  esac
   extraOpts=$*
 fi
 echo """
 BUILDING:
 module    = $module
 clean     = $clean
+fast      = $fast 
 extraOpts = $extraOpts
 """
 
@@ -68,6 +71,10 @@ case $module in
     genOpt EVALUATION=OFF
     ;;
   epic)
+    ;;
+  EICrecon)
+    prefix=$module/install # FIXME: delete this line when ready
+    genOpt CMAKE_FIND_DEBUG_MODE=OFF
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
@@ -149,13 +156,22 @@ fi
 
 ########################################
 # run cmake
-$cmakeGen
+[ $fast -eq 0 ] && $cmakeGen
 $cmakeBuild
 $cmakeInstall
 
 ########################################
 # post-cmake tasks
+function warn_env {
+  printf "\nIf this is your first time installing module '$module' to prefix\n  '$prefix'\nsource environ.sh again\n\n"
+}
 case $module in
+  epic)
+    warn_env
+    ;;
+  EICrecon)
+    warn_env
+    ;;
   athena)
     # make legacy prefix compatible with EPIC expectations
     printf "\ncompatibility updates for built targets...\n"

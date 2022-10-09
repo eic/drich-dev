@@ -15,7 +15,7 @@ echo "detected $BUILD_NPROC cpus"
 
 # cmake packages
 export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-export EICD_ROOT=$EIC_SHELL_PREFIX # overrides container version with local version
+export EDM4EIC_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
 
 # # source environment from reconstruction_benchmarks
 # if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
@@ -33,6 +33,9 @@ source /opt/detector/setup.sh
 # - overrides upstream `$DETECTOR*` vars
 # - prioritizes `$EIC_SHELL_PREFIX/lib` in `$LD_LIBRARY_PATH`
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
+
+# source EICrecon installation
+[ -f $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh ] && source $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh
 
 # environment overrides:
 # - prefer local juggler build
@@ -85,7 +88,6 @@ Detector:
 
 Packages:
   IRT_ROOT  = $IRT_ROOT
-  EICD_ROOT = $EICD_ROOT
 
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
