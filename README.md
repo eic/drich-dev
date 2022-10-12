@@ -37,8 +37,6 @@ of branches for varying configurations.
   this is temporarily supported for helping test reconstruction algorithms
 - See [doc/athena-branches.md](doc/athena-branches.md) for information about the
   development branches and pull requests that were used for the ATHENA proposal
-- It is possible that the pfRICH scripts no longer work, since we now focus on
-  the dRICH
 
 ---
 
