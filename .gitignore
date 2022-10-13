@@ -5,6 +5,7 @@
 *.exe
 
 bin
+lib
 macro
 !macro/.keep
 out

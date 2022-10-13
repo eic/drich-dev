@@ -52,6 +52,7 @@ class VariatorBase
       ### draw the hits
       [[
         'bin/draw_hits',
+        "d",
         settings[:output]
       ]],
       ### enable optics-debugging mode: all components become vacuum, except for mirrors

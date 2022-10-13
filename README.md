@@ -37,8 +37,6 @@ of branches for varying configurations.
   this is temporarily supported for helping test reconstruction algorithms
 - See [doc/athena-branches.md](doc/athena-branches.md) for information about the
   development branches and pull requests that were used for the ATHENA proposal
-- It is possible that the pfRICH scripts no longer work, since we now focus on
-  the dRICH
 
 ---
 
@@ -307,12 +305,9 @@ corresponding executables and install them to `bin/`
   - reads simulation output and draws raw hit positions and number of hits vs.
     momentum
   - build with `make`, execute as `bin/draw_hits [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 - `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
-  - build with `make`, execute with `bin/draw_segmentation [simulation_output_file]`
-  - specific for dRICH; for pfRICH version, see `deprecated/pfrich/`
 
 ## Automated Parameter Variation
 - use `scripts/vary_params.rb` to run simulation jobs while varying dRICH compact file parameters
@@ -355,9 +350,9 @@ simulate.py -t 1 -s -n 50
 
 - Run the reconstruction via Juggler, or try the stand-alone reader macro:
 ```bash
-recon.sh -j   # to use Juggler (IRTAlgorithm)
-recon.sh -r   # to use standalone reader (irt/scripts/reader*.C)
-recon.sh -h   # for usage guide, such as how to specify input/output files
+recon.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
+recon.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
+recon.sh         # for usage guide, such as how to specify input/output files
 ```
 
 - Run the evaluation code (use `-h` for usage):

@@ -6,6 +6,7 @@
 # -----------------------------------------------#
 
 import sys, getopt, os, re, importlib
+import pprint
 import subprocess, shlex
 import math
 from numpy import linspace
@@ -13,7 +14,10 @@ from numpy import linspace
 # SETTINGS
 ################################################################
 use_npdet_info = False  # use np_det_info to get envelope dimensions
-restrict_sector = True  # for tests with phi-dependence, restrict to 1 sector
+restrict_sector = {     # for tests with phi-dependence, restrict to 1 sector
+        "dRICH": True,
+        "pfRICH": False,
+        }
 rMinBuffer = 5  # acceptance test rMin = vessel rMin + rMinBuffer [cm]
 rMaxBuffer = 5  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
@@ -64,8 +68,8 @@ helpStr = f'''
 [OPTIONAL ARGUMENTS]
 
     OPTIONS:    -d: direction to throw particles (may not be used by all tests)
-                    1 = toward positive (hadron) endcap RICH (default)
-                   -1 = toward negative (electron) endcap RICH
+                    1 = toward dRICH (default)
+                   -1 = toward pfRICH
                 -s: enable standalone RICH-only simulation (default is full detector)
                 -c [compact file]: specify a custom compact file
                    (this will override -d and -s options)
@@ -261,27 +265,37 @@ if use_npdet_info:
     for paramLine in open(paramListFileN, 'r'):
         print(paramLine)
         paramLineKV = paramLine.strip().split('=')
-        if (len(paramLineKV) == 2): params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+        if (len(paramLineKV) == 2): 
+            try:
+                params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
+            except ValueError:
+                pass # ignore string constants
 else:
     ### hard-coded values (faster and reliable, but maybe out of date)
-    params['DRICH_rmin1']  = 15.332
-    params['DRICH_rmax2']  = 180.0
-    params['DRICH_zmin']   = 195.0
-    params['DRICH_Length'] = 120.0
-    params['PFRICH_rmin1'] = 10 ## FIXME: pfRICH is not used, these numbers are a complete guess
-    params['PFRICH_rmax']  = 80
-    params['PFRICH_zmax']  = 100
+    # dRICH:
+    params['DRICH_rmin1'] = 15.332
+    params['DRICH_rmax2'] = 180.0
+    params['DRICH_zmin']  = 195.0
+    params['DRICH_zmax']  = 315.0
+    # pfRICH
+    params['PFRICH_rmin1'] = 5.945
+    params['PFRICH_rmax']  = 63.0
+    params['PFRICH_zmin']  = -118.6
+    params['PFRICH_proximity_gap'] = 30.0
+    params['PFRICH_aerogel_thickness'] = 3.0
 
 ### set envelope limits
 if (zDirection < 0):
     rMin = params['PFRICH_rmin1'] + rMinBuffer
     rMax = params['PFRICH_rmax'] - rMaxBuffer
-    zMax = params['PFRICH_zmax'] * -1 - 20  # must be positive; subtract 20 since sensors are not at `zmax`
-    # TODO: use instead `params['PFRICH_sensor_dist']` `when https://eicweb.phy.anl.gov/EIC/detectors/athena/-/merge_requests/290` is merged
+    zMax = -1*params['PFRICH_zmin'] + params['PFRICH_aerogel_thickness'] + params['PFRICH_proximity_gap']  # must be positive
 else:
     rMin = params['DRICH_rmin1'] + rMinBuffer
     rMax = params['DRICH_rmax2'] - rMaxBuffer
-    zMax = params['DRICH_zmin'] + params['DRICH_Length']
+    zMax = params['DRICH_zmax']
+print('** constants from DD4hep **')
+pprint.pprint(params)
+print(sep)
 print('** acceptance limits **')
 print(f'rMin = {rMin} cm')
 print(f'rMax = {rMax} cm')
@@ -351,7 +365,7 @@ elif testNum == 5:
     print(f'SET theta range to {math.degrees(thetaMin)} to {math.degrees(thetaMax)} deg')
     for theta in list(linspace(thetaMin, thetaMax, numTheta)):
         for phi in list(linspace(0, 2 * math.pi, numPhi, endpoint=False)):
-            if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
+            if restrict_sector[xRICH] and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
             if (abs(phi) > 0.001 and abs(theta - thetaMin) < 0.001): continue  # allow only one ring at thetaMin
             x = math.sin(theta) * math.cos(phi)
             y = math.sin(theta) * math.sin(phi)
@@ -431,19 +445,15 @@ elif testNum == 13:
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
 
     from scripts import createAngles
-    theta_min = thetaMin # minimum polar angle
-    theta_max = thetaMax # maximum polar angle
-    # theta_min = math.radians(3.8) # default, maybe outdated values (use if `npdet_info` fails)
-    # theta_max = math.radians(32.0)
     num_rings = 120 if numTestSamples==0 else numTestSamples  # number of concentric rings, type=int
     hit_density = 80  # amount of photon hits for the smallest polar angle, type=int
-    angles = createAngles.makeAngles(theta_min, theta_max, num_rings, hit_density)  # list of angles
+    angles = createAngles.makeAngles(thetaMin, thetaMax, num_rings, hit_density)  # list of angles
 
-    print(f'SET theta range to {math.degrees(theta_min)} to {math.degrees(theta_max)} deg')
+    print(f'SET theta range to {math.degrees(thetaMin)} to {math.degrees(thetaMax)} deg')
     for angle in angles:
         theta, phi = angle[0], angle[1]
-        if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
-        if abs(phi) > 0.001 and abs(theta - theta_min) < 0.001: continue  # allow only one ring at thetaMin
+        if restrict_sector[xRICH] and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
+        if abs(phi) > 0.001 and abs(theta - thetaMin) < 0.001: continue  # allow only one ring at thetaMin
         x = math.sin(theta) * math.cos(phi)
         y = math.sin(theta) * math.sin(phi)
         z = math.cos(theta) * zDirection

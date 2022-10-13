@@ -22,15 +22,31 @@
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
 
+// local
+#include "WhichRICH.h"
+
 using std::cout;
 using std::cerr;
 using std::endl;
 
 int main(int argc, char** argv) {
 
-  // open simulation output file (from simulate.py / npsim / ddsim)
+  // args, figure out which RICH you are reading
   TString infileN="out/sim.root";
-  if(argc>1) infileN = TString(argv[1]);
+  if(argc<=1) {
+    fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
+    fmt::print("    [d/p]: d for dRICH\n");
+    fmt::print("           p for pfRICH\n");
+    fmt::print("    [simulation_output_file]: output from `npsim` (`simulate.py`)\n");
+    fmt::print("                              default: {}\n",infileN);
+    return 2;
+  }
+  std::string zDirectionStr = argv[1];
+  if(argc>2) infileN = TString(argv[2]);
+  WhichRICH wr(zDirectionStr);
+  if(!wr.valid) return 1;
+
+  // open simulation output file (from simulate.py / npsim / ddsim)
   podio::EventStore store;
   podio::ROOTReader reader;
   reader.openFile(infileN.Data());
@@ -43,14 +59,14 @@ int main(int argc, char** argv) {
   for(unsigned e=0; e<reader.getEntries(); e++) {
     cout << "\n\n\n==== EVENT " << e << " =====================================" << endl;
 
-    // get the dRICH hits
-    auto& hits = store.get<edm4hep::SimTrackerHitCollection>("DRICHHits");
+    // get the RICH hits
+    auto& hits = store.get<edm4hep::SimTrackerHitCollection>(wr.XRICH+"Hits");
     if(!hits.isValid()) continue;
-    // cout << "\nDRICHHits:\n" << hits << endl; // print them
+    // cout << "\nHits:\n" << hits << endl; // print them
 
-    // dRICH hits loop
+    // RICH hits loop
     for(const auto& hit : hits) {
-      cout << "  drich hit position = (" << hit.x() << ", " << hit.y() << ", " << hit.z() << ")" << endl;
+      cout << "  rich hit position = (" << hit.x() << ", " << hit.y() << ", " << hit.z() << ")" << endl;
       true_tracks.insert(hit.getMCParticle()); // OneToOneRelation: get the true MCParticle associated with this hit
     }
 
