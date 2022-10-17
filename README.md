@@ -241,7 +241,7 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
       - see comments within the code for documentation
 
 ## Viewing the Geometry and Parameter Values
-- run `./run_dd_web_display.sh` to produce the `TGeo` geometry ROOT file
+- run `./geometry.sh` to produce the `TGeo` geometry ROOT file
   - follow the usage guide to specify whether to draw the full EPIC
     detector, or just the dRICH
   - output ROOT file will be in `geo/`, by default
