@@ -37,7 +37,7 @@ class VariatorBase
       ]],
       ### draw geometry
       [[
-        './run_dd_web_display.sh',
+        './geometry.sh',
         "-c #{settings[:compact_detector]}", 
         "-o #{settings[:output].sub(/root$/,'geometry.root')}",
       ]],
