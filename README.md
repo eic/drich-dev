@@ -275,6 +275,7 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
   - the search pattern is case sensitive
   - this script is just a wrapper for `npdet_info`, run `npdet_info -h` for
     further guidance
+- use `dawn.sh` to generate a PNG file showing a cross section of all detectors
 
 ## GDML Output
 - currently we use the CI for this, from the `epic` repository
