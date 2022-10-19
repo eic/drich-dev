@@ -35,6 +35,10 @@ source /opt/detector/setup.sh
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
 # source EICrecon installation
+#
+# FIXME: update prefix
+#
+#
 [ -f $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh ] && source $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh
 
 # environment overrides:

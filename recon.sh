@@ -1,13 +1,5 @@
 #!/bin/bash
 
-### FIXME: implement as an option
-eicrecon \
-  -Pplugins=irtgeo,irt,RICH \
-  -Ppodio:output_include_collections=IRT \
-  out/sim.root
-exit $?
-#################################
-
 # default settings
 which_rich=""
 method=""
@@ -35,6 +27,7 @@ USAGE:
     -p  use pfRICH data for reconstruction
 
   RECONSTRUCTION METHODS: (one required)
+    -e  run reconstruction through EICrecon
     -j  run reconstruction through juggler
     -r  run reconstruction with stand-alone IRT reader.C macro
 
@@ -67,11 +60,12 @@ USAGE:
 if [ $# -lt 2 ]; then usage; fi
 
 # parse options
-while getopts "hdpjri:o:x:c:ft" opt; do
+while getopts "hdpejri:o:x:c:ft" opt; do
   case $opt in
     h|\?) usage             ;;
     d) which_rich="drich"   ;;
     p) which_rich="pfrich"  ;;
+    e) method="EICrecon"    ;;
     j) method="juggler"     ;;
     r) method="reader"      ;;
     i) sim_file=$OPTARG     ;;
@@ -105,6 +99,21 @@ use_full     = $use_full
 
 # run reconstruction
 case $method in
+  EICrecon)
+    cmd="""
+    eicrecon
+      -Pplugins=irtgeo,irt,RICH
+      -Ppodio:output_include_collections=IRT
+      -Ppodio:output_file=$rec_file
+      $sim_file
+    """
+    if [ $dry_run -eq 0 ]; then
+      $cmd
+      printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
+    else
+      printf "EICRECON COMMAND:\n$cmd\n"
+    fi
+    ;;
   juggler)
     export JUGGLER_SIM_FILE=$sim_file
     export JUGGLER_REC_FILE=$rec_file
