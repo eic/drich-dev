@@ -73,6 +73,7 @@ case $module in
   epic)
     ;;
   EICrecon)
+    genOpts+="-LAH " # dump variables
     prefix=$module/install # FIXME: delete this line when ready
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
     ;;
