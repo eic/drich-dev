@@ -102,8 +102,8 @@ case $method in
   EICrecon)
     cmd="""
     eicrecon
-      -Pplugins=irtgeo,irt,RICH
-      -Ppodio:output_include_collections=IRT
+      -Pplugins=irt,RICH
+      -Ppodio:output_include_collections=IrtParticleID
       -Ppodio:output_file=$rec_file
       $sim_file
     """
