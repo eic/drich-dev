@@ -3,6 +3,11 @@
 
 set -e
 
+### choose compiler ##################
+# export CC=gcc; export CXX=g++;
+export CC=clang; export CXX=clang++;
+######################################
+
 # check environment
 if [ -z "$DRICH_DEV" ]; then echo "ERROR: source environ.sh"; exit 1; fi
 if [ -z "$BUILD_NPROC" ]; then export BUILD_NPROC=1; fi
@@ -43,6 +48,7 @@ BUILDING:
 module    = $module
 clean     = $clean
 extraOpts = $extraOpts
+compiler  = CC=$CC, CXX=$CXX
 """
 
 ########################################
