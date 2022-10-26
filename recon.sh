@@ -100,13 +100,23 @@ use_full     = $use_full
 # run reconstruction
 case $method in
   EICrecon)
+    # EICrecon geometry services use $DETECTOR_PATH and $DETECTOR_CONFIG;
+    # $DETECTOR_PATH is already set, here we extract $DETECTOR_CONFIG from $compact_file
+    export DETECTOR_CONFIG=$(basename $compact_file .xml)
+    echo """
+    DETECTOR_PATH   = $DETECTOR_PATH  
+    DETECTOR_CONFIG = $DETECTOR_CONFIG
+    """
+    # build `eicrecon` command
     cmd="""
     eicrecon
       -Pplugins=irt,RICH
-      -Ppodio:output_include_collections=IrtParticleID
+      -Ppodio:output_include_collections=IrtHypothesis
+      -Pirt:LogLevel=debug
       -Ppodio:output_file=$rec_file
       $sim_file
     """
+    # run `eicrecon`
     if [ $dry_run -eq 0 ]; then
       $cmd
       printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
