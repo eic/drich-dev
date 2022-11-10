@@ -3,9 +3,9 @@
 
 set -e
 
-### choose compiler ##################
+### custom compiler ##################
 # export CC=gcc; export CXX=g++;
-export CC=clang; export CXX=clang++;
+# export CC=clang; export CXX=clang++;
 ######################################
 
 # check environment
@@ -48,7 +48,6 @@ BUILDING:
 module    = $module
 clean     = $clean
 extraOpts = $extraOpts
-compiler  = CC=$CC, CXX=$CXX
 """
 
 ########################################
