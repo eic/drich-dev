@@ -107,16 +107,33 @@ case $method in
     DETECTOR_PATH   = $DETECTOR_PATH  
     DETECTOR_CONFIG = $DETECTOR_CONFIG
     """
-    # build `eicrecon` command
+    # build `eicrecon` command #####################
+    ### full reconstruction
+    # cmd="""
+    # run_eicrecon_reco_flags.py
+    #   $sim_file
+    #   $(basename $rec_file .root)
+    #   -Peicrecon:LogLevel=debug
+    #   """
+    ### IrtGeo testing
+    # cmd="""
+    # eicrecon
+    #   -Pplugins=irt,RICH
+    #   -Ppodio:output_include_collections=IrtHypothesis
+    #   -Pirt:LogLevel=debug
+    #   -Ppodio:output_file=$rec_file
+    #   $sim_file
+    #   """
+    ### dRICH digitization
     cmd="""
     eicrecon
-      -Pplugins=irt,RICH
-      -Ppodio:output_include_collections=IrtHypothesis
+      -Pplugins=DRICH
+      -Ppodio:output_include_collections=DRICHRawHits
       -Pirt:LogLevel=debug
       -Ppodio:output_file=$rec_file
       $sim_file
-    """
-    # run `eicrecon`
+      """
+    # run `eicrecon` #####################
     if [ $dry_run -eq 0 ]; then
       $cmd
       printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
@@ -124,28 +141,33 @@ case $method in
       printf "EICRECON COMMAND:\n$cmd\n"
     fi
     ;;
+
   juggler)
     export JUGGLER_SIM_FILE=$sim_file
     export JUGGLER_REC_FILE=$rec_file
     export JUGGLER_IRT_AUXFILE=$aux_file
     export JUGGLER_COMPACT_FILE=$compact_file
     options_file=juggler/JugPID/tests/options/${which_rich}.py
+    # options_file=/opt/benchmarks/physics_benchmarks/options/reconstruction.py # use this for FULL reconstruction
     echo "RUN JUGGLER with options file $options_file"
     if [ $dry_run -eq 0 ]; then
       gaudirun.py $options_file
       printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
     fi
     ;;
+
   reader)
     echo "RUN STANDALONE reader macro"
     if [ $dry_run -eq 0 ]; then
       root -b -q irt/scripts/reader.C'("'$sim_file'","'$aux_file'")'
     fi
     ;;
+
   *)
     echo "ERROR: unspecified reconstruction method" >&2
     usage
     ;;
+
 esac
 
 [ $dry_run -eq 1 ] && echo "DRY RUN complete, remove '-t' to run for real"

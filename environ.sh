@@ -35,11 +35,7 @@ source /opt/detector/setup.sh
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
 # source EICrecon installation
-#
-# FIXME: update prefix
-#
-#
-[ -f $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh ] && source $DRICH_DEV/EICrecon/install/bin/eicrecon-this.sh
+[ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ] && source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
 
 # environment overrides:
 # - prefer local juggler build
@@ -53,6 +49,7 @@ unset branch
 # prioritize local build targets
 export LD_LIBRARY_PATH=$DRICH_DEV/lib:$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
+export PATH=$EIC_SHELL_PREFIX/bin:$PATH
 
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$DRICH_DEV/.rbenv
