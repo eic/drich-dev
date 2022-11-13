@@ -130,6 +130,7 @@ case $method in
       -Pplugins=DRICH
       -Ppodio:output_include_collections=DRICHRawHits
       -Peicrecon:LogLevel=info
+      -PDRICH:DRICHRawHits:LogLevel=trace
       -Pirt:LogLevel=trace
       -Ppodio:output_file=$rec_file
       $sim_file
