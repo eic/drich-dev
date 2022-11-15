@@ -128,9 +128,9 @@ case $method in
     cmd="""
     eicrecon
       -Pplugins=DRICH
-      -Ppodio:output_include_collections=DRICHRawHits
+      -Ppodio:output_include_collections=DRICHHits,DRICHRawHits
       -Peicrecon:LogLevel=info
-      -PDRICH:DRICHRawHits:LogLevel=trace
+      -PDRICH:DRICHRawHits:LogLevel=debug
       -Pirt:LogLevel=trace
       -Ppodio:output_file=$rec_file
       $sim_file
