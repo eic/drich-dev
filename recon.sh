@@ -77,6 +77,12 @@ while getopts "hdpejri:o:x:c:ft" opt; do
   esac
 done
 
+# use full compact file, if running EICrecon
+if [ "$method" == "EICrecon" ]; then
+  echo "Using full geometry compact file, since running EICrecon"
+  use_full=1
+fi
+
 # set default rich-dependent settings, if unspecified
 if [ -z "$which_rich" ]; then
   echo "ERROR: specify [DETECTOR]"
@@ -109,32 +115,26 @@ case $method in
     """
     # build `eicrecon` command #####################
     ### full reconstruction
-    # cmd="""
-    # run_eicrecon_reco_flags.py
-    #   $sim_file
-    #   $(basename $rec_file .root)
-    #   -Peicrecon:LogLevel=debug
-    #   """
-    ### IrtGeo testing
+    cmd="""
+    run_eicrecon_reco_flags.py
+      $sim_file
+      $(basename $rec_file .root)
+      -Peicrecon:LogLevel=info
+      -PDRICH:DRICHRawHits:LogLevel=debug
+      """
+    ### dRICH digitization
     # cmd="""
     # eicrecon
-    #   -Pplugins=irt,RICH
-    #   -Ppodio:output_include_collections=IrtHypothesis
-    #   -Pirt:LogLevel=debug
+    #   -Pplugins=DRICH
+    #   -Ppodio:output_include_collections=DRICHHits,DRICHRawHits
+    #   -Peicrecon:LogLevel=info
+    #   -PDRICH:DRICHRawHits:LogLevel=trace
+    #   -PDRICH:DRICHRawHits:seed=1
+    #   -PDRICH:DRICHRawHits:safetyFactor=0.7
+    #   -Pirt:LogLevel=trace
     #   -Ppodio:output_file=$rec_file
     #   $sim_file
     #   """
-    ### dRICH digitization
-    cmd="""
-    eicrecon
-      -Pplugins=DRICH
-      -Ppodio:output_include_collections=DRICHHits,DRICHRawHits
-      -Peicrecon:LogLevel=info
-      -PDRICH:DRICHRawHits:LogLevel=debug
-      -Pirt:LogLevel=trace
-      -Ppodio:output_file=$rec_file
-      $sim_file
-      """
     # run `eicrecon` #####################
     if [ $dry_run -eq 0 ]; then
       $cmd
