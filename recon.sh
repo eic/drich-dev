@@ -109,6 +109,7 @@ case $method in
     # EICrecon geometry services use $DETECTOR_PATH and $DETECTOR_CONFIG;
     # $DETECTOR_PATH is already set, here we extract $DETECTOR_CONFIG from $compact_file
     export DETECTOR_CONFIG=$(basename $compact_file .xml)
+    rec_file_base=$(echo $rec_file | sed 's;\.root$;;')
     echo """
     DETECTOR_PATH   = $DETECTOR_PATH  
     DETECTOR_CONFIG = $DETECTOR_CONFIG
@@ -118,7 +119,7 @@ case $method in
     cmd="""
     run_eicrecon_reco_flags.py
       $sim_file
-      $(basename $rec_file .root)
+      $rec_file_base
       -Peicrecon:LogLevel=info
       -PDRICH:DRICHRawHits:LogLevel=debug
       """
@@ -138,6 +139,7 @@ case $method in
     # run `eicrecon` #####################
     if [ $dry_run -eq 0 ]; then
       $cmd
+      if [[ "$cmd" =~ "run_eicrecon_reco_flags" ]]; then mv -v $rec_file_base.tree.edm4eic.root $rec_file; fi
       printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
     else
       printf "EICRECON COMMAND:\n$cmd\n"
