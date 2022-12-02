@@ -122,6 +122,8 @@ case $method in
       $rec_file_base
       -Peicrecon:LogLevel=info
       -PDRICH:DRICHRawHits:LogLevel=debug
+      -PDRICH:DRICHTracks:LogLevel=debug
+      -Pirt:LogLevel=trace
       """
     ### dRICH digitization
     # cmd="""

@@ -5,4 +5,5 @@ set -e
 ./build.sh EDM4eic  $*
 ./build.sh irt      $*
 ./build.sh epic     $*
+source environ.sh
 ./build.sh EICrecon $*

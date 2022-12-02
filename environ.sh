@@ -35,7 +35,11 @@ source /opt/detector/setup.sh
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
 # source EICrecon installation
-[ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ] && source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
+if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
+  source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
+  export PATH="$PATH:/usr/local/bin" ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+fi
+
 
 # environment overrides:
 # - prefer local juggler build
