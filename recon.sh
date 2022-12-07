@@ -116,14 +116,18 @@ case $method in
     """
     # build `eicrecon` command #####################
     ### full reconstruction
+    collections="DRICHHits"
+    collections+=",DRICHRawHits"
+    collections+=",DRICHTracks"
     cmd="""
     run_eicrecon_reco_flags.py
       $sim_file
       $rec_file_base
+      -Ppodio:output_include_collections=$collections
       -Peicrecon:LogLevel=info
+      -Prich:LogLevel=debug
       -PDRICH:DRICHRawHits:LogLevel=debug
       -PDRICH:DRICHTracks:LogLevel=debug
-      -Pirt:LogLevel=trace
       """
     ### dRICH digitization
     # cmd="""
@@ -134,7 +138,7 @@ case $method in
     #   -PDRICH:DRICHRawHits:LogLevel=trace
     #   -PDRICH:DRICHRawHits:seed=1
     #   -PDRICH:DRICHRawHits:safetyFactor=0.7
-    #   -Pirt:LogLevel=trace
+    #   -Prich:LogLevel=trace
     #   -Ppodio:output_file=$rec_file
     #   $sim_file
     #   """
