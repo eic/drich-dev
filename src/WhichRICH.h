@@ -14,6 +14,7 @@ class WhichRICH {
     std::string sensorNamePattern;
     double plotXmin, plotXmax, plotYmin, plotYmax;
     std::string readoutName;
+    std::string rawHitsName;
 
     // constructor
     WhichRICH(std::string spec) {
@@ -44,6 +45,7 @@ class WhichRICH {
         fmt::print(stderr,"ERROR(WhichRICH): unknown argument \"{}\"\n",spec);
       }
       readoutName = XRICH+"Hits";
+      rawHitsName = XRICH+"RawHits";
     }
 
     ~WhichRICH() {}
