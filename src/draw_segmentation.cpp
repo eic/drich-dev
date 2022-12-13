@@ -14,6 +14,7 @@
 #include "TApplication.h"
 #include "TBox.h"
 #include "ROOT/RDataFrame.hxx"
+#include "ROOT/RDF/HistoModels.hxx"
 #include "ROOT/RVec.hxx"
 
 // DD4Hep
@@ -29,17 +30,27 @@ int main(int argc, char** argv) {
 
   // arguments
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  TString infileN="out/sim.root";
-  if(argc<=1) {
-    fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
-    fmt::print("    [d/p]: d for dRICH\n");
-    fmt::print("           p for pfRICH\n");
-    fmt::print("    [simulation_output_file]: output from `npsim` (`simulate.py`)\n");
-    fmt::print("                              default: {}\n",infileN);
+  if(argc<=3) {
+    fmt::print("\nUSAGE: {} [d/p] [s/r] [input_root_file] [event_number (optional)]\n\n",argv[0]);
+    fmt::print("    [d/p]: detector\n");
+    fmt::print("         - d for dRICH\n");
+    fmt::print("         - p for pfRICH\n");
+    fmt::print("\n");
+    fmt::print("    [s/r]: file type:\n");
+    fmt::print("         - s for simulation file (all photons)\n");
+    fmt::print("         - p for reconstructed file (digitized hits)\n");
+    fmt::print("\n");
+    fmt::print("    [input_root_file]: output from simulation or reconstruction\n");
+    fmt::print("\n");
+    fmt::print("    [event_number]: if specified, draw a single event\n");
+    fmt::print("                    otherwise the sum of all events is drawn\n");
+    fmt::print("\n");
     return 2;
   }
   std::string zDirectionStr = argv[1];
-  if(argc>2) infileN = TString(argv[2]);
+  std::string fileType      = argv[2];
+  TString     infileN       = TString(argv[3]);
+  int         evnumArg      = argc>4 ? std::atoi(argv[4]) : -1;
   WhichRICH wr(zDirectionStr);
   if(!wr.valid) return 1;
 
@@ -56,12 +67,26 @@ int main(int argc, char** argv) {
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
-  const Int_t dilation = 5;
+  const Int_t dilation = 4;
 
   // drawing
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
-  const Bool_t singleCanvas = false; // if true, draw all hitmaps on one canvas
+  const Bool_t singleCanvas = true; // if true, draw all hitmaps on one canvas
+
+  // data collections
+  std::string inputCollection;
+  if(fileType=="s")
+    inputCollection = wr.readoutName;
+  else if(fileType=="r")
+    inputCollection = wr.rawHitsName;
+  else {
+    fmt::print(stderr,"ERROR: unknown file type '{}'\n",fileType);
+    return 1;
+  }
+  fmt::print("Reading collection '{}'\n",inputCollection);
+  if(evnumArg<0) fmt::print("Reading all events\n");
+  else fmt::print("Reading only event number {}\n",evnumArg);
 
 
   // setup
@@ -88,8 +113,8 @@ int main(int argc, char** argv) {
   det->fromXML(compactFile);
   const auto detRich  = det->detector(richName);
   const auto posRich  = detRich.placement().position();
-  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(wr.XRICH+"_RECON_cellMask")));
-  const auto nSectors = wr.zDirection>0 ? det->constant<int>(wr.XRICH+"_RECON_nSectors") : 1;
+  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(wr.XRICH+"_cell_mask")));
+  const auto nSectors = wr.zDirection>0 ? det->constant<int>(wr.XRICH+"_num_sectors") : 1;
 
   // cellID decoder
   /* - `decodeCellID(fieldName)` returns a "decoder" for the field with name `fieldName`
@@ -145,7 +170,9 @@ int main(int argc, char** argv) {
             hitmapX + numPx,
             hitmapY + numPx
             ));
-      boxList.back()->SetLineColor(kGray);
+      boxList.back()->SetLineColor(kGreen-10);
+      boxList.back()->SetFillColor(kGreen-10);
+      boxList.back()->SetFillStyle(1001);
     }
   }
 
@@ -182,7 +209,11 @@ int main(int argc, char** argv) {
 
   // decode cellID to bit field element values
   auto dfDecoded = dfIn
-      .Alias("cellID", wr.readoutName+".cellID")
+      .Range(
+          evnumArg<0 ? 0 : evnumArg,
+          evnumArg<0 ? 0 : evnumArg+1
+          )
+      .Alias("cellID", inputCollection+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
       .Define("module", decodeCellID("module"), {"cellID"})
@@ -235,13 +266,15 @@ int main(int argc, char** argv) {
   Double_t pixelXmax = dilation * wr.plotXmax;
   Double_t pixelYmin = dilation * wr.plotYmin;
   Double_t pixelYmax = dilation * wr.plotYmax;
-  auto pixelHitmap = dfHitmap.Histo3D(
-      { "pixelHitmap", "Pixel Hit Map;x;y;sector",
-        (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
-        (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
-        nSectors,0,double(nSectors) },
-      "pixelX","pixelY","sector"
+  auto pixelHitmapModel = RDF::TH3DModel(
+      "pixelHitmap", "Pixel Hit Map;x;y;sector",
+      (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
+      (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
+      nSectors,0,double(nSectors)
       );
+  auto pixelHitmap = fileType=="r" ? // weight by ADC counts, if reading digitized hits
+    dfHitmap.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector", inputCollection+".integral") :
+    dfHitmap.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector");
 
   // draw
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -278,12 +311,20 @@ int main(int argc, char** argv) {
     if(singleCanvas) c->cd(sec+1); else c = new TCanvas();
     secBin = pixelHitmap->GetZaxis()->FindBin(Double_t(sec));
     pixelHitmap->GetZaxis()->SetRange(secBin,secBin);
+
     pixelHitmapSec[sec] = (TH2D*) pixelHitmap->Project3D("yx");
     pixelHitmapSec[sec]->SetName(Form("pixelHitmap_s%d",sec));
-    pixelHitmapSec[sec]->SetTitle(Form("pixel hits sector %d",sec));
+
+    TString pixelHitmapTitle;
+    if(fileType=="s")      pixelHitmapTitle = "Photon hits";
+    else if(fileType=="r") pixelHitmapTitle = "ADC Counts";
+    pixelHitmapTitle += Form(", sector %d",sec);
+    if(evnumArg<0) pixelHitmapTitle += ", all events";
+    else           pixelHitmapTitle += Form(", event %d",evnumArg);
+
+    pixelHitmapSec[sec]->SetTitle(pixelHitmapTitle);
     pixelHitmapSec[sec]->Draw("colz");
     for(auto box : boxList) {
-      box->SetFillStyle(0);
       box->Draw("same");
     };
     pixelHitmapSec[sec]->Draw("colz same");
