@@ -10,6 +10,7 @@ compact_file_base="${DETECTOR_PATH}/${DETECTOR}"
 compact_file=""
 use_full=0
 dry_run=0
+debug_run=0
 
 # create file names, given detector
 function compact_only_name { echo "${compact_file_base}_${1}_only.xml"; }
@@ -54,13 +55,14 @@ USAGE:
             $(compact_full_name)
         [ default: use the standalone RICH, and no B-field ]
     -t  Test using a dry-run; just prints settings
+    -D  Run with debugger (gdb)
   """
   exit 2
 }
 if [ $# -lt 2 ]; then usage; fi
 
 # parse options
-while getopts "hdpejri:o:x:c:ft" opt; do
+while getopts "hdpejri:o:x:c:ftD" opt; do
   case $opt in
     h|\?) usage             ;;
     d) which_rich="drich"   ;;
@@ -74,6 +76,7 @@ while getopts "hdpejri:o:x:c:ft" opt; do
     c) compact_file=$OPTARG ;;
     f) use_full=1           ;;
     t) dry_run=1            ;;
+    D) debug_run=1          ;;
   esac
 done
 
@@ -115,34 +118,39 @@ case $method in
     DETECTOR_CONFIG = $DETECTOR_CONFIG
     """
     # build `eicrecon` command #####################
-    ### full reconstruction
     collections="DRICHHits"
     collections+=",DRICHRawHits"
-    collections+=",DRICHTracks"
+    collections+=",DRICHAerogelTracks,DRICHGasTracks"
+    collections+=",DRICHIrtParticleID"
+    ### reco_flags.py
     cmd="""
     run_eicrecon_reco_flags.py
       $sim_file
       $rec_file_base
       -Ppodio:output_include_collections=$collections
       -Peicrecon:LogLevel=info
-      -Prich:LogLevel=debug
-      -PDRICH:DRICHRawHits:LogLevel=debug
-      -PDRICH:DRICHTracks:LogLevel=debug
+      -Prich:LogLevel=info
+      -PDRICH:DRICHRawHits:LogLevel=info
+      -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
+      -PDRICH:DRICHIrtParticleID:LogLevel=trace
       """
-    ### dRICH digitization
+    ### native eicrecon
     # cmd="""
     # eicrecon
-    #   -Pplugins=DRICH
-    #   -Ppodio:output_include_collections=DRICHHits,DRICHRawHits
+    #   -Ppodio:output_include_collections=$collections
     #   -Peicrecon:LogLevel=info
-    #   -PDRICH:DRICHRawHits:LogLevel=trace
-    #   -PDRICH:DRICHRawHits:seed=1
-    #   -PDRICH:DRICHRawHits:safetyFactor=0.7
-    #   -Prich:LogLevel=trace
+    #   -Prich:LogLevel=info
+    #   -PDRICH:DRICHRawHits:LogLevel=info
+    #   -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
+    #   -PDRICH:DRICHIrtParticleID:LogLevel=trace
     #   -Ppodio:output_file=$rec_file
     #   $sim_file
     #   """
     # run `eicrecon` #####################
+    if [ $debug_run -eq 1 ]; then
+      export SHELL=`which bash`
+      cmd="gdb --args $cmd -Pjana:timeout=0"
+    fi
     if [ $dry_run -eq 0 ]; then
       $cmd
       if [[ "$cmd" =~ "run_eicrecon_reco_flags" ]]; then mv -v $rec_file_base.tree.edm4eic.root $rec_file; fi

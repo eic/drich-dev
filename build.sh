@@ -67,6 +67,7 @@ case $module in
     genOpt BUILD_DATA_MODEL=ON
     ;;
   irt)
+    genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=ON
     genOpt EVALUATION=OFF
     ;;
@@ -74,7 +75,9 @@ case $module in
     ;;
   EICrecon)
     # genOpts+="-LAH " # dump variables
+    genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
+    genOpt EICRECON_VERBOSE_CMAKE=ON
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
