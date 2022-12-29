@@ -350,7 +350,7 @@ Procedure:
 ```bash
 bin/create_irt_auxfile
 ```
-- Note: the creation of is auxiliary file requires `EICrecon` to be cloned locally, but it does
+- Note: the creation of this auxiliary file requires `EICrecon` to be cloned locally, but it does
   not need to be compiled
 
 - Run the simulation, for example:
