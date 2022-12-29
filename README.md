@@ -336,7 +336,8 @@ corresponding executables and install them to `bin/`
 ## IRT: Indirect Ray Tracing
 
 NOTE: this documentation is primarily for the Juggler version; the EICrecon version will be documented
-later, when at least a basic version is merged to `main`
+later, when at least a basic version is merged to `main`, but in the meantime, see
+[doc/eicrecon.pdf](doc/eicrecon.pdf)
 
 We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
 as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
