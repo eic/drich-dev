@@ -7,8 +7,8 @@
 
 // local
 #include "WhichRICH.h"
-#include "irtgeo/IrtGeoDRICH.h"
-#include "irtgeo/IrtGeoPFRICH.h"
+#include "richgeo/IrtGeoDRICH.h"
+#include "richgeo/IrtGeoPFRICH.h"
 
 int main(int argc, char** argv) {
 
@@ -28,19 +28,23 @@ int main(int argc, char** argv) {
   // RICH-specific settings (also checks `zDirectionStr`)
   WhichRICH wr(zDirectionStr);
   if(!wr.valid) return 1;
+  if(zDirectionStr=="p") {
+    fmt::print("NOTE: pfRICH is only in brycecanyon; updating $DETECTOR_CONFIG\n");
+    setenv("DETECTOR_CONFIG","epic_brycecanyon",1);
+  }
 
   // start auxfile
   if(irtAuxFileName=="") irtAuxFileName = "geo/irt-"+wr.xrich+".root";
   auto irtAuxFile = new TFile(irtAuxFileName.c_str(),"RECREATE");
 
   // given DD4hep geometry from `compactFileName`, produce IRT geometry
-  IrtGeo *IG;
-  if(zDirectionStr=="d")      IG = new IrtGeoDRICH(compactFileName);
-  else if(zDirectionStr=="p") IG = new IrtGeoPFRICH(compactFileName);
+  rich::IrtGeo *IG;
+  if(zDirectionStr=="d")      IG = new rich::IrtGeoDRICH(compactFileName, true);
+  else if(zDirectionStr=="p") IG = new rich::IrtGeoPFRICH(compactFileName, true);
   else return 1;
 
   // write IRT auxiliary file
-  IG->GetIrtGeometry()->Write();
+  IG->GetIrtDetectorCollection()->Write();
   irtAuxFile->Close();
   fmt::print("\nWrote IRT Aux File: {}\n\n",irtAuxFileName);
 }

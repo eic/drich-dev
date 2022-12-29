@@ -10,6 +10,8 @@ macro
 !macro/.keep
 out
 !out/.keep
+tmp
+!tmp/.keep
 
 irt
 epic

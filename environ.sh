@@ -15,7 +15,7 @@ echo "detected $BUILD_NPROC cpus"
 
 # cmake packages
 export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-export EICD_ROOT=$EIC_SHELL_PREFIX # overrides container version with local version
+export EDM4EIC_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
 
 # # source environment from reconstruction_benchmarks
 # if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
@@ -34,6 +34,13 @@ source /opt/detector/setup.sh
 # - prioritizes `$EIC_SHELL_PREFIX/lib` in `$LD_LIBRARY_PATH`
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
+# source EICrecon installation
+if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
+  source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
+  export PATH="$PATH:/usr/local/bin" ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+fi
+
+
 # environment overrides:
 # - prefer local juggler build
 export JUGGLER_INSTALL_PREFIX=$EIC_SHELL_PREFIX
@@ -46,6 +53,7 @@ unset branch
 # prioritize local build targets
 export LD_LIBRARY_PATH=$DRICH_DEV/lib:$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
+export PATH=$EIC_SHELL_PREFIX/bin:$PATH
 
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$DRICH_DEV/.rbenv
@@ -84,8 +92,8 @@ Detector:
   DETECTOR_VERSION = $DETECTOR_VERSION
 
 Packages:
-  IRT_ROOT  = $IRT_ROOT
-  EICD_ROOT = $EICD_ROOT
+  IRT_ROOT = $IRT_ROOT
+  EDM4EIC  = $EDM4EIC
 
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX

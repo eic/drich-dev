@@ -7,8 +7,8 @@ LIBS += $(shell root-config --glibs)
 
 # image libs
 LIBS += -L/usr/local/lib
-LIBS += -lDDCore
-LIBS += -lDD4pod -lpodio -lpodioRootIO -ledm4hep
+LIBS += -lDDCore -lDDRec
+LIBS += -lpodio -lpodioRootIO -ledm4hep
 LIBS += -lfmt
 LIBS += -lG4global -lG4materials -lG4geometry -lG4persistency
 DEPS += -I/usr/local/include
@@ -21,15 +21,18 @@ DEPS += -Isrc
 
 #--------------------------------------------
 
-LIB_TARGET = lib
-IRTGEO_LIB_NAME = IrtGeo
-IRTGEO_LIB = $(LIB_TARGET)/lib$(IRTGEO_LIB_NAME).so
-
 BIN_TARGET = bin
 EXECUTABLES := $(addprefix $(BIN_TARGET)/, $(basename $(notdir $(wildcard src/*.cpp))))
 
-IRTGEO_SOURCES := $(wildcard src/irtgeo/*.cc)
-IRTGEO_HEADERS := $(wildcard src/irtgeo/*.h)
+EICRECON_DIR = ${DRICH_DEV}/EICrecon/src/services/geometry/rich
+DEPS += -I$(EICRECON_DIR)
+
+LIB_TARGET = lib
+IRTGEO_LIB_NAME = IrtGeo
+IRTGEO_LIB = $(LIB_TARGET)/lib$(IRTGEO_LIB_NAME).so
+IRTGEO_ROOT = $(EICRECON_DIR)/richgeo
+IRTGEO_SOURCES := $(wildcard $(IRTGEO_ROOT)/IrtGeo*.cc)
+IRTGEO_HEADERS := $(wildcard $(IRTGEO_ROOT)/IrtGeo*.h) $(IRTGEO_ROOT)/RichGeo.h
 
 #--------------------------------------------
 
