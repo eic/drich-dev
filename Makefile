@@ -7,7 +7,7 @@ LIBS += $(shell root-config --glibs)
 
 # image libs
 LIBS += -L/usr/local/lib
-LIBS += -lDDCore
+LIBS += -lDDCore -lDDRec
 LIBS += -lpodio -lpodioRootIO -ledm4hep
 LIBS += -lfmt
 LIBS += -lG4global -lG4materials -lG4geometry -lG4persistency
