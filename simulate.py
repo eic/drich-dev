@@ -354,6 +354,8 @@ elif testNum == 4:
         z = math.cos(theta) * zDirection
         m.write(f'/gps/direction {x} {y} {z}\n')
         m.write(f'/run/beamOn {numEvents}\n')
+        # m.write(f'/gps/direction -{x} {y} {z}\n') # include -x sector
+        # m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 5:
     numTheta = 4 if numTestSamples==0 else numTestSamples # number of theta steps

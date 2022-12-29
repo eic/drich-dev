@@ -121,7 +121,7 @@ case $method in
     collections="DRICHHits"
     collections+=",DRICHRawHits"
     collections+=",DRICHAerogelTracks,DRICHGasTracks"
-    collections+=",DRICHIrtParticleID"
+    collections+=",DRICHIrtCherenkovParticleID"
     ### reco_flags.py
     cmd="""
     run_eicrecon_reco_flags.py
@@ -132,7 +132,7 @@ case $method in
       -Prich:LogLevel=info
       -PDRICH:DRICHRawHits:LogLevel=info
       -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
-      -PDRICH:DRICHIrtParticleID:LogLevel=trace
+      -PDRICH:DRICHIrtCherenkovParticleID:LogLevel=trace
       """
     ### native eicrecon
     # cmd="""
@@ -142,7 +142,7 @@ case $method in
     #   -Prich:LogLevel=info
     #   -PDRICH:DRICHRawHits:LogLevel=info
     #   -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
-    #   -PDRICH:DRICHIrtParticleID:LogLevel=trace
+    #   -PDRICH:DRICHIrtCherenkovParticleID:LogLevel=trace
     #   -Ppodio:output_file=$rec_file
     #   $sim_file
     #   """
