@@ -77,13 +77,15 @@ of branches for varying configurations.
     - [EDM4eic](https://github.com/eic/EDM4eic) to `./EDM4eic`, for the data model; this extends
       [EDM4hep](https://github.com/key4hep/EDM4hep), the common data model, which is included
       in the EIC software image
+    - [EICRecon](https://github.com/eic/EICrecon) to `./EICrecon`, for the reconstruction framework
     - [juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`, for the reconstruction
-      framework used in ATHENA, and supported while we migrate to the new reconstruction framework in EPIC
+      framework used in ATHENA, and supported while we migrate `EICrecon`
   - Suggestion: clone with SSH, which is required for contributions:
     ```bash
     git clone git@github.com:eic/epic.git
     git clone git@github.com:eic/irt.git
     git clone git@github.com:eic/EDM4eic.git
+    git clone git@github.com:eic/EICrecon.git
     ```
     Since `juggler` is not on Github, but is hosted on EICweb, it is recommended to clone
     with HTTPS:
@@ -131,10 +133,11 @@ of branches for varying configurations.
   ./build.sh EDM4eic
   ./build.sh irt
   ./build.sh epic
-  ./build.sh juggler
+  ./build.sh EICrecon
+  ./build.sh juggler  # (only if you need it)
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
-    recommended order
+    recommended order (it will not build `juggler`)
 - run `source environ.sh` again, if:
   - if this is your first time building, or a clean build
   - if a module's environment has been updated, in particular `epic/templates/setup.sh.in`
@@ -332,9 +335,12 @@ corresponding executables and install them to `bin/`
 
 ## IRT: Indirect Ray Tracing
 
+NOTE: this documentation is primarily for the Juggler version; the EICrecon version will be documented
+later, when at least a basic version is merged to `main`
+
 We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
 as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
-until it is time to migrate to the new reconstruction framework.
+until the migration to `EICrecon` is complete.
 
 Procedure:
 
@@ -343,6 +349,8 @@ Procedure:
 ```bash
 bin/create_irt_auxfile
 ```
+- Note: the creation of is auxiliary file requires `EICrecon` to be cloned locally, but it does
+  not need to be compiled
 
 - Run the simulation, for example:
 ```bash
