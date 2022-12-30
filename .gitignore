@@ -30,6 +30,7 @@ eicd
 
 calibrations
 fieldmaps
+tracking_geometry.obj
 
 *.hepmc*
 hepmc

@@ -15,13 +15,13 @@ void draw_tracks(TString infileN = "out/rec.root") {
     radiator_config{ 1, "Gas",     kBlack }
   };
 
-  double rmax = 190;
+  double rmax = 1900;
   double xmax = rmax;
   double ymax = rmax;
-  double zmin = 180;
-  double zmax = 330;
+  double zmin = 1800;
+  double zmax = 3300;
 
-  ymax = 0.5; // zoom to horizontal (y=0) plane
+  // ymax = 60; // zoom to horizontal (y=0) plane
 
   std::vector<TH3D*> histograms;
   for(auto radiator : radiators) {

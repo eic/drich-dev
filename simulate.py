@@ -14,10 +14,6 @@ from numpy import linspace
 # SETTINGS
 ################################################################
 use_npdet_info = False  # use np_det_info to get envelope dimensions
-restrict_sector = {     # for tests with phi-dependence, restrict to 1 sector
-        "dRICH": True,
-        "pfRICH": False,
-        }
 rMinBuffer = 5  # acceptance test rMin = vessel rMin + rMinBuffer [cm]
 rMaxBuffer = 5  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
@@ -34,6 +30,7 @@ energy = '40.0 GeV'
 runType = 'run'
 numEvents = 50
 numTestSamples = 0
+restrict_sector = True
 outputImageType = ''
 outputFileName = ''
 useEDM4hepFormat = True
@@ -80,6 +77,7 @@ helpStr = f'''
                     - kaon+ / kaon-
                     - proton / anti_proton
                     - opticalphoton
+                -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
                 -n [numEvents]: number of events to process (default={numEvents})
                    (if using TEST_NUM, this is usually the number of events PER fixed momentum)
                 -k [numTestSamples]: some tests throw particles in multiple different directions,
@@ -87,7 +85,8 @@ helpStr = f'''
                    how many directions are tested
                    - many tests offer a similar usage of [numTestSamples]
                    - these tests also have default [numTestSamples] values
-                -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
+                -a: allow azimuthal scans to cover the full 2*pi range, rather than restricting
+                    to a single sector
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
                 -m [output image type]: save visual with specified type (svg,pdf,ps)
@@ -105,7 +104,7 @@ if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:n:k:e:rvm:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:e:n:k:arvm:o:f')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr)
     sys.exit(2)
@@ -116,9 +115,10 @@ for opt, arg in opts:
     if (opt == '-s'): standalone = True
     if (opt == '-c'): compactFileCustom = arg.lstrip()
     if (opt == '-p'): particle = arg.lstrip()
+    if (opt == '-e'): energy = arg.lstrip() + " GeV"
     if (opt == '-n'): numEvents = int(arg)
     if (opt == '-k'): numTestSamples = int(arg)
-    if (opt == '-e'): energy = arg.lstrip() + " GeV"
+    if (opt == '-a'): restrict_sector = False
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
     if (opt == '-m'): outputImageType = arg.lstrip()
@@ -367,7 +367,7 @@ elif testNum == 5:
     print(f'SET theta range to {math.degrees(thetaMin)} to {math.degrees(thetaMax)} deg')
     for theta in list(linspace(thetaMin, thetaMax, numTheta)):
         for phi in list(linspace(0, 2 * math.pi, numPhi, endpoint=False)):
-            if restrict_sector[xRICH] and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
+            if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
             if (abs(phi) > 0.001 and abs(theta - thetaMin) < 0.001): continue  # allow only one ring at thetaMin
             x = math.sin(theta) * math.cos(phi)
             y = math.sin(theta) * math.sin(phi)
@@ -454,7 +454,7 @@ elif testNum == 13:
     print(f'SET theta range to {math.degrees(thetaMin)} to {math.degrees(thetaMax)} deg')
     for angle in angles:
         theta, phi = angle[0], angle[1]
-        if restrict_sector[xRICH] and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
+        if restrict_sector and (math.pi / 6 < phi < (2 * math.pi - math.pi / 6)): continue  # restrict to one sector
         if abs(phi) > 0.001 and abs(theta - thetaMin) < 0.001: continue  # allow only one ring at thetaMin
         x = math.sin(theta) * math.cos(phi)
         y = math.sin(theta) * math.sin(phi)
