@@ -14,13 +14,13 @@ We intend to keep these tables up-to-date as development proceeds.
 | `juggler`   | `main` |
 
 ## IRT -- EICrecon development
-| Repository  | Branch          | Pull Request                             |
-| --:         | ---             | ---                                      |
-| `drich-dev` | `main`          |                                          |
-| `epic`      | `main`          |                                          |
-| `EDM4eic`   | `cherenkov-pid` | https://github.com/eic/EDM4eic/pull/17   |
-| `irt`       | `main`          |                                          |
-| `EICrecon`  | `irt-algo`      | https://github.com/eic/EICrecon/pull/393 |
+| Repository  | Branch             | Pull Request                             |
+| --:         | ---                | ---                                      |
+| `drich-dev` | `main`             |                                          |
+| `epic`      | `main`             |                                          |
+| `EDM4eic`   | `cherenkov-pid`    | https://github.com/eic/EDM4eic/pull/17   |
+| `irt`       | `eicrecon-support` | https://github.com/eic/irt/pull/25       |
+| `EICrecon`  | `irt-algo`         | https://github.com/eic/EICrecon/pull/393 |
 
 ## IRT -- Legacy Juggler Support
 | Repository  | Branch                      | Pull Request                                                                |
