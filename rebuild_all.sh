@@ -7,3 +7,4 @@ set -e
 ./build.sh epic     $*
 source environ.sh
 ./build.sh EICrecon $*
+#./build.sh juggler  $*  # NOTE: may be incompatible with EICrecon; build one or the other, but not both
