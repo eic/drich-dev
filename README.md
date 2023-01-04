@@ -142,8 +142,8 @@ of branches for varying configurations.
   - if a module's environment has been updated, in particular `epic/templates/setup.sh.in`
 - finally, build the local `drich-dev` code:
   ```bash
-  make         # builds
-  make clean   # remove built targets
+  make         # compiles
+  make clean   # remove built targets (only if you want to recompile from scratch)
   ```
   - this will produce several executables in `bin/` from code in `src/`
 
