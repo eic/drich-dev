@@ -77,7 +77,7 @@ helpStr = f'''
                     - kaon+ / kaon-
                     - proton / anti_proton
                     - opticalphoton
-                -e [energy]: energy (GeV) for mono-energetic runs (default={energy} GeV)
+                -e [energy]: energy (GeV) for mono-energetic runs (default={energy})
                 -n [numEvents]: number of events to process (default={numEvents})
                    (if using TEST_NUM, this is usually the number of events PER fixed momentum)
                 -k [numTestSamples]: some tests throw particles in multiple different directions,

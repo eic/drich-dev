@@ -96,11 +96,10 @@ of branches for varying configurations.
     thus it is unlikely you will need to have SSH access to `juggler`.
   - Checkout the appropriate branches of each repository, depending on your needs
     - see [Branches and Pull Requests](doc/branches.md)
-    - for example, currently the IRT code runs in `juggler` and relies on a
-      custom data model in `EDM4eic`, neither of which have been merged to the
-      main branches; the "IRT Development" branches are recommended for running
-      the IRT code for now, until IRT is integrated with the new reconstruction
-      framework
+    - for example, currently the IRT code relies on a custom data model in
+      `EDM4eic`, which has not been merged to the main branches; the "IRT
+      Development" branches are recommended for running the IRT code for now,
+      until IRT is integrated with the new reconstruction framework
     - see also the [project page](https://github.com/orgs/eic/projects/4/views/1)
       for more up-to-date information
   - Follow directions below to build each module
@@ -141,6 +140,12 @@ of branches for varying configurations.
 - run `source environ.sh` again, if:
   - if this is your first time building, or a clean build
   - if a module's environment has been updated, in particular `epic/templates/setup.sh.in`
+- finally, build the local `drich-dev` code:
+  ```bash
+  make         # compiles
+  make clean   # remove built targets (only if you want to recompile from scratch)
+  ```
+  - this will produce several executables in `bin/` from code in `src/`
 
 ### Recommendations and Troubleshooting
 - be mindful of the environment variables
@@ -342,6 +347,9 @@ later, when at least a basic version is merged to `main`, but in the meantime, s
 We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
 as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
 until the migration to `EICrecon` is complete.
+
+To use Juggler (or EICrecon) with IRT, you must be on the correct set of branches. See
+the [tables of branches](doc/branches.md) for guidance.
 
 Procedure:
 
