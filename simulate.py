@@ -136,7 +136,7 @@ if (testNum >= 10):
     print("optics test, overriding some settings...")
     particle = 'opticalphoton'
     standalone = True
-    if (testNum in [10,11,12]):
+    if (testNum in [10,11]):
         print("-- this is a visual test --")
         runType = 'vis'
 if (particle == "opticalphoton"):
@@ -430,8 +430,8 @@ elif testNum == 11:
 elif testNum == 12:
     numBeams = 5 if numTestSamples==0 else numTestSamples  # number of beams within theta acceptance
     m.write(f'\n# opticalphoton parallel-to-point focusing\n')
-    m.write(f'/vis/scene/endOfEventAction accumulate\n')
-    m.write(f'/vis/scene/endOfRunAction accumulate\n')
+    #m.write(f'/vis/scene/endOfEventAction accumulate\n')
+    #m.write(f'/vis/scene/endOfRunAction accumulate\n')
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
     for rVal in list(linspace(rMin, rMax, numBeams)):
@@ -460,6 +460,36 @@ elif testNum == 13:
         y = math.sin(theta) * math.sin(phi)
         z = math.cos(theta) * zDirection
         m.write(f'/gps/direction {x} {y} {z}\n')
+        m.write(f'/run/beamOn {numEvents}\n')
+        
+elif testNum == 14:
+    m.write(f'\n# opticalphoton parallel-to-point focusing, full coverage\n')
+    #m.write(f'/vis/scene/endOfEventAction accumulate\n')
+    #m.write(f'/vis/scene/endOfRunAction accumulate\n')
+    m.write(f'/gps/pos/type Beam\n')
+    m.write(f'/gps/ang/type beam1d\n')
+    import numpy as np
+    def makeBasicAngles(theta_min, theta_max, num_theta, num_phi):
+        angles = []
+        thetas = np.linspace(theta_min, theta_max, num=num_theta)
+        phis = np.linspace(-math.pi/6, math.pi/6, num=num_phi)
+        for i in range(num_phi):
+            if phis[i] < 0:
+                phis[i] = phis[i]+2*np.pi
+        for i in thetas:
+            for j in phis:
+                angles.append(tuple((i,j)))
+        return angles
+    angles = makeBasicAngles(thetaMin, thetaMax, 50, 50)
+
+    for angle in angles:
+        theta, phi = angle[0], angle[1]
+        if math.pi / 6 < phi < (2 * math.pi - math.pi / 6): continue  # restrict to one sector                                                                                                  
+        x = math.sin(theta) * math.cos(phi)
+        y = math.sin(theta) * math.sin(phi)
+        z = math.cos(theta) * zDirection
+        m.write(f'/gps/direction {x} {y} {z} \n')
+        m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width                                                                                                                                          
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum > 0:
