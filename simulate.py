@@ -79,7 +79,9 @@ helpStr = f'''
                     - opticalphoton
                 -e [energy]: energy (GeV) for mono-energetic runs (default={energy})
                 -n [numEvents]: number of events to process (default={numEvents})
-                   (if using TEST_NUM, this is usually the number of events PER fixed momentum)
+                   - if using TEST_NUM, this is usually the number of events PER fixed momentum
+                   - if using INPUT_FILE, you can set to 0 to run ALL events in the file, otherwise
+                     it will run the default amount of {numEvents}
                 -k [numTestSamples]: some tests throw particles in multiple different directions,
                    such as "polar scan test"; for this test, use [numTestSamples] to control
                    how many directions are tested
@@ -501,9 +503,12 @@ if (testNum > 0):
         ])
 else:
     cmd.extend([
-      f'-N {numEvents}',
-      f'--inputFiles \'{inputFileName}\'',
-      ])
+        f'--inputFiles \'{inputFileName}\'',
+        ])
+    if (numEvents > 0):
+        cmd.extend([ f'-N {numEvents}' ])
+    else:
+        cmd.extend([ f'-N -1' ])
 
 ### run simulation
 cmdShell = shlex.split(" ".join(cmd))
