@@ -1,5 +1,5 @@
 // draw hits, and make some other related plots
-// (cf. draw_segmentation.cpp for readout)
+// (cf. event_display.cpp for readout)
 #include <cstdlib>
 #include <iostream>
 #include <fmt/format.h>

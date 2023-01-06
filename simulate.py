@@ -13,9 +13,9 @@ from numpy import linspace
 
 # SETTINGS
 ################################################################
-use_npdet_info = False  # use np_det_info to get envelope dimensions
-rMinBuffer = 5  # acceptance test rMin = vessel rMin + rMinBuffer [cm]
-rMaxBuffer = 5  # acceptance test rMax = vessel rMax - rMinBuffer [cm]
+use_npdet_info = False  # use npdet_info to get envelope dimensions
+rMinBuffer = 40 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
+rMaxBuffer = 15 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
 ################################################################
@@ -319,7 +319,7 @@ print(sep)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    thetaMid = (thetaMin+thetaMax)/2.0
+    thetaMid = (thetaMin+thetaMax)/2.0 + math.radians(4.0) # offset so we get full rings
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection

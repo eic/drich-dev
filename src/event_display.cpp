@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
     fmt::print("\n");
     fmt::print("    [s/r]: file type:\n");
     fmt::print("         - s for simulation file (all photons)\n");
-    fmt::print("         - p for reconstructed file (digitized hits)\n");
+    fmt::print("         - r for reconstructed file (digitized hits)\n");
     fmt::print("\n");
     fmt::print("    [input_root_file]: output from simulation or reconstruction\n");
     fmt::print("\n");
@@ -328,6 +328,8 @@ int main(int argc, char** argv) {
       box->Draw("same");
     };
     pixelHitmapSec[sec]->Draw("colz same");
+    // pixelHitmapSec[sec]->GetXaxis()->SetRangeUser(475, 725);  // zoom in
+    // pixelHitmapSec[sec]->GetYaxis()->SetRangeUser(-150, 150);
   };
 
   fmt::print("\n\npress ^C to exit.\n\n");
