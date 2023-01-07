@@ -1,3 +1,12 @@
+// dRICH event display
+
+
+//////////////////////////////////
+// if defined, keep TCanvas open for interactive usage (and with extra histograms)
+//#define INTERACTIVE_USE
+//////////////////////////////////
+
+
 // test readout segmentation
 #include <cstdlib>
 #include <iostream>
@@ -31,7 +40,7 @@ int main(int argc, char** argv) {
   // arguments
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   if(argc<=3) {
-    fmt::print("\nUSAGE: {} [d/p] [s/r] [input_root_file] [event_number (optional)]\n\n",argv[0]);
+    fmt::print("\nUSAGE: {} [d/p] [s/r] [input_root_file] [event_num_min] [event_num_max]\n\n",argv[0]);
     fmt::print("    [d/p]: detector\n");
     fmt::print("         - d for dRICH\n");
     fmt::print("         - p for pfRICH\n");
@@ -42,15 +51,31 @@ int main(int argc, char** argv) {
     fmt::print("\n");
     fmt::print("    [input_root_file]: output from simulation or reconstruction\n");
     fmt::print("\n");
-    fmt::print("    [event_number]: if specified, draw a single event\n");
-    fmt::print("                    otherwise the sum of all events is drawn\n");
+    fmt::print("    [event_num_min]: minimum event number (optional)\n");
+    fmt::print("         - if unspecified, draw sum of all events\n");
+    fmt::print("         - if specified, but without [event_num_max], draw only\n");
+    fmt::print("           this event\n");
+    fmt::print("         - if specified with [event_num_max], draw the range\n");
+    fmt::print("           of events, ONE at a time\n");
+    fmt::print("    [event_num_max]: maximum event number (optional)\n");
+    fmt::print("         - set to 0 if you want the maximum possible\n");
     fmt::print("\n");
+    fmt::print("\n");
+    fmt::print("NOTE: INTERACTIVE_USE mode is ");
+#ifdef INTERACTIVE_USE
+    fmt::print("ON: TCanvases (and extra histograms) will remain open\n");
+#else
+    fmt::print("OFF: TCanvases will saved as PNG files\n");
+    fmt::print("- FIXME: there is still a slow memory leak, don't run too many\n");
+#endif
+    fmt::print("- this setting is hard-coded in {}.cpp\n",argv[0]);
     return 2;
   }
   std::string zDirectionStr = argv[1];
   std::string fileType      = argv[2];
   TString     infileN       = TString(argv[3]);
-  int         evnumArg      = argc>4 ? std::atoi(argv[4]) : -1;
+  int         evnumMin      = argc>4 ? std::atoi(argv[4]) : -1;
+  int         evnumMax      = argc>5 ? std::atoi(argv[5]) : -1;
   WhichRICH wr(zDirectionStr);
   if(!wr.valid) return 1;
 
@@ -72,7 +97,10 @@ int main(int argc, char** argv) {
   // drawing
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
-  const Bool_t singleCanvas = true; // if true, draw all hitmaps on one canvas
+  Bool_t singleCanvas = true; // if true, draw all hitmaps on one canvas
+#ifndef INTERACTIVE_USE
+  singleCanvas = true;
+#endif
 
   // data collections
   std::string inputCollection;
@@ -85,18 +113,45 @@ int main(int argc, char** argv) {
     return 1;
   }
   fmt::print("Reading collection '{}'\n",inputCollection);
-  if(evnumArg<0) fmt::print("Reading all events\n");
-  else fmt::print("Reading only event number {}\n",evnumArg);
-
 
   // setup
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#ifdef INTERACTIVE_USE
   // define application environment, to keep canvases open
   TApplication mainApp("mainApp",&argc,argv);
+#endif
 
   // main dataframe
   RDataFrame dfIn("events",infileN.Data());
+  auto numEvents = dfIn.Count().GetValue();
+
+  // determine event numbers to read
+  std::vector<std::pair<int,int>> evnumRanges;
+  if(evnumMin<0) {
+    fmt::print("Reading all events\n");
+    evnumRanges.push_back({ 0, 0 });
+  }
+  else if(evnumMax<0) {
+    fmt::print("Reading only event number {}\n",evnumMin);
+    evnumRanges.push_back({ evnumMin, evnumMin+1 });
+  }
+  else {
+    if(evnumMax==0)
+      evnumMax = numEvents-1;
+    if(evnumMax>=numEvents) {
+      fmt::print("WARNING: there are only {} events\n",numEvents);
+      evnumMax = numEvents-1;
+    }
+    fmt::print("Reading event numbers {} to {}, one at a time\n",evnumMin,evnumMax);
+    for(int e=evnumMin; e<=evnumMax; e++)
+      evnumRanges.push_back({ e, e+1 });
+#ifdef INTERACTIVE_USE
+    fmt::print(stderr,"ERROR: cannot yet run with INTERACTIVE_USE on an event number range; change it in {}.cpp and rebuild\n",argv[0]);
+    return 1;
+#endif
+  }
+
 
   // compact file name
   std::string DETECTOR_PATH(getenv("DETECTOR_PATH"));
@@ -209,10 +264,6 @@ int main(int argc, char** argv) {
 
   // decode cellID to bit field element values
   auto dfDecoded = dfIn
-      .Range(
-          evnumArg<0 ? 0 : evnumArg,
-          evnumArg<0 ? 0 : evnumArg+1
-          )
       .Alias("cellID", inputCollection+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
@@ -241,98 +292,124 @@ int main(int argc, char** argv) {
   fmt::print("{:=<60}\nNUMBER OF HITS OUTSIDE EXPECTED BOX: {} / {} ({:.4f}%)\n{:=<60}\n",
       "", numOutBox, numInBox+numOutBox, 100*Double_t(numOutBox)/Double_t(numInBox+numOutBox), "");
 
-  // histograms
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // loop over event number(s)
+  for(auto& [evnum,evnum_stop] : evnumRanges) {
 
-  // cellID field histograms
-  auto fieldHists = std::vector({
-    dfHitmap.Histo1D("system"),
-    dfHitmap.Histo1D("sector"),
-    dfHitmap.Histo1D("module"),
-    dfHitmap.Histo1D("x"),
-    dfHitmap.Histo1D("y")
-  });
-  const int segXmaxPlot = 10;
-  auto segXY = dfHitmap.Histo2D(
-      { "segXY", "CartesianGridXY;x;y",
-        2*segXmaxPlot, -segXmaxPlot, segXmaxPlot,
-        2*segXmaxPlot, -segXmaxPlot, segXmaxPlot },
-      "x","y"
-      );
+    // cut on specified event(s)
+    auto dfFinal = dfHitmap.Range(evnum,evnum_stop);
+
+    // histograms
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // cellID field histograms
+    auto fieldHists = std::vector({
+      dfFinal.Histo1D("system"),
+      dfFinal.Histo1D("sector"),
+      dfFinal.Histo1D("module"),
+      dfFinal.Histo1D("x"),
+      dfFinal.Histo1D("y")
+    });
+    const int segXmaxPlot = 10;
+    auto segXY = dfFinal.Histo2D(
+        { "segXY", "CartesianGridXY;x;y",
+          2*segXmaxPlot, -segXmaxPlot, segXmaxPlot,
+          2*segXmaxPlot, -segXmaxPlot, segXmaxPlot },
+        "x","y"
+        );
 
 
-  // pixel hitmap
-  Double_t pixelXmin = dilation * wr.plotXmin;
-  Double_t pixelXmax = dilation * wr.plotXmax;
-  Double_t pixelYmin = dilation * wr.plotYmin;
-  Double_t pixelYmax = dilation * wr.plotYmax;
-  auto pixelHitmapModel = RDF::TH3DModel(
-      "pixelHitmap", "Pixel Hit Map;x;y;sector",
-      (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
-      (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
-      nSectors,0,double(nSectors)
-      );
-  auto pixelHitmap = fileType=="r" ? // weight by ADC counts, if reading digitized hits
-    dfHitmap.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector", inputCollection+".integral") :
-    dfHitmap.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector");
+    // pixel hitmap
+    Double_t pixelXmin = dilation * wr.plotXmin;
+    Double_t pixelXmax = dilation * wr.plotXmax;
+    Double_t pixelYmin = dilation * wr.plotYmin;
+    Double_t pixelYmax = dilation * wr.plotYmax;
+    auto pixelHitmapModel = RDF::TH3DModel(
+        "pixelHitmap", "Pixel Hit Map;x;y;sector",
+        (Int_t)(pixelXmax-pixelXmin), pixelXmin, pixelXmax,
+        (Int_t)(pixelYmax-pixelYmin), pixelYmin, pixelYmax,
+        nSectors,0,double(nSectors)
+        );
+    auto pixelHitmap = fileType=="r" ? // weight by ADC counts, if reading digitized hits
+      dfFinal.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector", inputCollection+".integral") :
+      dfFinal.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector");
 
-  // draw
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // draw
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  // draw cellID field histograms
-  TCanvas *c = new TCanvas();
-  c->Divide(3,2);
-  int pad=1;
-  for(auto hist : fieldHists) {
-    c->GetPad(pad)->SetLogy();
+    TCanvas *c;
+#ifdef INTERACTIVE_USE
+    // draw cellID field histograms
+    c = new TCanvas();
+    c->Divide(3,2);
+    int pad=1;
+    for(auto hist : fieldHists) {
+      c->GetPad(pad)->SetLogy();
+      c->cd(pad);
+      if(TString(hist->GetName())!="module") hist->SetBarWidth(4);
+      hist->SetLineColor(kBlack);
+      hist->SetFillColor(kBlack);
+      hist->Draw("bar");
+      pad++;
+    }
+
+    // draw segmentation XY plot, along with expected box
     c->cd(pad);
-    if(TString(hist->GetName())!="module") hist->SetBarWidth(4);
-    hist->SetLineColor(kBlack);
-    hist->SetFillColor(kBlack);
-    hist->Draw("bar");
-    pad++;
-  }
+    c->GetPad(pad)->SetGrid(1,1);
+    segXY->Draw("colz");
+    auto expectedBox = new TBox(segXmin, segXmin, segXmax+1, segXmax+1);
+    expectedBox->SetFillStyle(0);
+    expectedBox->SetLineColor(kBlack);
+    expectedBox->SetLineWidth(4);
+    expectedBox->Draw("same");
+#endif
 
-  // draw segmentation XY plot, along with expected box
-  c->cd(pad);
-  c->GetPad(pad)->SetGrid(1,1);
-  segXY->Draw("colz");
-  auto expectedBox = new TBox(segXmin, segXmin, segXmax+1, segXmax+1);
-  expectedBox->SetFillStyle(0);
-  expectedBox->SetLineColor(kBlack);
-  expectedBox->SetLineWidth(4);
-  expectedBox->Draw("same");
+    // draw pixel hitmap
+    if(singleCanvas) { c = new TCanvas("canv","canv",3*700,2*600); c->Divide(3,2); };
+    int secBin;
+    TH2D *pixelHitmapSec[nSectors];
+    for(int sec=0; sec<nSectors; sec++) {
+      if(singleCanvas) c->cd(sec+1); else c = new TCanvas();
+      secBin = pixelHitmap->GetZaxis()->FindBin(Double_t(sec));
+      pixelHitmap->GetZaxis()->SetRange(secBin,secBin);
 
-  // draw pixel hitmap
-  if(singleCanvas) { c = new TCanvas(); c->Divide(3,2); };
-  int secBin;
-  TH2D *pixelHitmapSec[nSectors];
-  for(int sec=0; sec<nSectors; sec++) {
-    if(singleCanvas) c->cd(sec+1); else c = new TCanvas();
-    secBin = pixelHitmap->GetZaxis()->FindBin(Double_t(sec));
-    pixelHitmap->GetZaxis()->SetRange(secBin,secBin);
+      pixelHitmapSec[sec] = (TH2D*) pixelHitmap->Project3D("yx");
+      if(fileType=="r") pixelHitmapSec[sec]->SetMaximum(4096);
+      pixelHitmapSec[sec]->SetName(Form("pixelHitmap_s%d",sec));
 
-    pixelHitmapSec[sec] = (TH2D*) pixelHitmap->Project3D("yx");
-    pixelHitmapSec[sec]->SetName(Form("pixelHitmap_s%d",sec));
+      TString pixelHitmapTitle;
+      if(fileType=="s")      pixelHitmapTitle = "Photon hits";
+      else if(fileType=="r") pixelHitmapTitle = "Digitized hits";
+      pixelHitmapTitle += Form(", sector %d",sec);
+      if(evnumMin<0) pixelHitmapTitle += ", all events";
+      else           pixelHitmapTitle += Form(", event %d",evnum);
 
-    TString pixelHitmapTitle;
-    if(fileType=="s")      pixelHitmapTitle = "Photon hits";
-    else if(fileType=="r") pixelHitmapTitle = "ADC Counts";
-    pixelHitmapTitle += Form(", sector %d",sec);
-    if(evnumArg<0) pixelHitmapTitle += ", all events";
-    else           pixelHitmapTitle += Form(", event %d",evnumArg);
-
-    pixelHitmapSec[sec]->SetTitle(pixelHitmapTitle);
-    pixelHitmapSec[sec]->Draw("colz");
-    for(auto box : boxList) {
-      box->Draw("same");
+      pixelHitmapSec[sec]->SetTitle(pixelHitmapTitle);
+      pixelHitmapSec[sec]->Draw("colz");
+      for(auto box : boxList) {
+        box->Draw("same");
+      };
+      pixelHitmapSec[sec]->Draw("colz same");
+      // pixelHitmapSec[sec]->GetXaxis()->SetRangeUser(475, 725);  // zoom in
+      // pixelHitmapSec[sec]->GetYaxis()->SetRangeUser(-150, 150);
     };
-    pixelHitmapSec[sec]->Draw("colz same");
-    // pixelHitmapSec[sec]->GetXaxis()->SetRangeUser(475, 725);  // zoom in
-    // pixelHitmapSec[sec]->GetYaxis()->SetRangeUser(-150, 150);
-  };
 
-  fmt::print("\n\npress ^C to exit.\n\n");
-  mainApp.Run();
+    // either hold the TCanvases open, or save them as PNG files
+#ifdef INTERACTIVE_USE
+    fmt::print("\n\npress ^C to exit.\n\n");
+    mainApp.Run();
+#else
+    gROOT->ProcessLine(".! mkdir -p out/ev");
+    c->SaveAs(Form("out/ev/%s.png",fmt::format("{:08}",evnum).c_str()));
+    // cleanup and avoid memory leaks # FIXME: refactor this... and there is still a slow leak...
+    delete c;
+    for(int sec=0; sec<nSectors; sec++) delete pixelHitmapSec[sec];
+#endif
+
+  } // end evnumRanges loop
+
+#ifndef INTERACTIVE_USE
+  fmt::print("\n\nEvent display images written to out/ev/*.png\n\n");
+#endif
+
   return 0;
 };
