@@ -15,7 +15,7 @@ from numpy import linspace
 ################################################################
 use_npdet_info = False  # use npdet_info to get envelope dimensions
 rMinBuffer = 40 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
-rMaxBuffer = 15 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
+rMaxBuffer = -5 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
 ################################################################
@@ -177,7 +177,7 @@ else:
 
 ### get env vars
 
-detMain = os.environ['DETECTOR']
+detMain = os.environ['DETECTOR_CONFIG']
 detPath = os.environ['DETECTOR_PATH']
 outDir  = os.environ['DRICH_DEV'] + '/out'
 
@@ -306,13 +306,17 @@ print(f'zMax = {zMax} cm')
 ### set angular acceptance limits
 thetaMin = math.atan2(rMin, zMax)
 thetaMax = math.atan2(rMax, zMax)
-etaMin = -math.log(math.tan(0.5 * thetaMax))
-etaMax = -math.log(math.tan(0.5 * thetaMin))
+def theta_to_eta(th):
+    return -math.log(math.tan(0.5 * th))
+etaMin = theta_to_eta(thetaMax)
+etaMax = theta_to_eta(thetaMin)
 print(f'thetaMin = {math.degrees(thetaMin)} deg')
 print(f'thetaMax = {math.degrees(thetaMax)} deg')
 print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
+
+evnum = 0 # event number counter (for logging)
 
 # TEST SETTINGS
 ######################################
@@ -345,8 +349,8 @@ elif testNum == 3:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 4:
-    numTheta = 4 if numTestSamples==0 else numTestSamples  # number of theta steps
     m.write(f'\n# polar scan test\n')
+    numTheta = 4 if numTestSamples==0 else numTestSamples  # number of theta steps
     if (runType == "vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
@@ -358,11 +362,14 @@ elif testNum == 4:
         m.write(f'/run/beamOn {numEvents}\n')
         # m.write(f'/gps/direction -{x} {y} {z}\n') # include -x sector
         # m.write(f'/run/beamOn {numEvents}\n')
+        for _ in range(numEvents):
+            print(f'evnum = {evnum}   theta = {math.degrees(theta)} deg   eta = {theta_to_eta(theta)}')
+            evnum += 1
 
 elif testNum == 5:
+    m.write(f'\n# polar+azimuthal scan test\n')
     numTheta = 4 if numTestSamples==0 else numTestSamples # number of theta steps
     numPhi = 24  # number of phi steps, prefer even multiple of 6 (12,24,36) to check sector boundaries
-    m.write(f'\n# polar+azimuthal scan test\n')
     if (runType == "vis"):
         m.write(f'/vis/scene/endOfEventAction accumulate\n')
         m.write(f'/vis/scene/endOfRunAction accumulate\n')
@@ -391,8 +398,8 @@ elif testNum == 6:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 7 or testNum == 8:
-    numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
     m.write(f'\n# momentum scan\n')
+    numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
     thetaMid = (thetaMin+thetaMax)/2.0
     x = math.sin(thetaMid)
     y = 0.0
