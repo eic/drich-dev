@@ -133,6 +133,8 @@ case $method in
       -PDRICH:DRICHRawHits:LogLevel=info
       -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
       -PDRICH:DRICHIrtCherenkovParticleID:LogLevel=trace
+      -Pbenchmarks_pid:LogLevel=trace
+      -Pplugins=benchmarks_pid
       """
     ### native eicrecon
     # cmd="""
