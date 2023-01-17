@@ -6,11 +6,15 @@ require 'fileutils'
 require 'pycall/import'
 
 ## args
-if ARGV.length<1
+if ARGV.length<2
   $stderr.puts """
-  USAGE: #{$0} [d/p]
-     d: test dRICH
-     p: test pfRICH
+  USAGE: #{$0} [d/p] [j/e]
+     [d/p]: detector
+       d: dRICH
+       p: pfRICH
+     [j/e]: reconstruction
+       j: juggler
+       e: eicrecon
   """
   exit 2
 end
@@ -23,23 +27,37 @@ when "d"
   xRICH      = "dRICH"
   xrich      = "drich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>65.0, },
   }
 when "p"
   zDirection = -1
   xRICH      = "pfRICH"
   xrich      = "pfrich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>65.0, },
   }
 else
-  $stderr.puts "ERROR: unknown argument #{ARGV[0]}"
+  $stderr.puts "ERROR: unknown detector '#{ARGV[0]}'"
+  exit 1
+end
+
+## reconstruction specific settings
+case ARGV[1]
+when "j"
+  reconMethod      = :juggler
+  reconWrapperArgs = '-j'
+when "e"
+  reconMethod      = :eicrecon
+  reconWrapperArgs = '-e'
+else
+  $stderr.puts "ERROR: unknown reconstruction '#{ARGV[1]}'"
+  exit 1
 end
 
 ## settings
-NumEvents      = 50                  # number of events per fixed momentum
+NumEvents      = 10                  # number of events per fixed momentum
 NumPoints      = 10                  # number of momenta to sample
 PoolSize       = 6                   # number of parallel threads to run
 OutputDir      = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
@@ -83,7 +101,6 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
       cmds << [
         './simulate.py',
         "-t#{rad[:testNum]}",
-        '-s',
         "-d#{zDirection}",
         "-p#{particle}",
         "-n#{NumEvents}",
@@ -93,7 +110,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
-        "-j",
+        "#{reconWrapperArgs}",
         "-i #{sim_file}",
         "-o #{rec_file}",
       ]
@@ -101,8 +118,14 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
       plot_file = out_file particle, "rec_plots.#{rad_name}.root"
       cmds << [
         'root', '-b', '-q',
-        "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
       ]
+      case reconMethod
+      when :juggler
+        cmds.last << "scripts/src/momentum_scan_juggler_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
+      when :eicrecon
+        ana_file = rec_file.sub /\.root/, '.ana.root'
+        cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})"
+      end
     end
     # spawn thread
     Thread.new do
@@ -246,6 +269,7 @@ radiator_h.each do |rad_name,rad|
           rad[:maxTheta] = [rad[:maxTheta],plot.GetMaximum].max        # max point
         end
       end
+      plot.GetXaxis.SetRangeUser(0,rad[:maxMomentum])
       plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta]) if plot_name.match?(/^theta_/)
 
     end
