@@ -16,7 +16,7 @@ void momentum_scan_eicrecon_draw(
     TString  ana_file_name  = "out/rec.ana.root",        // output analysis file from EICrecon benchmarks
     TString  out_file_name  = "out/rec.scan_plots.root", // this script will produce this file
     unsigned which_radiator = 1,                         // see `rad_enum` above
-    TString  ana_dir_name   = "pid"                      // which directory in `ana_file_name` file
+    TString  ana_dir_name   = "pid/irt"                  // which directory in `ana_file_name` file
     )
 {
 
