@@ -14,7 +14,7 @@ from numpy import linspace
 # SETTINGS
 ################################################################
 use_npdet_info = False  # use npdet_info to get envelope dimensions
-rMinBuffer = 40 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
+rMinBuffer = 10 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
 rMaxBuffer = -5 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
