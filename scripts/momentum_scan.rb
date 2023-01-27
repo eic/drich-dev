@@ -111,8 +111,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         './recon.sh',
         "-#{xrich[0]}",
         "#{reconWrapperArgs}",
-        "-i #{sim_file}",
-        "-o #{rec_file}",
+        "-i#{sim_file}",
+        "-o#{rec_file}",
       ]
       # analysis
       plot_file = out_file particle, "rec_plots.#{rad_name}.root"

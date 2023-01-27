@@ -316,6 +316,12 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
+### set "ideal" angle for testing -> fill rings, middle of acceptance
+# thetaMid = (thetaMin+thetaMax)/2.0
+thetaMid = math.radians(23.5)
+print(f'thetaMid = {math.degrees(thetaMid)} deg')
+print(sep)
+
 evnum = 0 # event number counter (for logging)
 
 # TEST SETTINGS
@@ -325,7 +331,6 @@ evnum = 0 # event number counter (for logging)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    thetaMid = (thetaMin+thetaMax)/2.0 + math.radians(4.0) # offset so we get full rings
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection
@@ -400,7 +405,6 @@ elif testNum == 6:
 elif testNum == 7 or testNum == 8:
     m.write(f'\n# momentum scan\n')
     numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
-    thetaMid = (thetaMin+thetaMax)/2.0
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection

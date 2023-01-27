@@ -123,9 +123,12 @@ case $method in
     # build `eicrecon` command #####################
     cmd="eicrecon"
 
+    # helpers
     set_config() { cmd+=" -P$1=$2"; } # set a JANA configuration parameter
+    set_log_level() { cmd+=" -P$1:LogLevel=$2"; } # set logger level
     join() { n=$1[@]; a=("${!n}"); echo ${a[*]} | sed 's; ;,;g'; } # Array.join(',') in bash
 
+    # list of collections to save
     collections=(
       DRICHHits
       DRICHRawHits
@@ -133,28 +136,31 @@ case $method in
       DRICHIrtCherenkovParticleID
     )
 
+    # list of additional plugins to use
     plugins=(
       dump_flags
       benchmarks_pid
     )
 
+    # general common settings
     set_config "plugins"                          $(join plugins)
     set_config "podio:output_include_collections" $(join collections)
     set_config "podio:output_file"                "$rec_file"
     set_config "histsfile"                        "$ana_file"
+    set_config "jana:nevents"                     "0"
+    set_config "jana:debug_plugin_loading"        "1"
+    set_config "acts:MaterialMap"                 "calibrations/materials-map.cbor"
 
-    set_config "eicrecon:LogLevel"                          "info"
-    set_config "rich:LogLevel"                              "info"
-    set_config "DRICH:DRICHRawHits:LogLevel"                "info"
-    set_config "DRICH:DRICHAerogelTracks:LogLevel"          "debug"
-    set_config "DRICH:DRICHGasTracks:LogLevel"              "debug"
-    set_config "DRICH:DRICHIrtCherenkovParticleID:LogLevel" "trace"
-    set_config "benchmarks_pid:LogLevel"                    "trace"
+    # log levels
+    set_log_level "eicrecon"                          "info"
+    set_log_level "rich"                              "info"
+    set_log_level "DRICH:DRICHRawHits"                "info"
+    set_log_level "DRICH:DRICHAerogelTracks"          "debug"
+    set_log_level "DRICH:DRICHGasTracks"              "debug"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
+    set_log_level "benchmarks_pid"                    "trace"
 
-    set_config "jana:debug_plugin_loading" "1"
-    set_config "jana:nevents"              "0"
-    set_config "acts:MaterialMap"          "calibrations/materials-map.cbor"
-
+    # input file from simulation
     cmd+=" $sim_file"
 
     # run `eicrecon` #####################
