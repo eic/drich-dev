@@ -15,8 +15,7 @@ enum rad_enum {kAgl, kGas, nRad};
 void momentum_scan_eicrecon_draw(
     TString  ana_file_name  = "out/rec.ana.root",        // output analysis file from EICrecon benchmarks
     TString  out_file_name  = "out/rec.scan_plots.root", // this script will produce this file
-    unsigned which_radiator = 1,                         // see `rad_enum` above
-    TString  ana_dir_name   = "pid_irt"                  // which directory in `ana_file_name` file
+    unsigned which_radiator = 1                          // see `rad_enum` above
     )
 {
 
@@ -43,15 +42,17 @@ void momentum_scan_eicrecon_draw(
 
   // get plots
   std::map<TString,TH2D*> scans;
-  auto get_scan = [&] (TString name) {
-    TString hist_name = ana_dir_name + "/" + name + "_vs_p_" + radiator_name;
+  auto get_scan = [&] (TString dir, TString name, TString suffix="") {
+    TString hist_name = dir + "/" + name + "_vs_p";
+    if(suffix!="") hist_name += "_" + suffix;
     fmt::print("get histogram '{}'\n",hist_name);
     auto hist = ana_file->Get<TH2D>(hist_name);
     hist->SetName(name+"_scan");
     scans.insert({name,hist});
   };
-  get_scan("npe");
-  get_scan("theta");
+  get_scan( "pid_irt", "nphot"  );
+  get_scan( "pid_irt", "npe",   radiator_name );
+  get_scan( "pid_irt", "theta", radiator_name );
 
   // make scan profiles
   std::map<TString,TProfile*> scan_profs;

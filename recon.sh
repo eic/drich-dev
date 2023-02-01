@@ -138,7 +138,7 @@ case $method in
 
     # list of additional plugins to use
     plugins=(
-      dump_flags
+      # dump_flags
       benchmarks_pid
     )
 
@@ -153,12 +153,12 @@ case $method in
 
     # log levels
     set_log_level "eicrecon"                          "info"
-    set_log_level "rich"                              "info"
+    set_log_level "richgeo"                           "info"
     set_log_level "DRICH:DRICHRawHits"                "info"
-    set_log_level "DRICH:DRICHAerogelTracks"          "debug"
-    set_log_level "DRICH:DRICHGasTracks"              "debug"
+    set_log_level "DRICH:DRICHAerogelTracks"          "info"
+    set_log_level "DRICH:DRICHGasTracks"              "info"
     set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
-    set_log_level "benchmarks_pid"                    "trace"
+    set_log_level "benchmarks_pid"                    "info"
 
     # input file from simulation
     cmd+=" $sim_file"
@@ -172,7 +172,9 @@ case $method in
     if [ $dry_run -eq 0 ]; then
       $cmd
       if [[ "$cmd" =~ "run_eicrecon_reco_flags" ]]; then mv -v $rec_file_base.tree.edm4eic.root $rec_file; fi
-      printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
+      printf "\nEICrecon IRT reconstruction finished\n"
+      printf " -> produced RECO file:     $rec_file\n"
+      printf " -> produced ANALYSIS file: $ana_file\n"
     fi
     ;;
 
@@ -186,7 +188,8 @@ case $method in
     echo "RUN JUGGLER with options file $options_file"
     if [ $dry_run -eq 0 ]; then
       gaudirun.py $options_file
-      printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
+      printf "\nJuggler IRTAlgorithm finished\n"
+      printf " -> produced RECO file: $rec_file\n"
     fi
     ;;
 

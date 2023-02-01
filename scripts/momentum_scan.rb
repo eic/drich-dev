@@ -57,12 +57,13 @@ else
 end
 
 ## settings
-NumEvents      = 10                  # number of events per fixed momentum
-NumPoints      = 10                  # number of momenta to sample
-PoolSize       = 6                   # number of parallel threads to run
+NumEvents      = 10    # number of events per fixed momentum
+NumPoints      = 10    # number of momenta to sample
+PoolSize       = 6     # number of parallel threads to run
+RunSimRec      = true  # if false, do not run simulation+reconstruction, only draw the result
+SkipSimulation = true  # if true, skip running the simulation and just run reconstruction
+UseRINDEXrange = false # if true, use range of RINDEX values rather than a single reference value
 OutputDir      = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
-RunSimRec      = true                # if false, do not run simulation+reconstruction, only draw the result
-UseRINDEXrange = false               # if true, use range of RINDEX values rather than a single reference value
 
 ## list of particles to test
 particle_h = {
@@ -80,7 +81,7 @@ particle_h = {
 puts "\nNOTE: skipping simulation+reconstruction, since RunSimRec=false\n\n" unless RunSimRec
 
 ## produce output file dir and names
-if RunSimRec
+if RunSimRec and not SkipSimulation
   FileUtils.rm_r OutputDir, secure: true, verbose: true, force: true
   FileUtils.mkdir_p OutputDir
 end
@@ -106,7 +107,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         "-n#{NumEvents}",
         "-k#{NumPoints}",
         "-o#{sim_file}",
-      ]
+      ] unless SkipSimulation
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
