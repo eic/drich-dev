@@ -138,6 +138,7 @@ case $method in
 
     # list of additional plugins to use
     plugins=(
+      janadot
       # dump_flags
       benchmarks_pid
     )
