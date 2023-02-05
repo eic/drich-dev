@@ -5,6 +5,16 @@ require 'open3'
 require 'fileutils'
 require 'pycall/import'
 
+## SETTINGS ########################################
+NumEvents         = 20    # number of events per fixed momentum
+NumPoints         = 10    # number of momenta to sample
+PoolSize          = 6     # number of parallel threads to run
+RunSimulation     = false # if true, run the simulation step
+RunReconstruction = true  # if true, run the reconstruction step
+UseRINDEXrange    = false # if true, use range of RINDEX values rather than a single reference value
+####################################################
+
+
 ## args
 if ARGV.length<2
   $stderr.puts """
@@ -56,15 +66,6 @@ else
   exit 1
 end
 
-## settings
-NumEvents      = 10    # number of events per fixed momentum
-NumPoints      = 10    # number of momenta to sample
-PoolSize       = 6     # number of parallel threads to run
-RunSimRec      = true  # if false, do not run simulation+reconstruction, only draw the result
-SkipSimulation = true  # if true, skip running the simulation and just run reconstruction
-UseRINDEXrange = false # if true, use range of RINDEX values rather than a single reference value
-OutputDir      = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
-
 ## list of particles to test
 particle_h = {
   'e-'          => { :mass=>0.00051, },
@@ -77,11 +78,9 @@ particle_h = {
   # 'anti_proton' => { :mass=>0.93827, },
 }
 
-## warn if not doing simulation
-puts "\nNOTE: skipping simulation+reconstruction, since RunSimRec=false\n\n" unless RunSimRec
-
 ## produce output file dir and names
-if RunSimRec and not SkipSimulation
+OutputDir = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
+if RunSimulation
   FileUtils.rm_r OutputDir, secure: true, verbose: true, force: true
   FileUtils.mkdir_p OutputDir
 end
@@ -98,7 +97,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     rec_file = out_file particle, "rec.#{rad_name}.root"
     cmds = []
     # simulation + reconstruction
-    if RunSimRec
+    if RunSimulation or RunReconstruction
       cmds << [
         './simulate.py',
         "-t#{rad[:testNum]}",
@@ -107,14 +106,14 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         "-n#{NumEvents}",
         "-k#{NumPoints}",
         "-o#{sim_file}",
-      ] unless SkipSimulation
+      ] if RunSimulation
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
         "#{reconWrapperArgs}",
         "-i#{sim_file}",
         "-o#{rec_file}",
-      ]
+      ] if RunReconstruction
       # analysis
       plot_file = out_file particle, "rec_plots.#{rad_name}.root"
       cmds << [

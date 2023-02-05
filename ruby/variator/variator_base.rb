@@ -73,7 +73,7 @@ class VariatorBase
           "-t 12",
           "-v",
           "-n 15",
-          "-m svg",
+          "-e svg",
           "-c #{settings[:compact_detector]}",
           "-o #{settings[:output]}",
         ],
