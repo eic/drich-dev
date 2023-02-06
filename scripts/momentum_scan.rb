@@ -6,7 +6,7 @@ require 'fileutils'
 require 'pycall/import'
 
 ## SETTINGS ########################################
-NumEvents         = 20    # number of events per fixed momentum
+NumEvents         = 30    # number of events per fixed momentum
 NumPoints         = 10    # number of momenta to sample
 PoolSize          = 6     # number of parallel threads to run
 RunSimulation     = false # if true, run the simulation step
@@ -134,8 +134,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         mode = i==0 ? 'w' : 'a'
         Open3.pipeline(
           cmd,
-          out: [out_file(particle,'log.out'),mode],
-          err: [out_file(particle,'log.err'),mode],
+          out: [out_file(particle,"#{rad_name}.log.out"),mode],
+          err: [out_file(particle,"#{rad_name}.log.err"),mode],
         )
       end
     end
@@ -149,8 +149,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
 end
 
 # print errors for one of the particles
-puts "ERRORS (for one particle) ======================="
-system "cat #{out_file particle_h.keys.first, 'log.err'}"
+puts "ERRORS (for one job) ======================="
+system "cat #{Dir.glob(OutputDir+"/*.err").first}"
 puts "END ERRORS ======================================"
 
 
