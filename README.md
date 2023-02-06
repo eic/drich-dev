@@ -49,12 +49,12 @@ of branches for varying configurations.
     own set up; in that case, make symlinks to your local `git` repository
     clones, so you can use the scripts in this directory
 - Obtain the EIC Software image (`jug_xl`):
-  - follow [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
+  - follow [ePIC Software Tutorials](https://indico.bnl.gov/category/443/)
     to obtain the EIC software image
     - the `eic-shell` script is used to start a container shell
     - all documentation below assumes you are running in `eic-shell`
     - this image contains all the dependencies needed for EPIC simulations
-      - tip: when in a container shell (`eic-shell`), see `/opt/software/linux.../gcc.../`
+      - tip: when in a container shell (`eic-shell`), see `/usr/local` or `/opt/software/linux.../gcc.../`
         for the installed software
         - for example, if you want to check exactly what is available in the
           [EDM4hep data model](https://github.com/key4hep/EDM4hep), see the headers
@@ -63,11 +63,6 @@ of branches for varying configurations.
           configuration file)
     - be sure to regularly update your image by running `eic-shell --upgrade`; this is necessary
       to keep up with upstream changes, such as in EDM4hep or DD4hep
-  - alternatively, we have a wrapper script:
-    - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
-    - the image and builds will be stored in `./opt`
-    - run `opt/eic-shell` to start a container
-    - this wrapper script may not be supported in the future (use `eic-shell --upgrade` instead)
 - Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - Modules:
