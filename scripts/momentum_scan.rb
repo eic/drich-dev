@@ -6,7 +6,7 @@ require 'fileutils'
 require 'pycall/import'
 
 ## SETTINGS ########################################
-NumEvents         = 30    # number of events per fixed momentum
+NumEvents         = 70    # number of events per fixed momentum
 NumPoints         = 10    # number of momenta to sample
 PoolSize          = 6     # number of parallel threads to run
 RunSimulation     = false # if true, run the simulation step
@@ -68,7 +68,7 @@ end
 
 ## list of particles to test
 particle_h = {
-  'e-'          => { :mass=>0.00051, },
+  # 'e-'          => { :mass=>0.00051, },
   'pi+'         => { :mass=>0.13957, },
   'kaon+'       => { :mass=>0.49368, },
   'proton'      => { :mass=>0.93827, },
@@ -180,14 +180,14 @@ radiator_h.each do |rad_name,rad|
       }.to_h
     ]
   end.to_h
-  draw_h['e-'][:color]      = r.kBlack
-  draw_h['pi+'][:color]     = r.kBlue
-  draw_h['kaon+'][:color]   = r.kGreen+1
-  draw_h['proton'][:color]  = r.kMagenta
-  draw_h['e-'][:marker]     = r.kFullCircle
-  draw_h['pi+'][:marker]    = r.kFullSquare
-  draw_h['kaon+'][:marker]  = r.kFullTriangleUp
-  draw_h['proton'][:marker] = r.kFullTriangleDown
+  draw_h['e-'][:color]      = r.kBlack            if particle_h.has_key? 'e-'
+  draw_h['pi+'][:color]     = r.kBlue             if particle_h.has_key? 'pi+'
+  draw_h['kaon+'][:color]   = r.kGreen+1          if particle_h.has_key? 'kaon+'
+  draw_h['proton'][:color]  = r.kMagenta          if particle_h.has_key? 'proton'
+  draw_h['e-'][:marker]     = r.kFullCircle       if particle_h.has_key? 'e-'
+  draw_h['pi+'][:marker]    = r.kFullSquare       if particle_h.has_key? 'pi+'
+  draw_h['kaon+'][:marker]  = r.kFullTriangleUp   if particle_h.has_key? 'kaon+'
+  draw_h['proton'][:marker] = r.kFullTriangleDown if particle_h.has_key? 'proton'
 
   ## loop over plots (loop through the first particle's file, assume the rest have the same)
   first_root_file = draw_h[particle_h.keys.first][:root_file]

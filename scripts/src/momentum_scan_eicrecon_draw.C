@@ -50,9 +50,10 @@ void momentum_scan_eicrecon_draw(
     hist->SetName(name+"_scan");
     scans.insert({name,hist});
   };
-  get_scan( "pid_irt", "nphot"  );
-  get_scan( "pid_irt", "npe",   radiator_name );
-  get_scan( "pid_irt", "theta", radiator_name );
+  get_scan( "pid_irt", "nphot"       );
+  get_scan( "pid_irt", "npe",        radiator_name );
+  get_scan( "pid_irt", "theta",      radiator_name );
+  get_scan( "pid_irt", "thetaResid", radiator_name );
 
   // make scan profiles
   std::map<TString,TProfile*> scan_profs;
