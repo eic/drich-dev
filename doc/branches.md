@@ -30,7 +30,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | `epic`      | `main`                      |                                                                             |
 | `EDM4eic`   | `irt-data-model`            | https://github.com/eic/EDM4eic/pull/1                                       |
 | `irt`       | `main`                      |                                                                             |
-| `EICrecon`  | `juggler-irt-support`       | https://github.com/eic/EICrecon/pull/424                                    |
+| `EICrecon`  | `main`                      |                                                                             |
 | `juggler`   | `73-add-rich-irt-algorithm` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377) |
 
 ## Sensor Development
