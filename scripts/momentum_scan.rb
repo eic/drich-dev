@@ -5,12 +5,26 @@ require 'open3'
 require 'fileutils'
 require 'pycall/import'
 
+## SETTINGS ########################################
+NumEvents         = 70    # number of events per fixed momentum
+NumPoints         = 10    # number of momenta to sample
+PoolSize          = 6     # number of parallel threads to run
+RunSimulation     = true  # if true, run the simulation step
+RunReconstruction = true  # if true, run the reconstruction step
+UseRINDEXrange    = false # if true, use range of RINDEX values rather than a single reference value
+####################################################
+
+
 ## args
-if ARGV.length<1
+if ARGV.length<2
   $stderr.puts """
-  USAGE: #{$0} [d/p]
-     d: test dRICH
-     p: test pfRICH
+  USAGE: #{$0} [d/p] [j/e]
+     [d/p]: detector
+       d: dRICH
+       p: pfRICH
+     [j/e]: reconstruction
+       j: juggler
+       e: eicrecon
   """
   exit 2
 end
@@ -23,32 +37,38 @@ when "d"
   xRICH      = "dRICH"
   xrich      = "drich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>65.0, },
   }
 when "p"
   zDirection = -1
   xRICH      = "pfRICH"
   xrich      = "pfrich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>65.0, },
   }
 else
-  $stderr.puts "ERROR: unknown argument #{ARGV[0]}"
+  $stderr.puts "ERROR: unknown detector '#{ARGV[0]}'"
+  exit 1
 end
 
-## settings
-NumEvents      = 50                  # number of events per fixed momentum
-NumPoints      = 10                  # number of momenta to sample
-PoolSize       = 6                   # number of parallel threads to run
-OutputDir      = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
-RunSimRec      = true                # if false, do not run simulation+reconstruction, only draw the result
-UseRINDEXrange = false               # if true, use range of RINDEX values rather than a single reference value
+## reconstruction specific settings
+case ARGV[1]
+when "j"
+  reconMethod      = :juggler
+  reconWrapperArgs = '-j'
+when "e"
+  reconMethod      = :eicrecon
+  reconWrapperArgs = '-e'
+else
+  $stderr.puts "ERROR: unknown reconstruction '#{ARGV[1]}'"
+  exit 1
+end
 
 ## list of particles to test
 particle_h = {
-  'e-'          => { :mass=>0.00051, },
+  # 'e-'          => { :mass=>0.00051, },
   'pi+'         => { :mass=>0.13957, },
   'kaon+'       => { :mass=>0.49368, },
   'proton'      => { :mass=>0.93827, },
@@ -58,11 +78,9 @@ particle_h = {
   # 'anti_proton' => { :mass=>0.93827, },
 }
 
-## warn if not doing simulation
-puts "\nNOTE: skipping simulation+reconstruction, since RunSimRec=false\n\n" unless RunSimRec
-
 ## produce output file dir and names
-if RunSimRec
+OutputDir = "out/momentum_scan.#{xrich}" # output directory ( ! will be overwritten ! )
+if RunSimulation
   FileUtils.rm_r OutputDir, secure: true, verbose: true, force: true
   FileUtils.mkdir_p OutputDir
 end
@@ -79,30 +97,35 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     rec_file = out_file particle, "rec.#{rad_name}.root"
     cmds = []
     # simulation + reconstruction
-    if RunSimRec
+    if RunSimulation or RunReconstruction
       cmds << [
         './simulate.py',
         "-t#{rad[:testNum]}",
-        '-s',
         "-d#{zDirection}",
         "-p#{particle}",
         "-n#{NumEvents}",
         "-k#{NumPoints}",
         "-o#{sim_file}",
-      ]
+      ] if RunSimulation
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
-        "-j",
-        "-i #{sim_file}",
-        "-o #{rec_file}",
-      ]
+        "#{reconWrapperArgs}",
+        "-i#{sim_file}",
+        "-o#{rec_file}",
+      ] if RunReconstruction
       # analysis
       plot_file = out_file particle, "rec_plots.#{rad_name}.root"
       cmds << [
         'root', '-b', '-q',
-        "scripts/src/momentum_scan_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
       ]
+      case reconMethod
+      when :juggler
+        cmds.last << "scripts/src/momentum_scan_juggler_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
+      when :eicrecon
+        ana_file = rec_file.sub /\.root/, '.ana.root'
+        cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})"
+      end
     end
     # spawn thread
     Thread.new do
@@ -111,8 +134,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         mode = i==0 ? 'w' : 'a'
         Open3.pipeline(
           cmd,
-          out: [out_file(particle,'log.out'),mode],
-          err: [out_file(particle,'log.err'),mode],
+          out: [out_file(particle,"#{rad_name}.log.out"),mode],
+          err: [out_file(particle,"#{rad_name}.log.err"),mode],
         )
       end
     end
@@ -126,8 +149,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
 end
 
 # print errors for one of the particles
-puts "ERRORS (for one particle) ======================="
-system "cat #{out_file particle_h.keys.first, 'log.err'}"
+puts "ERRORS (for one job) ======================="
+system "cat #{Dir.glob(OutputDir+"/*.err").first}"
 puts "END ERRORS ======================================"
 
 
@@ -157,14 +180,14 @@ radiator_h.each do |rad_name,rad|
       }.to_h
     ]
   end.to_h
-  draw_h['e-'][:color]      = r.kBlack
-  draw_h['pi+'][:color]     = r.kBlue
-  draw_h['kaon+'][:color]   = r.kGreen+1
-  draw_h['proton'][:color]  = r.kMagenta
-  draw_h['e-'][:marker]     = r.kFullCircle
-  draw_h['pi+'][:marker]    = r.kFullSquare
-  draw_h['kaon+'][:marker]  = r.kFullTriangleUp
-  draw_h['proton'][:marker] = r.kFullTriangleDown
+  draw_h['e-'][:color]      = r.kBlack            if particle_h.has_key? 'e-'
+  draw_h['pi+'][:color]     = r.kBlue             if particle_h.has_key? 'pi+'
+  draw_h['kaon+'][:color]   = r.kGreen+1          if particle_h.has_key? 'kaon+'
+  draw_h['proton'][:color]  = r.kMagenta          if particle_h.has_key? 'proton'
+  draw_h['e-'][:marker]     = r.kFullCircle       if particle_h.has_key? 'e-'
+  draw_h['pi+'][:marker]    = r.kFullSquare       if particle_h.has_key? 'pi+'
+  draw_h['kaon+'][:marker]  = r.kFullTriangleUp   if particle_h.has_key? 'kaon+'
+  draw_h['proton'][:marker] = r.kFullTriangleDown if particle_h.has_key? 'proton'
 
   ## loop over plots (loop through the first particle's file, assume the rest have the same)
   first_root_file = draw_h[particle_h.keys.first][:root_file]
@@ -246,6 +269,7 @@ radiator_h.each do |rad_name,rad|
           rad[:maxTheta] = [rad[:maxTheta],plot.GetMaximum].max        # max point
         end
       end
+      plot.GetXaxis.SetRangeUser(0,rad[:maxMomentum])
       plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta]) if plot_name.match?(/^theta_/)
 
     end

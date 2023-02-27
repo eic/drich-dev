@@ -14,7 +14,7 @@ from numpy import linspace
 # SETTINGS
 ################################################################
 use_npdet_info = False  # use npdet_info to get envelope dimensions
-rMinBuffer = 40 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
+rMinBuffer = 10 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
 rMaxBuffer = -5 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
 
 # ARGUMENTS
@@ -25,8 +25,8 @@ testNum = -1
 standalone = False
 compactFileCustom = ''
 zDirection = 1
-particle = 'pi+'
-energy = '40.0 GeV'
+particle_name = 'pi+'
+particle_momentum = 40.0
 runType = 'run'
 numEvents = 50
 numTestSamples = 0
@@ -70,14 +70,14 @@ helpStr = f'''
                 -s: enable standalone RICH-only simulation (default is full detector)
                 -c [compact file]: specify a custom compact file
                    (this will override -d and -s options)
-                -p [particle]: name of particle to throw; default: {particle}
+                -p [particle]: name of particle to throw; default: {particle_name}
                    examples:
                     - e- / e+
                     - pi+ / pi-
                     - kaon+ / kaon-
                     - proton / anti_proton
                     - opticalphoton
-                -e [energy]: energy (GeV) for mono-energetic runs (default={energy})
+                -m [momentum]: momentum (GeV) for mono-energetic runs (default={particle_momentum})
                 -n [numEvents]: number of events to process (default={numEvents})
                    - if using TEST_NUM, this is usually the number of events PER fixed momentum
                    - if using INPUT_FILE, you can set to 0 to run ALL events in the file, otherwise
@@ -91,7 +91,7 @@ helpStr = f'''
                     to a single sector
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
-                -m [output image type]: save visual with specified type (svg,pdf,ps)
+                -e [output image extension]: save visual with specified type (svg,pdf,ps)
                    - useful tip: if you want to suppress the drawing of the visual, but
                      still save an output image, use Xvbf (start EIC container shell
                      as `xvfb-run eic-shell`); this is good for batch processing
@@ -106,9 +106,9 @@ if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:e:n:k:arvm:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:n:k:arve:o:f')
 except getopt.GetoptError:
-    print('\n\nERROR: invalid argument\n', helpStr)
+    print('\n\nERROR: invalid argument\n', helpStr, file=sys.stderr)
     sys.exit(2)
 for opt, arg in opts:
     if (opt == '-i'): inputFileName = arg.lstrip()
@@ -116,34 +116,58 @@ for opt, arg in opts:
     if (opt == '-d'): zDirection = int(arg)
     if (opt == '-s'): standalone = True
     if (opt == '-c'): compactFileCustom = arg.lstrip()
-    if (opt == '-p'): particle = arg.lstrip()
-    if (opt == '-e'): energy = arg.lstrip() + " GeV"
+    if (opt == '-p'): particle_name = arg.lstrip()
+    if (opt == '-m'): particle_momentum = float(arg)
     if (opt == '-n'): numEvents = int(arg)
     if (opt == '-k'): numTestSamples = int(arg)
     if (opt == '-a'): restrict_sector = False
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
-    if (opt == '-m'): outputImageType = arg.lstrip()
+    if (opt == '-e'): outputImageType = arg.lstrip()
     if (opt == '-o'): outputFileName = arg.lstrip()
     if (opt == '-f'): useEDM4hepFormat = False
 if (testNum < 0 and inputFileName == ''):
-    print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr)
+    print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr, file=sys.stderr)
     sys.exit(2)
 elif (testNum > 0 and inputFileName != ''):
-    print('\n\nWARNING: You specified both an input file and a test number; proceeding with the input file only.\n')
+    print('\n\nWARNING: You specified both an input file and a test number; proceeding with the input file only.\n', file=sys.stderr)
     testNum = -1
 
 ### overrides
 if (testNum >= 10):
     print("optics test, overriding some settings...")
-    particle = 'opticalphoton'
+    particle_name = 'opticalphoton'
     standalone = True
     if (testNum in [10,11,12]):
         print("-- this is a visual test --")
         runType = 'vis'
-if (particle == "opticalphoton"):
-    energy = '3.0 eV'
-    print(f'optical photons test: using energy {energy}')
+if (particle_name == "opticalphoton"):
+    particle_momentum = 3e-9
+    print(f'optical photons test: using energy {particle_momentum}')
+
+### helper functions
+# convert momentum -> kinetic energy
+def momentum_to_kinetic_energy(p,part):
+    # first get the mass
+    mass = 0.0
+    if bool(re.search('^e[+-]$',part)):
+        mass = 0.000510999
+    elif bool(re.search('^pi[+-]$',part)):
+        mass = 0.13957
+    elif bool(re.search('^kaon[+-]$',part)):
+        mass = 0.493677
+    elif bool(re.search('proton$',part)):
+        mass = 0.938272
+    elif (part == "opticalphoton"):
+        mass = 0.0
+    else:
+        print(f'WARNING: mass for particle "{part}" needs to be added to simulate.py; assuming momentum==energy for now', file=sys.stderr)
+    # then convert to energy
+    en = math.sqrt( math.pow(p,2) + math.pow(mass,2) )
+    kin_en = en - mass # total energy = kinetic energy + rest energy
+    print(f'Momentum {p} GeV converted to Kinetic Energy {kin_en} GeV')
+    return kin_en
+
 
 ### configure input and output file names
 ### relative paths will be made absolute here
@@ -196,7 +220,7 @@ print(sep)
 print("** simulation args **")
 print(f'inputFileName  = {inputFileName}')
 print(f'testNum        = {testNum}')
-print(f'particle       = {particle}')
+print(f'particle       = {particle_name}')
 print(f'numEvents      = {numEvents}')
 print(f'numTestSamples = {numTestSamples}')
 print(f'runType        = {runType}')
@@ -238,11 +262,13 @@ if (runType == 'vis'):
 
 ### append particle info
 m.write(f'/gps/verbose 2\n')
-m.write(f'/gps/particle {particle}\n')
+m.write(f'/gps/particle {particle_name}\n')
 m.write(f'/gps/number 1\n')
-if (testNum != 7 and testNum != 8): m.write(f'/gps/ene/mono {energy}\n')
-# m.write(f'/gps/ene/type Gauss\n')
-# m.write(f'/gps/ene/sigma 3.0 GeV\n')
+
+### convert momentum to energy, mono-energetic gun
+if (testNum != 7 and testNum != 8):
+    energy = momentum_to_kinetic_energy(particle_momentum,particle_name)
+    m.write(f'/gps/ene/mono {energy} GeV\n')
 
 ### append source settings
 m.write(f'/gps/position 0 0 0 cm\n')
@@ -316,6 +342,12 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
+### set "ideal" angle for testing -> fill rings, middle of acceptance
+# thetaMid = (thetaMin+thetaMax)/2.0
+thetaMid = math.radians(23.5)
+print(f'thetaMid = {math.degrees(thetaMid)} deg')
+print(sep)
+
 evnum = 0 # event number counter (for logging)
 
 # TEST SETTINGS
@@ -325,7 +357,6 @@ evnum = 0 # event number counter (for logging)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    thetaMid = (thetaMin+thetaMax)/2.0 + math.radians(4.0) # offset so we get full rings
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection
@@ -400,7 +431,6 @@ elif testNum == 6:
 elif testNum == 7 or testNum == 8:
     m.write(f'\n# momentum scan\n')
     numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
-    thetaMid = (thetaMin+thetaMax)/2.0
     x = math.sin(thetaMid)
     y = 0.0
     z = math.cos(thetaMid) * zDirection
@@ -408,7 +438,8 @@ elif testNum == 7 or testNum == 8:
     momMax = 60
     if testNum == 7:
         momMax = 20
-    for en in list(linspace(1, momMax, numMomPoints)):
+    for mom in list(linspace(1, momMax, numMomPoints)):
+        en = momentum_to_kinetic_energy(mom,particle_name)
         m.write(f'/gps/ene/mono {en} GeV\n')
         m.write(f'/run/beamOn {numEvents}\n')
 
@@ -472,7 +503,7 @@ elif testNum == 13:
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum > 0:
-    print("ERROR: unknown test number\n")
+    print("ERROR: unknown test number\n", file=sys.stderr)
     m.close()
     sys.exit(2)
 

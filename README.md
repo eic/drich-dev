@@ -109,7 +109,8 @@ of branches for varying configurations.
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
   - `$EIC_SHELL_PREFIX` is the main directory where module builds will be installed
-    - by default, it is `<path to eic-shell>/local`
+    - `environ.sh` will change this to `./prefix`, so that all module builds
+      will be installed locally
     - change it, if you prefer a different directory
   - you can find documentation for many other variables in the corresponding
     module repositories

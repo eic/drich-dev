@@ -22,7 +22,7 @@ class radiator_config {
 
 
 
-void draw_tracks(TString infileN = "out/rec.root") {
+void test_tracks(TString infileN = "out/rec.root") {
   auto infile = new TFile(infileN);
   auto tr = (TTree*) infile->Get("events");
   TTreeReader tr_reader("events", infile);
