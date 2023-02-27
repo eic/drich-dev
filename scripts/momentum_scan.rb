@@ -9,7 +9,7 @@ require 'pycall/import'
 NumEvents         = 70    # number of events per fixed momentum
 NumPoints         = 10    # number of momenta to sample
 PoolSize          = 6     # number of parallel threads to run
-RunSimulation     = false # if true, run the simulation step
+RunSimulation     = true  # if true, run the simulation step
 RunReconstruction = true  # if true, run the reconstruction step
 UseRINDEXrange    = false # if true, use range of RINDEX values rather than a single reference value
 ####################################################
