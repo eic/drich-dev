@@ -7,8 +7,8 @@
 
 // local
 #include "WhichRICH.h"
-#include "richgeo/IrtGeoDRICH.h"
-#include "richgeo/IrtGeoPFRICH.h"
+#include "IrtGeoDRICH.h"
+#include "IrtGeoPFRICH.h"
 
 int main(int argc, char** argv) {
 
@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
   auto irtAuxFile = new TFile(irtAuxFileName.c_str(),"RECREATE");
 
   // given DD4hep geometry from `compactFileName`, produce IRT geometry
-  rich::IrtGeo *IG;
-  if(zDirectionStr=="d")      IG = new rich::IrtGeoDRICH(compactFileName, true);
-  else if(zDirectionStr=="p") IG = new rich::IrtGeoPFRICH(compactFileName, true);
+  richgeo::IrtGeo *IG;
+  if(zDirectionStr=="d")      IG = new richgeo::IrtGeoDRICH(compactFileName, true);
+  else if(zDirectionStr=="p") IG = new richgeo::IrtGeoPFRICH(compactFileName, true);
   else return 1;
 
   // write IRT auxiliary file

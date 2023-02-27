@@ -25,13 +25,13 @@ DEPS += -I/usr/local/include
 BIN_TARGET = bin
 EXECUTABLES := $(addprefix $(BIN_TARGET)/, $(basename $(notdir $(wildcard src/*.cpp))))
 
-EICRECON_DIR = ${DRICH_DEV}/EICrecon/src/services/geometry/rich
+EICRECON_DIR = ${DRICH_DEV}/EICrecon/src/services/geometry/richgeo
 DEPS += -I$(EICRECON_DIR)
 
 LIB_TARGET = lib
 IRTGEO_LIB_NAME = IrtGeo
 IRTGEO_LIB = $(LIB_TARGET)/lib$(IRTGEO_LIB_NAME).so
-IRTGEO_ROOT = $(EICRECON_DIR)/richgeo
+IRTGEO_ROOT = $(EICRECON_DIR)
 IRTGEO_SOURCES := $(wildcard $(IRTGEO_ROOT)/IrtGeo*.cc)
 IRTGEO_HEADERS := $(wildcard $(IRTGEO_ROOT)/IrtGeo*.h) $(IRTGEO_ROOT)/RichGeo.h
 
