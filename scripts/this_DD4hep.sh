@@ -17,6 +17,9 @@ export LD_LIBRARY_PATH=$DD4hep_ROOT/lib:$LD_LIBRARY_PATH_TMP
 # thisdd4hep.sh also doens't select the newly installed examples
 export DD4HEP=$DD4hep_ROOT/examples
 
+# add /usr/local/bin back to $PATH (workaround..)
+export PATH="/usr/local/bin:$PATH"
+
 
 # old test version (not using thisdd4hep.sh)
 # export DD4hep_ROOT=$DRICH_DEV/DD4hep/install

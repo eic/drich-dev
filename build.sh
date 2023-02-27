@@ -66,6 +66,10 @@ case $module in
   EDM4eic)
     genOpt BUILD_DATA_MODEL=ON
     ;;
+  EDM4hep)
+    genOpt BUILD_DATA_MODEL=ON
+    genOpt USE_EXTERNAL_CATCH2=OFF
+    ;;
   irt)
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=ON
@@ -188,5 +192,8 @@ case $module in
     ;;
   DD4hep)
     printf "\nDone. To use, run:  source scripts/this_DD4hep.sh\n\n"
+    ;;
+  EDM4hep)
+    printf "\nDone. To use, run:  export EDM4HEP_ROOT=$prefix\n\n"
     ;;
 esac
