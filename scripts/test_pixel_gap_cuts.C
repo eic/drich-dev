@@ -21,17 +21,4 @@ void test_pixel_gap_cuts() {
     h->Draw();
     c->SaveAs("out/gap.png");
   }
-
-  // draw ADC and TDC
-  // TH1Dgcl
-
-  /*
-  auto infile = new TFile("out/rec.root");
-  auto tr = (TTree*) infile->Get("events");
-  auto h = new TH1D("h","h",1000,0,10000);
-  tr->Project("h","DRICHRawHits.integral");
-  cout << "ENTRIES = " << h->GetEntries() << endl;
-  */
-
-
 }
