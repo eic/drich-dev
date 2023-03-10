@@ -74,6 +74,14 @@ export PATH=$DRICH_DEV/bin:$PATH                      # drich-dev/bin
 # - shell settings and aliases
 shopt -s autocd # enable autocd (`alias <dirname>='cd <dirname>'`)
 alias ll='ls -lhp --color=auto'
+# - open a ROOT file in a TBrowser
+broot() {
+  if [ $# -ne 1 ]; then
+    echo "USAGE: $0 [ROOT file]"
+  else
+    root -l --web=off $1 -e 'new TBrowser'
+  fi
+}
 
 # print environment
 echo """
