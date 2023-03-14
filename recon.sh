@@ -121,7 +121,7 @@ case $method in
     """
 
     # build `eicrecon` command #####################
-    cmd="eicrecon"
+    cmd="prefix2/install/bin/eicrecon"
 
     # helpers
     set_config() { cmd+=" -P$1=$2"; } # set a JANA configuration parameter
@@ -131,16 +131,16 @@ case $method in
     # list of collections to save
     collections=(
       DRICHHits
-      DRICHRawHitsAssociations
-      DRICHAerogelTracks DRICHGasTracks
-      DRICHIrtCherenkovParticleID
+      # DRICHRawHitsAssociations
+      # DRICHAerogelTracks DRICHGasTracks
+      # DRICHIrtCherenkovParticleID
     )
 
     # list of additional plugins to use
     plugins=(
       janadot
       # dump_flags
-      benchmarks_pid
+      # benchmarks_pid
     )
 
     # general common settings
@@ -158,7 +158,7 @@ case $method in
     set_log_level "DRICH:DRICHRawHitsAssociations"    "info"
     set_log_level "DRICH:DRICHAerogelTracks"          "info"
     set_log_level "DRICH:DRICHGasTracks"              "info"
-    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "info"
     set_log_level "benchmarks_pid"                    "info"
 
     # input file from simulation
