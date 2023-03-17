@@ -16,10 +16,6 @@ echo "detected $BUILD_NPROC cpus"
 # local installation prefix
 export EIC_SHELL_PREFIX=$DRICH_DEV/prefix
 
-# cmake packages
-export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-export EDM4EIC_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-
 # # source environment from reconstruction_benchmarks
 # if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
 #   pushd reconstruction_benchmarks
@@ -101,10 +97,6 @@ Detector:
   DETECTOR_PATH    = $DETECTOR_PATH
   DETECTOR_CONFIG  = $DETECTOR_CONFIG
   DETECTOR_VERSION = $DETECTOR_VERSION
-
-Packages:
-  IRT_ROOT     = $IRT_ROOT
-  EDM4EIC_ROOT = $EDM4EIC_ROOT
 
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
