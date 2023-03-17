@@ -1,17 +1,27 @@
 #!/bin/bash
 
 set -e
-mkdir -p prefix2
+
+prefix=$(pwd)/prefix2
+ncpu=4
+
+mkdir -p $prefix
+
+# override with local builds
+export CMAKE_PREFIX_PATH=$prefix/install:$CMAKE_PREFIX_PATH
 
 # build IRT
-cmake -S irt -B prefix2/build_irt -DCMAKE_INSTALL_PREFIX=prefix2/install
-cmake --build prefix2/build_irt -j8
-cmake --install prefix2/build_irt
+cmake -S irt -B $prefix/build_irt -DCMAKE_INSTALL_PREFIX=$prefix/install
+cmake --build $prefix/build_irt -j$ncpu
+cmake --install $prefix/build_irt
 
-# overrides container version with local version
-export IRT_ROOT=$pwd/prefix2/install
+echo ""
+echo "========================================"
+echo "========================================"
+echo "========================================"
+echo ""
 
 # build EICrecon
-cmake -S EICrecon -B prefix2/build_eicrecon -DCMAKE_INSTALL_PREFIX=prefix2/install
-cmake --build prefix2/build_eicrecon -j8
-cmake --install prefix2/build_eicrecon
+cmake -S EICrecon -B $prefix/build_eicrecon -DCMAKE_INSTALL_PREFIX=$prefix/install
+cmake --build $prefix/build_eicrecon -j$ncpu
+cmake --install $prefix/build_eicrecon
