@@ -1,5 +1,7 @@
 #!/bin/bash
 
+printf "\n\nNOTE: if using EICrecon, be on irt-algo branch\n\n"
+
 # default settings
 which_rich=""
 method=""
