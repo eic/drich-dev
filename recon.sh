@@ -131,16 +131,16 @@ case $method in
     # list of collections to save
     collections=(
       DRICHHits
-      DRICHRawHitsAssociations
+      DRICHRawHits
       DRICHAerogelTracks DRICHGasTracks
-      DRICHIrtCherenkovParticleID
+      # DRICHIrtCherenkovParticleID
     )
 
     # list of additional plugins to use
     plugins=(
-      janadot
+      # janadot
       # dump_flags
-      benchmarks_pid
+      # benchmarks_pid
     )
 
     # general common settings
@@ -155,11 +155,11 @@ case $method in
     # log levels
     set_log_level "eicrecon"                          "info"
     set_log_level "richgeo"                           "info"
-    set_log_level "DRICH:DRICHRawHitsAssociations"    "info"
+    set_log_level "DRICH:DRICHRawHits"                "info"
     set_log_level "DRICH:DRICHAerogelTracks"          "info"
     set_log_level "DRICH:DRICHGasTracks"              "info"
-    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
-    set_log_level "benchmarks_pid"                    "info"
+    # set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
+    # set_log_level "benchmarks_pid"                    "info"
 
     # input file from simulation
     cmd+=" $sim_file"
