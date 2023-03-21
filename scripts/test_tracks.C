@@ -4,11 +4,12 @@
 
 class radiator_config {
   public:
-    radiator_config(int id_, std::string name_, EColor color_, TTreeReader& reader) :
+    radiator_config(int id_, std::string name_, Color_t color_, Style_t style_, TTreeReader& reader) :
       id(id_),
       name(name_),
       color(color_),
-      collName(Form("DRICH%sTracks_0",name.c_str())),
+      style(style_),
+      collName(Form("DRICH%s_0",name.c_str())),
       x_arr({reader, collName+".position.x"}),
       y_arr({reader, collName+".position.y"}),
       z_arr({reader, collName+".position.z"}) {}
@@ -16,7 +17,8 @@ class radiator_config {
     int         id;
     std::string name;
     TString     collName;
-    EColor      color;
+    Color_t     color;
+    Style_t     style;
     TTreeReaderArray<Float_t> x_arr, y_arr, z_arr;
 };
 
@@ -28,8 +30,10 @@ void test_tracks(TString infileN = "out/rec.root") {
   TTreeReader tr_reader("events", infile);
   
   std::vector<radiator_config*> radiators = {
-    new radiator_config( 0, "Aerogel", kRed,   tr_reader ),
-    new radiator_config( 1, "Gas",     kBlack, tr_reader )
+    new radiator_config( 0, "AerogelTracks",       kAzure+7, kFullCircle, tr_reader ),
+    new radiator_config( 1, "GasTracks",           kRed,     kFullCircle, tr_reader ),
+    // new radiator_config( 0, "AerogelPseudoTracks", kGreen+2, kOpenCircle, tr_reader ),
+    // new radiator_config( 1, "GasPseudoTracks",     kMagenta, kOpenCircle, tr_reader )
   };
 
   double rmax = 1900;
@@ -38,7 +42,7 @@ void test_tracks(TString infileN = "out/rec.root") {
   double zmin = 1800;
   double zmax = 3300;
 
-  ymax = 30; // zoom to horizontal (y=0) plane
+  ymax = 200; // zoom to horizontal (y=0) plane
 
   // 2D plots
   enum views { zx, zy, xy, Nview };
@@ -62,12 +66,11 @@ void test_tracks(TString infileN = "out/rec.root") {
       points2[view].push_back(gr);
       points2mgr[view]->Add(gr);
       gr->SetMarkerColor(radiator->color);
-      gr->SetMarkerStyle(kFullCircle);
+      gr->SetMarkerStyle(radiator->style);
       gr->SetName(Form("points_%s_%s",viewN[view].Data(),radiator->name.c_str()));
       gr->SetTitle(viewT[view]);
       tr_reader.Restart();
-      tr_reader.SetEntriesRange(1,0);
-      do {
+      while(tr_reader.Next()) {
         auto i_offset = gr->GetN();
         for(int i=0; i<radiator->x_arr.GetSize(); i++) {
           auto x = radiator->x_arr[i];
@@ -79,7 +82,7 @@ void test_tracks(TString infileN = "out/rec.root") {
             case xy: gr->SetPoint(i+i_offset,x,y); break;
           }
         }
-      } while(tr_reader.Next());
+      }
     }
   }
   auto canv2 = new TCanvas("canv2","canv2",Nview*800,600);

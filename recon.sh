@@ -135,6 +135,7 @@ case $method in
       DRICHHits
       DRICHRawHitsAssociations
       DRICHAerogelTracks DRICHGasTracks
+      # DRICHAerogelPseudoTracks DRICHGasPseudoTracks
       DRICHIrtCherenkovParticleID
     )
 
@@ -160,7 +161,9 @@ case $method in
     set_log_level "DRICH:DRICHRawHitsAssociations"    "info"
     set_log_level "DRICH:DRICHAerogelTracks"          "info"
     set_log_level "DRICH:DRICHGasTracks"              "info"
-    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
+    # set_log_level "DRICH:DRICHAerogelPseudoTracks"    "info"
+    # set_log_level "DRICH:DRICHGasPseudoTracks"        "info"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "info"
     set_log_level "benchmarks_pid"                    "info"
 
     # input file from simulation

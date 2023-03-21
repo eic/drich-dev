@@ -26,7 +26,8 @@ standalone = False
 compactFileCustom = ''
 zDirection = 1
 particle_name = 'pi+'
-particle_momentum = 40.0
+particle_momentum = 40.0 # [GeV]
+particle_theta = 23.5 # [deg]
 runType = 'run'
 numEvents = 50
 numTestSamples = 0
@@ -78,6 +79,7 @@ helpStr = f'''
                     - proton / anti_proton
                     - opticalphoton
                 -m [momentum]: momentum (GeV) for mono-energetic runs (default={particle_momentum})
+                -a [angle]: fixed polar angle for certain tests [deg] (default={particle_theta})
                 -n [numEvents]: number of events to process (default={numEvents})
                    - if using TEST_NUM, this is usually the number of events PER fixed momentum
                    - if using INPUT_FILE, you can set to 0 to run ALL events in the file, otherwise
@@ -87,7 +89,7 @@ helpStr = f'''
                    how many directions are tested
                    - many tests offer a similar usage of [numTestSamples]
                    - these tests also have default [numTestSamples] values
-                -a: allow azimuthal scans to cover the full 2*pi range, rather than restricting
+                -l: allow azimuthal scans to cover the full 2*pi range, rather than restricting
                     to a single sector
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
@@ -106,7 +108,7 @@ if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:n:k:arve:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:a:n:k:lrve:o:f')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr, file=sys.stderr)
     sys.exit(2)
@@ -118,9 +120,10 @@ for opt, arg in opts:
     if (opt == '-c'): compactFileCustom = arg.lstrip()
     if (opt == '-p'): particle_name = arg.lstrip()
     if (opt == '-m'): particle_momentum = float(arg)
+    if (opt == '-a'): particle_theta = float(arg)
     if (opt == '-n'): numEvents = int(arg)
     if (opt == '-k'): numTestSamples = int(arg)
-    if (opt == '-a'): restrict_sector = False
+    if (opt == '-l'): restrict_sector = False
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
     if (opt == '-e'): outputImageType = arg.lstrip()
@@ -221,6 +224,7 @@ print("** simulation args **")
 print(f'inputFileName  = {inputFileName}')
 print(f'testNum        = {testNum}')
 print(f'particle       = {particle_name}')
+print(f'particle_theta = {particle_theta} deg')
 print(f'numEvents      = {numEvents}')
 print(f'numTestSamples = {numTestSamples}')
 print(f'runType        = {runType}')
@@ -342,12 +346,6 @@ print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
 print(sep)
 
-### set "ideal" angle for testing -> fill rings, middle of acceptance
-# thetaMid = (thetaMin+thetaMax)/2.0
-thetaMid = math.radians(23.5)
-print(f'thetaMid = {math.degrees(thetaMid)} deg')
-print(sep)
-
 evnum = 0 # event number counter (for logging)
 
 # TEST SETTINGS
@@ -357,9 +355,9 @@ evnum = 0 # event number counter (for logging)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    x = math.sin(thetaMid)
+    x = math.sin(math.radians(particle_theta))
     y = 0.0
-    z = math.cos(thetaMid) * zDirection
+    z = math.cos(math.radians(particle_theta)) * zDirection
     m.write(f'/gps/direction {x} {y} {z}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
@@ -431,9 +429,9 @@ elif testNum == 6:
 elif testNum == 7 or testNum == 8:
     m.write(f'\n# momentum scan\n')
     numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
-    x = math.sin(thetaMid)
+    x = math.sin(math.radians(particle_theta))
     y = 0.0
-    z = math.cos(thetaMid) * zDirection
+    z = math.cos(math.radians(particle_theta)) * zDirection
     m.write(f'/gps/direction {x} {y} {z}\n')
     momMax = 60
     if testNum == 7:
