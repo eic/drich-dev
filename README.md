@@ -338,7 +338,7 @@ corresponding executables and install them to `bin/`
 
 NOTE: this documentation is primarily for the Juggler version; the EICrecon version will be documented
 later, when at least a basic version is merged to `main`, but in the meantime, see
-[doc/eicrecon.pdf](doc/eicrecon.pdf)
+[the README in EICrecon](https://github.com/eic/EICrecon/tree/main/src/detectors/DRICH).
 
 We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
 as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
