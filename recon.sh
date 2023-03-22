@@ -137,6 +137,7 @@ case $method in
       DRICHAerogelTracks DRICHGasTracks
       # DRICHAerogelPseudoTracks DRICHGasPseudoTracks
       DRICHIrtCherenkovParticleID
+      DRICHParticleID
     )
 
     # list of additional plugins to use
@@ -164,6 +165,7 @@ case $method in
     # set_log_level "DRICH:DRICHAerogelPseudoTracks"    "info"
     # set_log_level "DRICH:DRICHGasPseudoTracks"        "info"
     set_log_level "DRICH:DRICHIrtCherenkovParticleID" "info"
+    set_log_level "DRICH:DRICHParticleID"             "trace"
     set_log_level "benchmarks_pid"                    "info"
 
     # input file from simulation
