@@ -68,7 +68,7 @@ end
 
 ## list of particles to test
 particle_h = {
-  # 'e-'          => { :mass=>0.00051, },
+  'e-'          => { :mass=>0.00051, },
   'pi+'         => { :mass=>0.13957, },
   'kaon+'       => { :mass=>0.49368, },
   'proton'      => { :mass=>0.93827, },
@@ -146,6 +146,18 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
   end
   # wait for pool to finish
   pool.each &:join
+end
+
+# draw 2D hadd plots
+if reconMethod == :eicrecon
+  radiator_h.each do |rad_name,rad|
+    drawArgs = [
+      "\"#{OutputDir}/*.rec.#{rad_name}.ana.root\"",
+      "\"#{OutputDir}/_theta_scan_2D.#{rad_name}\"",
+      rad[:id]
+    ].join ','
+    system "root -b -q scripts/src/momentum_scan_2D_draw.C'(#{drawArgs})'"
+  end
 end
 
 # print errors for one of the particles
