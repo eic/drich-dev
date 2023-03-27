@@ -10,7 +10,8 @@ enum rad_enum {kAgl, kGas, nRad};
 void momentum_scan_2D_draw(
     TString  ana_file_names = "out/momentum_scan.drich/*.rec.agl.ana.root", // input files (will be hadded)
     TString  out_base_name  = "out/2D",                                     // output; should be png or pdf
-    unsigned which_radiator = 0                                             // see `rad_enum` above
+    unsigned which_radiator = 0,                                            // see `rad_enum` above
+    Int_t    n_group_rebin  = 1                                             // ngroup for rebinning momentum bins (1=disable)
     )
 {
 
@@ -25,13 +26,13 @@ void momentum_scan_2D_draw(
   switch(which_radiator) {
     case kAgl:
       radiator_name = "Aerogel";
-      mom_max       = 22;  // for plot zoom
+      mom_max       = 20;  // for plot zoom
       theta_max     = 230; // for plot zoom
       rindex_ref    = 1.0190;
       break;
     case kGas:
       radiator_name = "Gas";
-      mom_max       = 65; // for plot zoom
+      mom_max       = 60; // for plot zoom
       theta_max     = 50; // for plot zoom
       rindex_ref    = 1.00076;
       break;
@@ -70,6 +71,14 @@ void momentum_scan_2D_draw(
     scans.insert({name,hist});
   };
   get_scan( "pid_irt", "theta", radiator_name );
+
+  // re-binning
+  for(const auto& [name,scan] : scans) {
+    if(n_group_rebin>1) {
+      fmt::print("REBIN: n_group_rebin={}\n", n_group_rebin);
+      scan->RebinX(n_group_rebin);
+    }
+  }
 
   // draw
   gStyle->SetOptStat(0);
