@@ -78,7 +78,11 @@ case $module in
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=OFF
     genOpt EVALUATION=OFF
-    genOpt IRT_ROOT_IO=ON
+    genOpt IRT_ROOT_IO=OFF  #
+                            #
+                            # FIXME: re-enable IRT_ROOT_IO before merging to main (for juggler support)
+                            #
+                            #
     ;;
   epic)
     ;;
