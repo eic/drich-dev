@@ -75,6 +75,8 @@ case $module in
     genOpt USE_EXTERNAL_CATCH2=OFF
     ;;
   irt)
+    echo "IRT building is currently disabled!" # FIXME: force us to test with container build
+    exit 1
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=OFF
     genOpt EVALUATION=OFF
