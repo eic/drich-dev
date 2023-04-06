@@ -35,8 +35,13 @@ source /opt/detector/setup.sh
 
 # source EICrecon installation
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
+  ### PATCH: exclude container's EICrecon plugins from $JANA_PLUGIN_PATH
+  exc="/usr/local/lib/EICrecon/plugins"
+  export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
+  ### SOURCE EICrecon
   source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-  export PATH="$PATH:/usr/local/bin" ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+  ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+  export PATH="$PATH:/usr/local/bin"
 fi
 
 
@@ -115,6 +120,7 @@ Common:
   DRICH_DEV        = $DRICH_DEV
   BUILD_NPROC      = $BUILD_NPROC
   EIC_SHELL_PREFIX = $EIC_SHELL_PREFIX
+  JANA_PLUGIN_PATH = $JANA_PLUGIN_PATH
   DETECTOR_PATH    = $DETECTOR_PATH
 
 """
