@@ -132,17 +132,22 @@ case $method in
     collections=(
       DRICHHits
       DRICHRawHitsAssociations
+
       DRICHAerogelTracks DRICHGasTracks
       # DRICHAerogelPseudoTracks DRICHGasPseudoTracks
+
       DRICHIrtCherenkovParticleID
-      DRICHParticleID
+      DRICHMergedCherenkovParticleID
+
+      ReconstructedChargedParticles
+      ReconstructedChargedParticlesAssociations
     )
 
     # list of additional plugins to use
     plugins=(
+      benchmarks_pid
       janadot
       # dump_flags
-      benchmarks_pid
     )
 
     # general common settings
@@ -155,16 +160,17 @@ case $method in
     set_config "acts:MaterialMap"                 "calibrations/materials-map.cbor"
 
     # log levels
-    set_log_level "eicrecon"                          "info"
-    set_log_level "richgeo"                           "info"
-    set_log_level "DRICH:DRICHRawHitsAssociations"    "info"
-    set_log_level "DRICH:DRICHAerogelTracks"          "info"
-    set_log_level "DRICH:DRICHGasTracks"              "info"
-    # set_log_level "DRICH:DRICHAerogelPseudoTracks"    "info"
-    # set_log_level "DRICH:DRICHGasPseudoTracks"        "info"
-    set_log_level "DRICH:DRICHIrtCherenkovParticleID" "info"
-    set_log_level "DRICH:DRICHParticleID"             "trace"
-    set_log_level "benchmarks_pid"                    "info"
+    set_log_level "eicrecon"                                     "info"
+    set_log_level "richgeo"                                      "info"
+    set_log_level "DRICH:DRICHRawHitsAssociations"               "info"
+    set_log_level "DRICH:DRICHAerogelTracks"                     "info"
+    set_log_level "DRICH:DRICHGasTracks"                         "info"
+    set_log_level "DRICH:DRICHAerogelPseudoTracks"               "info"
+    set_log_level "DRICH:DRICHGasPseudoTracks"                   "info"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID"            "info"
+    set_log_level "DRICH:DRICHMergedCherenkovParticleID"         "info"
+    set_log_level "DRICH:ChargedParticlesWithAssociationsAndPID" "trace"
+    set_log_level "benchmarks_pid"                               "trace"
 
     # input file from simulation
     cmd+=" $sim_file"
