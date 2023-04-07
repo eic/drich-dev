@@ -13,9 +13,18 @@ from numpy import linspace
 
 # SETTINGS
 ################################################################
-use_npdet_info = False  # use npdet_info to get envelope dimensions
-rMinBuffer = 10 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
-rMaxBuffer = -5 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
+acceptanceDict = {
+    'drich': {
+        # theta limits [degrees]
+        'thetaMin': 2.8,
+        'thetaMax': 30.5,
+    },
+    'pfrich': {
+        # theta limits [degrees]
+        'thetaMin': 180.0 - 10.0, # FIXME
+        'thetaMax': 180.0 - 70.0, # FIXME
+    },
+}
 
 # ARGUMENTS
 ################################################################
@@ -93,6 +102,10 @@ helpStr = f'''
                     to a single sector
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
+                   - it is HIGHLY recommended to set `DRICH_debug_sector` to `1` in `drich.xml`,
+                     which will draw one sector and set visibility such that you can see inside
+                     the dRICH
+                   - standalone mode will be automatically enabled
                 -e [output image extension]: save visual with specified type (svg,pdf,ps)
                    - useful tip: if you want to suppress the drawing of the visual, but
                      still save an output image, use Xvbf (start EIC container shell
@@ -147,6 +160,8 @@ if (testNum >= 10):
 if (particle_name == "opticalphoton"):
     particle_momentum = 3e-9
     print(f'optical photons test: using energy {particle_momentum}')
+if runType == 'vis':
+    standalone = True
 
 ### helper functions
 # convert momentum -> kinetic energy
@@ -280,66 +295,15 @@ m.write(f'/gps/position 0 0 0 cm\n')
 # ACCEPTANCE LIMITS
 ################################################################
 
-### RICH envelope parameters
-params = {}
-if detMain=='athena':
-    print('This is ATHENA, calling npdet_info to determine acceptance limits')
-    use_npdet_info = True
-if use_npdet_info:
-    ### call `npdet_info` to obtain most up-to-date RICH attributes and values
-    paramListFileN = f'{outDir}/params_{outputName}.txt'
-    with open(paramListFileN, 'w') as paramListFile:
-        cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
-        print(sep)
-        print('EXECUTE: ' + cmd)
-        print(sep)
-        subprocess.call(shlex.split(cmd), stdout=paramListFile)
-    for paramLine in open(paramListFileN, 'r'):
-        print(paramLine)
-        paramLineKV = paramLine.strip().split('=')
-        if (len(paramLineKV) == 2): 
-            try:
-                params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
-            except ValueError:
-                pass # ignore string constants
-else:
-    ### hard-coded values (faster and reliable, but maybe out of date)
-    # dRICH:
-    params['DRICH_rmin1'] = 15.332
-    params['DRICH_rmax2'] = 180.0
-    params['DRICH_zmin']  = 195.0
-    params['DRICH_zmax']  = 315.0
-    # pfRICH
-    params['PFRICH_rmin1'] = 5.945
-    params['PFRICH_rmax']  = 63.0
-    params['PFRICH_zmin']  = -118.6
-    params['PFRICH_proximity_gap'] = 30.0
-    params['PFRICH_aerogel_thickness'] = 3.0
-
-### set envelope limits
-if (zDirection < 0):
-    rMin = params['PFRICH_rmin1'] + rMinBuffer
-    rMax = params['PFRICH_rmax'] - rMaxBuffer
-    zMax = -1*params['PFRICH_zmin'] + params['PFRICH_aerogel_thickness'] + params['PFRICH_proximity_gap']  # must be positive
-else:
-    rMin = params['DRICH_rmin1'] + rMinBuffer
-    rMax = params['DRICH_rmax2'] - rMaxBuffer
-    zMax = params['DRICH_zmax']
-print('** constants from DD4hep **')
-pprint.pprint(params)
-print(sep)
-print('** acceptance limits **')
-print(f'rMin = {rMin} cm')
-print(f'rMax = {rMax} cm')
-print(f'zMax = {zMax} cm')
-
 ### set angular acceptance limits
-thetaMin = math.atan2(rMin, zMax)
-thetaMax = math.atan2(rMax, zMax)
+thetaMin = math.radians(acceptanceDict[xrich]['thetaMin'])
+thetaMax = math.radians(acceptanceDict[xrich]['thetaMax'])
 def theta_to_eta(th):
     return -math.log(math.tan(0.5 * th))
 etaMin = theta_to_eta(thetaMax)
 etaMax = theta_to_eta(thetaMin)
+print(sep)
+print('** acceptance limits **')
 print(f'thetaMin = {math.degrees(thetaMin)} deg')
 print(f'thetaMax = {math.degrees(thetaMax)} deg')
 print(f'etaMin = {etaMin}')
@@ -466,15 +430,18 @@ elif testNum == 11:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 12:
-    numBeams = 5 if numTestSamples==0 else numTestSamples  # number of beams within theta acceptance
+    numTheta = 5 if numTestSamples==0 else numTestSamples # number of theta steps
     m.write(f'\n# opticalphoton parallel-to-point focusing\n')
     m.write(f'/vis/scene/endOfEventAction accumulate\n')
     m.write(f'/vis/scene/endOfRunAction accumulate\n')
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
-    for rVal in list(linspace(rMin, rMax, numBeams)):
-        m.write(f'/gps/ang/rot1 -{zMax} 0 {rVal}\n')
-        m.write(f'/gps/pos/rot1 -{zMax} 0 {rVal}\n')
+    for theta in list(linspace(thetaMin, thetaMax, numTheta)):
+        x = math.sin(theta)
+        y = 0.0
+        z = math.cos(theta) * zDirection
+        m.write(f'/gps/ang/rot1 -{z} {y} {x}\n') # different coordinate system...
+        m.write(f'/gps/pos/rot1 -{z} {y} {x}\n')
         m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width
         m.write(f'/run/beamOn {numEvents}\n')
 
