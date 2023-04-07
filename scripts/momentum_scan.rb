@@ -12,6 +12,7 @@ PoolSize          = 6     # number of parallel threads to run
 RunSimulation     = true  # if true, run the simulation step
 RunReconstruction = true  # if true, run the reconstruction step
 UseRINDEXrange    = false # if true, use range of RINDEX values rather than a single reference value
+MaxNphot          = 500   # maximum number of incident photons expected (for plot drawing range)
 ####################################################
 
 
@@ -37,16 +38,16 @@ when "d"
   xRICH      = "dRICH"
   xrich      = "drich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>60.0, },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, :maxNPE=>20, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>60.0, :maxNPE=>40, },
   }
 when "p"
   zDirection = -1
   xRICH      = "pfRICH"
   xrich      = "pfrich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>60.0, },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, :maxNPE=>40, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>60.0, :maxNPE=>40, },
   }
 else
   $stderr.puts "ERROR: unknown detector '#{ARGV[0]}'"
@@ -286,9 +287,19 @@ radiator_h.each do |rad_name,rad|
           rad[:maxTheta] = [rad[:maxTheta],plot.GetMaximum].max        # max point
         end
       end
+
+      # set plot ranges
       plot.GetXaxis.SetRangeUser(0,1.1*rad[:maxMomentum])
-      plot.GetYaxis.SetRangeUser(-10,10)               if plot_name.match?(/^thetaResid_/)
-      plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta]) if plot_name.match?(/^theta_/)
+      case plot_name
+      when /^thetaResid_/
+        plot.GetYaxis.SetRangeUser(-10,10)
+      when /^theta_/
+        plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta])
+      when /^npe_/
+        plot.GetYaxis.SetRangeUser(0,rad[:maxNPE])
+      when /^nphot_/
+        plot.GetYaxis.SetRangeUser(0,MaxNphot)
+      end
 
     end
 
