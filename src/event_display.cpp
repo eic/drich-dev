@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
         nSectors,0,double(nSectors)
         );
     auto pixelHitmap = fileType=="r" ? // weight by ADC counts, if reading digitized hits
-      dfFinal.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector", inputCollection+".integral") :
+      dfFinal.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector", inputCollection+".charge") :
       dfFinal.Histo3D(pixelHitmapModel, "pixelX", "pixelY", "sector");
 
     // draw
@@ -399,7 +399,9 @@ int main(int argc, char** argv) {
     mainApp.Run();
 #else
     gROOT->ProcessLine(".! mkdir -p out/ev");
-    c->SaveAs(Form("out/ev/%s.png",fmt::format("{:08}",evnum).c_str()));
+    TString pngName = Form("out/ev/%s.png", fmt::format("{:08}",evnum).c_str()); 
+    c->SaveAs(pngName);
+    fmt::print("Saved image: {}", pngName);
     // cleanup and avoid memory leaks # FIXME: refactor this... and there is still a slow leak...
     delete c;
     for(int sec=0; sec<nSectors; sec++) delete pixelHitmapSec[sec];
