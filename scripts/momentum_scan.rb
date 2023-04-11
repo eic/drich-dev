@@ -97,8 +97,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     sim_file = out_file particle, "sim.#{rad_name}.root"
     rec_file = out_file particle, "rec.#{rad_name}.root"
     cmds = []
-    # simulation + reconstruction
-    if RunSimulation or RunReconstruction
+    # simulation
+    if RunSimulation
       cmds << [
         './simulate.py',
         "-t#{rad[:testNum]}",
@@ -107,34 +107,36 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         "-n#{NumEvents}",
         "-k#{NumPoints}",
         "-o#{sim_file}",
-      ] if RunSimulation
+      ]
+    end
+    # reconstruction
+    if RunReconstruction
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
         "#{reconWrapperArgs}",
         "-i#{sim_file}",
         "-o#{rec_file}",
-      ] if RunReconstruction
-      # analysis
-      plot_file = out_file particle, "rec_plots.#{rad_name}.root"
-      cmds << [
-        'root', '-b', '-q',
       ]
-      case reconMethod
-      when :juggler
-        cmds.last << "scripts/src/momentum_scan_juggler_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
-      when :eicrecon
-        ana_file = rec_file.sub /\.root/, '.ana.root'
-        cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})"
-      end
+    end
+    # analysis
+    plot_file = out_file particle, "rec_plots.#{rad_name}.root"
+    cmds << [ 'root', '-b', '-q' ]
+    case reconMethod
+    when :juggler
+      cmds.last << "scripts/src/momentum_scan_juggler_draw.C'(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})'"
+    when :eicrecon
+      ana_file = rec_file.sub /\.root/, '.ana.root'
+      cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C'(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})'"
     end
     # spawn thread
     Thread.new do
       cmds.each_with_index do |cmd,i|
-        puts cmd.join ' '
+        cmd_shell = cmd.join ' '
+        puts cmd_shell
         mode = i==0 ? 'w' : 'a'
         Open3.pipeline(
-          cmd,
+          cmd_shell,
           out: [out_file(particle,"#{rad_name}.log.out"),mode],
           err: [out_file(particle,"#{rad_name}.log.err"),mode],
         )
@@ -289,16 +291,16 @@ radiator_h.each do |rad_name,rad|
       end
 
       # set plot ranges
-      plot.GetXaxis.SetRangeUser(0,1.1*rad[:maxMomentum])
+      plot.GetXaxis.SetRangeUser 0, 1.1*rad[:maxMomentum]
       case plot_name
       when /^thetaResid_/
-        plot.GetYaxis.SetRangeUser(-10,10)
+        plot.GetYaxis.SetRangeUser -40, 40
       when /^theta_/
-        plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta])
+        plot.GetYaxis.SetRangeUser 0, 1.1*rad[:maxTheta]
       when /^npe_/
-        plot.GetYaxis.SetRangeUser(0,rad[:maxNPE])
+        plot.GetYaxis.SetRangeUser 0, rad[:maxNPE]
       when /^nphot_/
-        plot.GetYaxis.SetRangeUser(0,MaxNphot)
+        plot.GetYaxis.SetRangeUser 0, MaxNphot
       end
 
     end
