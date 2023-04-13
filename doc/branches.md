@@ -19,7 +19,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | --:         | ---                | ---                                      |
 | `drich-dev` | `irt-algo`         | https://github.com/eic/drich-dev/pull/62 |
 | `epic`      | `main`             |                                          |
-| `EDM4eic`   | `cherenkov-pid`    | https://github.com/eic/EDM4eic/pull/17   |
+| `EDM4eic`   | `main`             |                                          |
 | `irt`       | `main`             |                                          |
 | `EICrecon`  | `irt-algo`         | https://github.com/eic/EICrecon/pull/393 |
 
