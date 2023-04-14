@@ -139,8 +139,8 @@ case $method in
       DRICHIrtCherenkovParticleID
       DRICHMergedCherenkovParticleID
 
-      ReconstructedChargedParticles
-      ReconstructedChargedParticlesAssociations
+      # ReconstructedChargedParticles
+      # ReconstructedChargedParticlesAssociations
     )
 
     # list of additional plugins to use
