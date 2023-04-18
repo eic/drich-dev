@@ -17,13 +17,15 @@ We intend to keep these tables up-to-date as development proceeds.
 ## IRT -- EICrecon development
 | Repository  | Branch             | Pull Request                             |
 | --:         | ---                | ---                                      |
-| `drich-dev` | `irt-algo`         | https://github.com/eic/drich-dev/pull/62 |
+| `drich-dev` | `irt-algo-stable`  | https://github.com/eic/drich-dev/pull/62 |
 | `epic`      | `main`             |                                          |
 | `EDM4eic`   | `main`             |                                          |
 | `irt`       | `main`             |                                          |
-| `EICrecon`  | `irt-algo`         | https://github.com/eic/EICrecon/pull/393 |
+| `EICrecon`  | `irt-algo-stable`  | https://github.com/eic/EICrecon/pull/393 |
 
-**NOTE:** for EICrecon development that does not involve IRT, use branch `main` in `drich-dev`.
+**NOTES:**
+- for EICrecon development that does not involve IRT, use branch `main` in `drich-dev`
+- the branches `irt-algo-stable` are for a stable, working version; the branches `irt-algo` are for the unstable, most up-to-date version
 
 ## IRT -- Legacy Juggler Support
 | Repository  | Branch                      | Pull Request                                                                |
