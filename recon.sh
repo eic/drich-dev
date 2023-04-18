@@ -131,13 +131,14 @@ case $method in
     # list of collections to save
     collections=(
       DRICHHits
+      DRICHRawHits
       DRICHRawHitsAssociations
 
       DRICHAerogelTracks DRICHGasTracks
       # DRICHAerogelPseudoTracks DRICHGasPseudoTracks
 
       DRICHIrtCherenkovParticleID
-      DRICHMergedCherenkovParticleID
+      # DRICHMergedCherenkovParticleID
 
       # ReconstructedChargedParticles
       # ReconstructedChargedParticlesAssociations
@@ -162,15 +163,15 @@ case $method in
     # log levels
     set_log_level "eicrecon"                                     "info"
     set_log_level "richgeo"                                      "info"
-    set_log_level "DRICH:DRICHRawHitsAssociations"               "info"
+    set_log_level "DRICH:DRICHRawHits"                           "info"
     set_log_level "DRICH:DRICHAerogelTracks"                     "info"
     set_log_level "DRICH:DRICHGasTracks"                         "info"
     set_log_level "DRICH:DRICHAerogelPseudoTracks"               "info"
     set_log_level "DRICH:DRICHGasPseudoTracks"                   "info"
-    set_log_level "DRICH:DRICHIrtCherenkovParticleID"            "info"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID"            "trace"
     set_log_level "DRICH:DRICHMergedCherenkovParticleID"         "info"
-    set_log_level "DRICH:ChargedParticlesWithAssociationsAndPID" "trace"
-    set_log_level "benchmarks_pid"                               "trace"
+    # set_log_level "DRICH:ChargedParticlesWithAssociationsAndPID" "trace"
+    set_log_level "benchmarks_pid"                               "info"
 
     # input file from simulation
     cmd+=" $sim_file"
