@@ -138,7 +138,7 @@ case $method in
       # DRICHAerogelPseudoTracks DRICHGasPseudoTracks
 
       DRICHAerogelIrtCherenkovParticleID DRICHGasIrtCherenkovParticleID
-      # DRICHMergedCherenkovParticleID
+      DRICHMergedCherenkovParticleID
 
       # ReconstructedChargedParticles
       # ReconstructedChargedParticlesAssociations
