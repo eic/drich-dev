@@ -114,6 +114,8 @@ case $module in
     genOpt ROOT_DIR=$ROOTSYS
     genOpt CMAKE_BUILD_TYPE=Release
     ;;
+  Catch2)
+    ;;
 esac
 
 ########################################
