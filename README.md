@@ -268,6 +268,7 @@ flowchart TB
     DD4hep(DD4hep):::dep
     Geant(Geant4):::dep
   end
+  Geant --> DD4hep
 
   subgraph Geometry
     Epic[epic]:::epic
@@ -276,7 +277,6 @@ flowchart TB
     DDMat{{Material Properties<br/>optical_materials.xml}}:::obj
   end
   SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
-  Geant <--> DD4hep
   DD4hep --> Gun
   GenOR --> Epic
   DD4hep --> Epic
