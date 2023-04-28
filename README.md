@@ -205,6 +205,9 @@ git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
 
 <a name="flowchart"></a>
 # ePIC Software Stack
+This is a flowchart showing the ePIC Software Stack, depenencies, and data flow, with some focus
+on parts specific for the dRICH. This `drich-dev` repository uses all of these, and in many cases,
+wraps functionality in dRICH-specific code stored here in `drich-dev`.
 
 ```mermaid
 flowchart LR
