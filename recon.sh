@@ -132,7 +132,7 @@ case $method in
     collections=(
       DRICHHits
       DRICHRawHits
-      DRICHAerogelTracks DRICHGasTracks
+      # DRICHAerogelTracks DRICHGasTracks
       # DRICHIrtCherenkovParticleID
     )
 
