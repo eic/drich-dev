@@ -468,11 +468,16 @@ bin/create_irt_auxfile
 simulate.py -t 1 -s -n 50
 ```
 
-- Run the reconstruction via Juggler, or try the stand-alone reader macro:
+- Run the reconstruction with EICrecon:
 ```bash
-recon.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
-recon.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
-recon.sh         # for usage guide, such as how to specify input/output files
+recon.rb -h  # see usage guide (run with no arguments to run with defaults)
+```
+
+- Alternatively, use Juggler or the old code:
+```bash
+juggler.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
+juggler.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
+juggler.sh         # for usage guide, such as how to specify input/output files
 ```
 
 - Run the evaluation code (use `-h` for usage):

@@ -58,10 +58,8 @@ end
 case ARGV[1]
 when "j"
   reconMethod      = :juggler
-  reconWrapperArgs = '-j'
 when "e"
   reconMethod      = :eicrecon
-  reconWrapperArgs = '-e'
 else
   $stderr.puts "ERROR: unknown reconstruction '#{ARGV[1]}'"
   exit 1
@@ -111,13 +109,21 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     end
     # reconstruction
     if RunReconstruction
-      cmds << [
-        './recon.sh',
-        "-#{xrich[0]}",
-        "#{reconWrapperArgs}",
-        "-i#{sim_file}",
-        "-o#{rec_file}",
-      ]
+      case reconMethod
+      when :juggler
+        cmds << [
+          './juggler.sh',
+          "-#{xrich[0]}",
+          "-i#{sim_file}",
+          "-o#{rec_file}",
+        ]
+      when :eicrecon
+        cmds << [
+          './recon.rb',
+          "-s #{sim_file}",
+          "-r #{rec_file}",
+        ]
+      end
     end
     # analysis
     plot_file = out_file particle, "rec_plots.#{rad_name}.root"
