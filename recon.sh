@@ -130,27 +130,27 @@ case $method in
 
     # list of collections to save
     collections=(
-      # DRICHHits
-      # DRICHRawHits
-      # DRICHRawHitsAssociations
+      DRICHHits
+      DRICHRawHits
+      DRICHRawHitsAssociations
 
-      # DRICHAerogelTracks
-      # DRICHGasTracks
+      DRICHAerogelTracks
+      DRICHGasTracks
 
-      # DRICHAerogelIrtCherenkovParticleID
-      # DRICHGasIrtCherenkovParticleID
-      # DRICHMergedCherenkovParticleID
+      DRICHAerogelIrtCherenkovParticleID
+      DRICHGasIrtCherenkovParticleID
+      DRICHMergedCherenkovParticleID
 
-      ReconstructedChargedParticles
-      # ReconstructedChargedParticlesAssociations
+      # ReconstructedChargedParticles
+      # ReconstructedChargedParticleAssociations
 
       ReconstructedChargedParticlesWithDRICHPID
-      # ReconstructedChargedParticlesAssociationsWithDRICHPID
+      ReconstructedChargedParticleAssociationsWithDRICHPID
     )
 
     # list of additional plugins to use
     plugins=(
-      # benchmarks_pid
+      benchmarks_pid
       janadot
       # dump_flags
     )
