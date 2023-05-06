@@ -7,12 +7,14 @@ from matplotlib.ticker import *
 
 narg = len(sys.argv)
 if narg == 1:
-  print("usage :",sys.argv[0],"1 1");
+  print("usage :",sys.argv[0],"1 1 0.3");
   print("First number 0 --> pi/K 1--> e/pi");
   print("Second number 0 --> gas 1--> aerogel");
+  print("Third number is the working resolution");
   exit();
-agrv1 = sys.argv[1]
-agrv2 = sys.argv[2]
+agrv1 = sys.argv[1];
+agrv2 = sys.argv[2];
+sigma = sys.argv[3];
 
 file = "";
 mass1 = 0;
@@ -79,39 +81,17 @@ for x in range(0,maxmom,1):
 Y = np.array(y);
 Z = np.array(z);
 m_a =np.subtract(Y,Z);
-m_0 = np.divide(m_a,3);
-m_1 = np.divide(m_a,3.25);
-m_2 = np.divide(m_a,3.50);
-m_3 = np.divide(m_a,3.75);
-m_4 = np.divide(m_a,4);
+m_0 = np.divide(m_a,sigma);
 m = list(m_0);
 #print(p);
 #print(y);  
 #plt.plot(p, y, color='green', linestyle='solid', linewidth = 1.5,
 #         marker='o', markerfacecolor='blue', markersize=0.5);
 plt.plot(p, m, color='magenta', linestyle='solid', linewidth = 1.5,
-         marker='o', markerfacecolor='blue', markersize=1.0, label="3");
-del m;
-m = list(m_1);
-plt.plot(p, m, color='purple', linestyle='solid', linewidth = 1.5,
-         marker='o', markerfacecolor='blue', markersize=1.0,label="3.25");
-del m;
-m = list(m_3);
-plt.plot(p, m, color='blue', linestyle='solid', linewidth = 1.5,
-         marker='o', markerfacecolor='blue', markersize=1.0,label="3.5");
-del m;
-m = list(m_3);
-plt.plot(p, m, color='cyan', linestyle='solid', linewidth = 1.5,
-         marker='o', markerfacecolor='blue', markersize=1.0,label="3.75");
-del m;
-m = list(m_4);
-plt.plot(p, m, color='green', linestyle='solid', linewidth = 1.5,
-         marker='o', markerfacecolor='blue', markersize=1.0,label="4");
-
-
+         marker='o', markerfacecolor='blue', markersize=1.0);
 plt.yscale('log');
 plt.xlabel('momentum (GeV/c)');
-plt.ylabel('required resolution (mrad)');
+plt.ylabel('expected N-sigma separation');
 plt.legend();
 plt.grid(True);
 plt.grid(which='minor', alpha=0.3) 
