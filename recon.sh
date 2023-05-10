@@ -109,44 +109,63 @@ use_full     = $use_full
 # run reconstruction
 case $method in
   EICrecon)
+
     # EICrecon geometry services use $DETECTOR_PATH and $DETECTOR_CONFIG;
     # $DETECTOR_PATH is already set, here we extract $DETECTOR_CONFIG from $compact_file
     export DETECTOR_CONFIG=$(basename $compact_file .xml)
     rec_file_base=$(echo $rec_file | sed 's;\.root$;;')
+    ana_file=$rec_file_base.ana.root
     echo """
     DETECTOR_PATH   = $DETECTOR_PATH  
     DETECTOR_CONFIG = $DETECTOR_CONFIG
     """
+
     # build `eicrecon` command #####################
-    collections="DRICHHits"
-    collections+=",DRICHRawHits"
-    collections+=",DRICHAerogelTracks,DRICHGasTracks"
-    collections+=",DRICHIrtCherenkovParticleID"
-    ### reco_flags.py
-    cmd="""
-    run_eicrecon_reco_flags.py
-      $sim_file
-      $rec_file_base
-      -Ppodio:output_include_collections=$collections
-      -Peicrecon:LogLevel=info
-      -Prich:LogLevel=info
-      -PDRICH:DRICHRawHits:LogLevel=info
-      -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
-      -PDRICH:DRICHIrtCherenkovParticleID:LogLevel=trace
-      """
-    ### native eicrecon
-    # cmd="""
-    # eicrecon
-    #   -Ppodio:output_include_collections=$collections
-    #   -Peicrecon:LogLevel=info
-    #   -Prich:LogLevel=info
-    #   -PDRICH:DRICHRawHits:LogLevel=info
-    #   -PDRICH:DRICHAerogelTracks:LogLevel=debug -PDRICH:DRICHGasTracks:LogLevel=debug
-    #   -PDRICH:DRICHIrtCherenkovParticleID:LogLevel=trace
-    #   -Ppodio:output_file=$rec_file
-    #   $sim_file
-    #   """
+    cmd="eicrecon"
+
+    # helpers
+    set_config() { cmd+=" -P$1=$2"; } # set a JANA configuration parameter
+    set_log_level() { cmd+=" -P$1:LogLevel=$2"; } # set logger level
+    join() { n=$1[@]; a=("${!n}"); echo ${a[*]} | sed 's; ;,;g'; } # Array.join(',') in bash
+
+    # list of collections to save
+    collections=(
+      DRICHHits
+      DRICHRawHits
+      # DRICHAerogelTracks DRICHGasTracks
+      # DRICHIrtCherenkovParticleID
+    )
+
+    # list of additional plugins to use
+    plugins=(
+      # janadot
+      # dump_flags
+      # benchmarks_pid
+    )
+
+    # general common settings
+    set_config "plugins"                          $(join plugins)
+    set_config "podio:output_include_collections" $(join collections)
+    set_config "podio:output_file"                "$rec_file"
+    set_config "histsfile"                        "$ana_file"
+    set_config "jana:nevents"                     "0"
+    set_config "jana:debug_plugin_loading"        "1"
+    set_config "acts:MaterialMap"                 "calibrations/materials-map.cbor"
+
+    # log levels
+    set_log_level "eicrecon"                          "info"
+    set_log_level "richgeo"                           "info"
+    set_log_level "DRICH:DRICHRawHits"                "info"
+    set_log_level "DRICH:DRICHAerogelTracks"          "info"
+    set_log_level "DRICH:DRICHGasTracks"              "info"
+    # set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
+    # set_log_level "benchmarks_pid"                    "info"
+
+    # input file from simulation
+    cmd+=" $sim_file"
+
     # run `eicrecon` #####################
+    printf "EICRECON COMMAND:\n$cmd\n\n"
     if [ $debug_run -eq 1 ]; then
       export SHELL=`which bash`
       cmd="gdb --args $cmd -Pjana:timeout=0"
@@ -154,9 +173,9 @@ case $method in
     if [ $dry_run -eq 0 ]; then
       $cmd
       if [[ "$cmd" =~ "run_eicrecon_reco_flags" ]]; then mv -v $rec_file_base.tree.edm4eic.root $rec_file; fi
-      printf "\nEICrecon IRT reconstruction finished\n -> produced $rec_file\n"
-    else
-      printf "EICRECON COMMAND:\n$cmd\n"
+      printf "\nEICrecon IRT reconstruction finished\n"
+      printf " -> produced RECO file:     $rec_file\n"
+      printf " -> produced ANALYSIS file: $ana_file\n"
     fi
     ;;
 
@@ -170,7 +189,8 @@ case $method in
     echo "RUN JUGGLER with options file $options_file"
     if [ $dry_run -eq 0 ]; then
       gaudirun.py $options_file
-      printf "\nJuggler IRTAlgorithm finished\n -> produced $rec_file\n"
+      printf "\nJuggler IRTAlgorithm finished\n"
+      printf " -> produced RECO file: $rec_file\n"
     fi
     ;;
 

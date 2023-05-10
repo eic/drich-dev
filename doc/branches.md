@@ -17,11 +17,15 @@ We intend to keep these tables up-to-date as development proceeds.
 ## IRT -- EICrecon development
 | Repository  | Branch             | Pull Request                             |
 | --:         | ---                | ---                                      |
-| `drich-dev` | `main`             |                                          |
+| `drich-dev` | `irt-algo-stable`  | https://github.com/eic/drich-dev/pull/62 |
 | `epic`      | `main`             |                                          |
-| `EDM4eic`   | `cherenkov-pid`    | https://github.com/eic/EDM4eic/pull/17   |
-| `irt`       | `eicrecon-support` | https://github.com/eic/irt/pull/25       |
-| `EICrecon`  | `irt-algo`         | https://github.com/eic/EICrecon/pull/393 |
+| `EDM4eic`   | `main`             |                                          |
+| `irt`       | `main`             |                                          |
+| `EICrecon`  | `irt-algo-stable`  | https://github.com/eic/EICrecon/pull/393 |
+
+**NOTES:**
+- for EICrecon development that does not involve IRT, use branch `main` in `drich-dev`
+- the branches `irt-algo-stable` are for a stable, working version; the branches `irt-algo` are for the unstable, most up-to-date version
 
 ## IRT -- Legacy Juggler Support
 | Repository  | Branch                      | Pull Request                                                                |
@@ -30,8 +34,11 @@ We intend to keep these tables up-to-date as development proceeds.
 | `epic`      | `main`                      |                                                                             |
 | `EDM4eic`   | `irt-data-model`            | https://github.com/eic/EDM4eic/pull/1                                       |
 | `irt`       | `main`                      |                                                                             |
-| `EICrecon`  | `juggler-irt-support`       | https://github.com/eic/EICrecon/pull/424                                    |
+| `EICrecon`  | `main`                      |                                                                             |
 | `juggler`   | `73-add-rich-irt-algorithm` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/juggler/-/merge_requests/377) |
+
+NOTE: do not build `EICrecon`, since for Juggler support we only need the
+`IrtGeo*` classes which are built externally here in `drich-dev`.
 
 ## Sensor Development
 | Repository  | Branch                                              | Pull Request                                                                                                 |

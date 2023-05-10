@@ -1,9 +1,10 @@
 # dRICH-dev
-Resources and Tools for EPIC dRICH development 
+Resources and Tools for EPIC dRICH development
 
 | **Table of Contents**               |                                                       |
 | --:                                 | ---                                                   |
 | [Setup](#setup)                     | How to download and build the code                    |
+| [ePIC Software Stack](#flowchart)   | Flowchart of ePIC Software and Dependency             |
 | [Geometry and Materials](#geometry) | Detector geometry and material properties description |
 | [Simulation](#simulation)           | Running the simulation in Geant4                      |
 | [Reconstruction](#reconstruction)   | Running the reconstruction algorithms                 |
@@ -11,13 +12,12 @@ Resources and Tools for EPIC dRICH development
 
 | **Documentation Links**                       |                                               |
 | --:                                           | ---                                           |
-| [Flowchart](doc/docDiagram.pdf)               | Diagram of software modules                   |
 | [Links](doc/links.md)                         | Collection of dRICH Software and Resources    |
 | [Branches and Pull Requests](doc/branches.md) | Active development branches and pull requests |
 | [Project Board](https://github.com/orgs/eic/projects/4) | Issues tracking                     |
 
 ## Notes
-EPIC Software is modular: see [the flowchart overview](doc/docDiagram.pdf) for
+EPIC Software is modular: see [the flowchart below](#flowchart) for
 general guidance of the modules relevant for RICH development. It shows their
 dependences, calls, and data flow.
 
@@ -49,12 +49,12 @@ of branches for varying configurations.
     own set up; in that case, make symlinks to your local `git` repository
     clones, so you can use the scripts in this directory
 - Obtain the EIC Software image (`jug_xl`):
-  - follow [eic-container documentation](https://eicweb.phy.anl.gov/containers/eic_container)
+  - follow [ePIC Software Tutorials](https://indico.bnl.gov/category/443/)
     to obtain the EIC software image
     - the `eic-shell` script is used to start a container shell
     - all documentation below assumes you are running in `eic-shell`
     - this image contains all the dependencies needed for EPIC simulations
-      - tip: when in a container shell (`eic-shell`), see `/opt/software/linux.../gcc.../`
+      - tip: when in a container shell (`eic-shell`), see `/usr/local` or `/opt/software/linux.../gcc.../`
         for the installed software
         - for example, if you want to check exactly what is available in the
           [EDM4hep data model](https://github.com/key4hep/EDM4hep), see the headers
@@ -63,11 +63,6 @@ of branches for varying configurations.
           configuration file)
     - be sure to regularly update your image by running `eic-shell --upgrade`; this is necessary
       to keep up with upstream changes, such as in EDM4hep or DD4hep
-  - alternatively, we have a wrapper script:
-    - Run `opt/update.sh` to obtain (or update) the EIC Software image automatically
-    - the image and builds will be stored in `./opt`
-    - run `opt/eic-shell` to start a container
-    - this wrapper script may not be supported in the future (use `eic-shell --upgrade` instead)
 - Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - Modules:
@@ -114,7 +109,8 @@ of branches for varying configurations.
     - change it, if you prefer
     - memory-hungry builds will be built single-threaded
   - `$EIC_SHELL_PREFIX` is the main directory where module builds will be installed
-    - by default, it is `<path to eic-shell>/local`
+    - `environ.sh` will change this to `./prefix`, so that all module builds
+      will be installed locally
     - change it, if you prefer a different directory
   - you can find documentation for many other variables in the corresponding
     module repositories
@@ -125,8 +121,7 @@ of branches for varying configurations.
 ## Building Modules
 - you must be in the EIC container (`eic-shell`) and have environment
   variables set (`source environ.sh`)
-- build each repository, one-by-one, in order of dependences (see
-  [flowchart](doc/docDiagram.pdf) dependency graph)
+- build each repository, one-by-one, in order of dependences
   - build scripts, in recommended order:
   ```bash
   ./build.sh EDM4eic
@@ -205,6 +200,113 @@ Now install the [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/bench
 ```bash
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
 ```
+
+---
+
+<a name="flowchart"></a>
+# ePIC Software Stack
+This is a flowchart showing the ePIC Software Stack, depenencies, and data flow, with some focus
+on parts specific for the dRICH. This `drich-dev` repository uses all of these, and in many cases,
+wraps functionality in dRICH-specific code stored here in `drich-dev`.
+
+```mermaid
+flowchart LR
+  classDef epic fill:#ff8888,color:black
+  classDef dep fill:#00aaaa,color:black
+  classDef obj fill:#88ff88,color:black
+  classDef data fill:#ffff88,color:black
+  classDef op fill:#770077,color:white
+
+  subgraph Legend
+    epic[ePIC<br/>Repository]:::epic
+    dep(Dependency<br/>Repository):::dep
+    data[(Data files)]:::data
+    obj{{Object}}:::obj
+    op{Boolean}:::op
+    dep --> epic --> data
+    obj --> epic
+  end
+```
+
+```mermaid
+flowchart TB
+  classDef epic fill:#ff8888,color:black
+  classDef dep fill:#00aaaa,color:black
+
+  subgraph Data Model
+    EDM4hep(EDM4hep):::dep
+    EDM4eic[EDM4eic]:::epic
+    PODIO(PODIO):::dep
+  end
+  PODIO --> EDM4hep --> EDM4eic
+  PODIO --> EDM4eic
+```
+
+```mermaid
+flowchart TB
+  classDef epic fill:#ff8888,color:black
+  classDef dep fill:#00aaaa,color:black
+  classDef obj fill:#88ff88,color:black
+  classDef data fill:#ffff88,color:black
+  classDef op fill:#770077,color:white
+
+  subgraph Event Generation
+    Pythia6(Pythia6):::dep
+    Pythia8(Pythia8):::dep
+    OtherGen(etc.):::dep
+    Hepmc[(HEPMC files)]:::data
+    Gun(Particle Guns<br/>ddsim OR npsim):::dep
+    GenOR{OR}:::op
+  end
+  Pythia6 --> Hepmc
+  Pythia8 --> Hepmc
+  OtherGen --> Hepmc
+  Hepmc --> GenOR
+  Gun --> GenOR
+
+  subgraph Simulation
+    DD4hep(DD4hep):::dep
+    Geant(Geant4):::dep
+  end
+  Geant --> DD4hep
+
+  subgraph Geometry
+    Epic[epic]:::epic
+    DDCompact{{Compact file<br/>drich.xml}}:::obj
+    DDPlugin{{C++ Plugin<br/>DRICH_geo.cpp}}:::obj
+    DDMat{{Material Properties<br/>optical_materials.xml}}:::obj
+  end
+  SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
+  DD4hep --> Gun
+  GenOR --> Epic
+  DD4hep --> Epic
+  DDCompact --> Epic
+  DDPlugin --> Epic
+  DDMat --> Epic
+  Epic --> SimOut
+
+  subgraph Reconstruction
+    JANA(JANA2):::dep
+    EICrecon[EICrecon]:::epic
+    IRT[irt]:::epic
+  end
+  RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
+  SimOut --> EICrecon
+  JANA --> EICrecon
+  IRT --> EICrecon
+  EICrecon --> RecOut
+
+  subgraph Benchmarks
+    PhysicsBenchmarks[physics_benchmarks]:::epic
+    DetectorBenchmarks[detector_benchmarks]:::epic
+    RecAnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
+  end
+  EICrecon --> RecAnaOut
+  RecOut --> PhysicsBenchmarks
+  RecOut --> DetectorBenchmarks
+
+```
+
 
 ---
 
@@ -314,7 +416,7 @@ corresponding executables and install them to `bin/`
   - reads simulation output and draws raw hit positions and number of hits vs.
     momentum
   - build with `make`, execute as `bin/draw_hits [simulation_output_file]`
-- `src/draw_segmentation.cpp` (run with `bin/draw_segmentation`)
+- `src/event_display.cpp` (run with `bin/event_display`)
   - reads simulation output and draws the hits within sensor pixels, which is
     useful for checking mapping of sensor segmentation (pixels)
 

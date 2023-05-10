@@ -27,7 +27,7 @@ particles = [
   'proton',
   # 'anti_proton',
 ]
-energies = [
+energies = [ # FIXME: simulate.py now reads these as momenta
   1,
   2,
   4,
@@ -58,7 +58,7 @@ gunTests.keys.product(particles,energies).each do |testNum,particle,energy|
     '-s',
     "-p#{particle}",
     "-n#{numEvents[:forGun]}",
-    "-e#{energy}",
+    "-m#{energy}",
     '-r',
     "-o#{outputFile}",
     "&& bin/draw_hits d #{outputFile}"

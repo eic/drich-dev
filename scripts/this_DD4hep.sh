@@ -17,6 +17,13 @@ export LD_LIBRARY_PATH=$DD4hep_ROOT/lib:$LD_LIBRARY_PATH_TMP
 # thisdd4hep.sh also doens't select the newly installed examples
 export DD4HEP=$DD4hep_ROOT/examples
 
+# add /usr/local/bin back to $PATH (workaround..)
+export PATH="$PATH:/usr/local/bin"
+
+# update prompt
+export PS1="${PS1:-}"
+export PS1="drich - WITH DD4HEP OVERRIDE ${PS1_SIGIL}>${PS1#*>}"
+unset branch
 
 # old test version (not using thisdd4hep.sh)
 # export DD4hep_ROOT=$DRICH_DEV/DD4hep/install

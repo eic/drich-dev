@@ -13,6 +13,9 @@ export BUILD_NPROC=$([ $(uname) = 'Darwin' ] && sysctl -n hw.ncpu || nproc)
 if [ "$BUILD_NPROC" = "" ]; then export BUILD_NPROC=1; fi
 echo "detected $BUILD_NPROC cpus"
 
+# local installation prefix
+export EIC_SHELL_PREFIX=$DRICH_DEV/prefix
+
 # cmake packages
 export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
 export EDM4EIC_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
@@ -71,6 +74,14 @@ export PATH=$DRICH_DEV/bin:$PATH                      # drich-dev/bin
 # - shell settings and aliases
 shopt -s autocd # enable autocd (`alias <dirname>='cd <dirname>'`)
 alias ll='ls -lhp --color=auto'
+# - open a ROOT file in a TBrowser
+broot() {
+  if [ $# -ne 1 ]; then
+    echo "USAGE: $0 [ROOT file]"
+  else
+    root -l --web=off $1 -e 'new TBrowser'
+  fi
+}
 
 # print environment
 echo """
@@ -92,8 +103,8 @@ Detector:
   DETECTOR_VERSION = $DETECTOR_VERSION
 
 Packages:
-  IRT_ROOT = $IRT_ROOT
-  EDM4EIC  = $EDM4EIC
+  IRT_ROOT     = $IRT_ROOT
+  EDM4EIC_ROOT = $EDM4EIC_ROOT
 
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
