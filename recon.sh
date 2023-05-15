@@ -155,6 +155,10 @@ case $method in
       # dump_flags
     )
 
+    # override settings
+    # set_config "DRICH:DRICHTracks:Aerogel:numPlanes" "2"
+    # set_config "DRICH:DRICHTracks:Gas:numPlanes"     "4"
+
     # general common settings
     set_config "plugins"                          $(join plugins)
     set_config "podio:output_include_collections" $(join collections)
@@ -168,10 +172,7 @@ case $method in
     set_log_level "eicrecon"                                     "info"
     set_log_level "richgeo"                                      "info"
     set_log_level "DRICH:DRICHRawHits"                           "info"
-    set_log_level "DRICH:DRICHAerogelTracks"                     "info"
-    set_log_level "DRICH:DRICHGasTracks"                         "info"
-    set_log_level "DRICH:DRICHAerogelPseudoTracks"               "info"
-    set_log_level "DRICH:DRICHGasPseudoTracks"                   "info"
+    set_log_level "DRICH:DRICHTracks"                            "info"
     set_log_level "DRICH:DRICHIrtCherenkovParticleID"            "info"
     set_log_level "DRICH:DRICHMergedCherenkovParticleID"         "info"
     # set_log_level "DRICH:ChargedParticlesWithAssociationsAndPID" "info"
