@@ -9,8 +9,8 @@ require 'ostruct'
 
 # default CLI options
 options = OpenStruct.new
-options.sim_file     = 'out/sim.root'
-options.rec_file     = 'out/rec.root'
+options.sim_file     = 'out/sim.edm4hep.root'
+options.rec_file     = 'out/rec.edm4hep.root'
 options.ana_file     = ''
 options.config_file  = 'config/recon_irt.yaml'
 options.dry_run      = false

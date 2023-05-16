@@ -3,8 +3,8 @@
 # default settings
 which_rich=""
 method="juggler"
-sim_file="out/sim.root"
-rec_file="out/rec.root"
+sim_file="out/sim.edm4hep.root"
+rec_file="out/rec.edm4hep.root"
 aux_file=""
 compact_file_base="${DETECTOR_PATH}/${DETECTOR}"
 compact_file=""

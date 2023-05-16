@@ -29,7 +29,7 @@ TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0)
 int main(int argc, char** argv) {
 
   // args
-  TString infileN="out/sim.root";
+  TString infileN="out/sim.edm4hep.root";
   if(argc<=1) {
     fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
     fmt::print("    [d/p]: d for dRICH\n");

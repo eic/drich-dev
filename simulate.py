@@ -43,7 +43,6 @@ numTestSamples = 0
 restrict_sector = True
 outputImageType = ''
 outputFileName = ''
-useEDM4hepFormat = True
 
 helpStr = f'''
 {sys.argv[0]} <INPUT_FILE or TEST_NUM> [OPTIONS]
@@ -111,17 +110,13 @@ helpStr = f'''
                      still save an output image, use Xvbf (start EIC container shell
                      as `xvfb-run eic-shell`); this is good for batch processing
                 -o [output file]: output root file name (overrides any default name)
-                -f: use TTree output format, rather than the default EDM4hep format, which
-                    is a TTree with PODIO metadata. The EDM4hep format is required
-                    for downstream reconstruction code, whereas the '-f' option produces
-                    a file which is easier to view in a TBrowser
     '''
 
 if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:a:n:k:lrve:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:a:n:k:lrve:o:')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr, file=sys.stderr)
     sys.exit(2)
@@ -141,7 +136,6 @@ for opt, arg in opts:
     if (opt == '-v'): runType = 'vis'
     if (opt == '-e'): outputImageType = arg.lstrip()
     if (opt == '-o'): outputFileName = arg.lstrip()
-    if (opt == '-f'): useEDM4hepFormat = False
 if (testNum < 0 and inputFileName == ''):
     print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr, file=sys.stderr)
     sys.exit(2)
@@ -195,16 +189,12 @@ if inputFileName != '':
     if not bool(re.search('^/', inputFileName)): inputFileName = workDir + "/" + inputFileName
 ##### ensure output file name has absolute path (and generate default name, if unspecified)
 if outputFileName == '':
-    outputFileName = workDir + "/out/sim.root"  # default name
+    outputFileName = workDir + "/out/sim.edm4hep.root"  # default name
 elif not bool(re.search('^/', outputFileName)):
     outputFileName = workDir + "/" + outputFileName  # convert relative path to absolute path
 ##### get output file basename
 outputName = re.sub('\.root$', '', outputFileName)
 outputName = re.sub('^.*/', '', outputName)
-##### set output file name for `npsim`, which is sensitive to file extension
-outputFileName_npsim = outputFileName
-if useEDM4hepFormat:
-    outputFileName_npsim = re.sub('\.root$', '.edm4hep.root', outputFileName_npsim)
 
 ### set RICH names, based on zDirection
 zDirection /= abs(zDirection)
@@ -494,7 +484,7 @@ cmd = [
         # f'{localDir}/NPDet/install/bin/npsim', # call local npsim
         f'--runType {runType}',
         f'--compactFile {compactFile}',
-        f'--outputFile {outputFileName_npsim}',
+        f'--outputFile {outputFileName}',
         "--part.userParticleHandler=''", # necessary for opticalphotons truth output
         # '--random.seed 1',
         # '--part.keepAllParticles True',
@@ -517,9 +507,6 @@ else:
 cmdShell = shlex.split(" ".join(cmd))
 print(f'{sep}\nRUN SIMULATION:\n{shlex.join(cmdShell)}\n{sep}')
 subprocess.run(cmdShell, cwd=detPath)
-
-### correct the output file name to the specified name
-os.rename(outputFileName_npsim, outputFileName)
 
 ### cleanup
 # os.remove(m.name) # remove macro
