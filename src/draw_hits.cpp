@@ -108,8 +108,8 @@ int main(int argc, char** argv) {
   canv = CreateCanvas("hits",0,0,1);
   hitPositionHist->Draw("colz");
   if(wr.zDirection>0) {
-    hitPositionHist->GetXaxis()->SetRangeUser(100,300);
-    hitPositionHist->GetYaxis()->SetRangeUser(-100,100);
+    hitPositionHist->GetXaxis()->SetRangeUser(100,200);
+    hitPositionHist->GetYaxis()->SetRangeUser(-50,50);
   } else {
     hitPositionHist->GetXaxis()->SetRangeUser(-70,70);
     hitPositionHist->GetYaxis()->SetRangeUser(-70,70);

@@ -16,10 +16,6 @@ echo "detected $BUILD_NPROC cpus"
 # local installation prefix
 export EIC_SHELL_PREFIX=$DRICH_DEV/prefix
 
-# cmake packages
-export IRT_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-export EDM4EIC_ROOT=$EIC_SHELL_PREFIX  # overrides container version with local version
-
 # # source environment from reconstruction_benchmarks
 # if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
 #   pushd reconstruction_benchmarks
@@ -39,8 +35,13 @@ source /opt/detector/setup.sh
 
 # source EICrecon installation
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
+  ### PATCH: exclude container's EICrecon plugins from $JANA_PLUGIN_PATH
+  exc="/usr/local/lib/EICrecon/plugins"
+  export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
+  ### SOURCE EICrecon
   source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-  export PATH="$PATH:/usr/local/bin" ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+  ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+  export PATH="$PATH:/usr/local/bin"
 fi
 
 
@@ -102,10 +103,6 @@ Detector:
   DETECTOR_CONFIG  = $DETECTOR_CONFIG
   DETECTOR_VERSION = $DETECTOR_VERSION
 
-Packages:
-  IRT_ROOT     = $IRT_ROOT
-  EDM4EIC_ROOT = $EDM4EIC_ROOT
-
 Juggler (to be deprecated):
   JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
   JUGGLER_DETECTOR         = $JUGGLER_DETECTOR
@@ -123,6 +120,7 @@ Common:
   DRICH_DEV        = $DRICH_DEV
   BUILD_NPROC      = $BUILD_NPROC
   EIC_SHELL_PREFIX = $EIC_SHELL_PREFIX
+  JANA_PLUGIN_PATH = $JANA_PLUGIN_PATH
   DETECTOR_PATH    = $DETECTOR_PATH
 
 """

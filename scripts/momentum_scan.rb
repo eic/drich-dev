@@ -6,12 +6,13 @@ require 'fileutils'
 require 'pycall/import'
 
 ## SETTINGS ########################################
-NumEvents         = 70    # number of events per fixed momentum
-NumPoints         = 10    # number of momenta to sample
+NumEvents         = 70    # number of events per fixed momentum (full test: 50)
+NumPoints         = 10    # number of momenta to sample (full test: 100)
 PoolSize          = 6     # number of parallel threads to run
 RunSimulation     = true  # if true, run the simulation step
 RunReconstruction = true  # if true, run the reconstruction step
 UseRINDEXrange    = false # if true, use range of RINDEX values rather than a single reference value
+MaxNphot          = 500   # maximum number of incident photons expected (for plot drawing range)
 ####################################################
 
 
@@ -37,16 +38,16 @@ when "d"
   xRICH      = "dRICH"
   xrich      = "drich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>65.0, },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190,  :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, :maxNPE=>20, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.00076, :rIndexRange=>[1.00075,1.00084], :maxMomentum=>60.0, :maxNPE=>40, },
   }
 when "p"
   zDirection = -1
   xRICH      = "pfRICH"
   xrich      = "pfrich"
   radiator_h = {
-    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>22.0, },
-    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>65.0, },
+    :agl => { :id=>0, :testNum=>7, :rIndexRef=>1.0190, :rIndexRange=>[1.01852,1.02381], :maxMomentum=>20.0, :maxNPE=>40, },
+    :gas => { :id=>1, :testNum=>8, :rIndexRef=>1.0013, :rIndexRange=>[1.0013,1.0015],   :maxMomentum=>60.0, :maxNPE=>40, },
   }
 else
   $stderr.puts "ERROR: unknown detector '#{ARGV[0]}'"
@@ -68,7 +69,7 @@ end
 
 ## list of particles to test
 particle_h = {
-  # 'e-'          => { :mass=>0.00051, },
+  'e-'          => { :mass=>0.00051, },
   'pi+'         => { :mass=>0.13957, },
   'kaon+'       => { :mass=>0.49368, },
   'proton'      => { :mass=>0.93827, },
@@ -96,8 +97,8 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     sim_file = out_file particle, "sim.#{rad_name}.root"
     rec_file = out_file particle, "rec.#{rad_name}.root"
     cmds = []
-    # simulation + reconstruction
-    if RunSimulation or RunReconstruction
+    # simulation
+    if RunSimulation
       cmds << [
         './simulate.py',
         "-t#{rad[:testNum]}",
@@ -106,34 +107,36 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         "-n#{NumEvents}",
         "-k#{NumPoints}",
         "-o#{sim_file}",
-      ] if RunSimulation
+      ]
+    end
+    # reconstruction
+    if RunReconstruction
       cmds << [
         './recon.sh',
         "-#{xrich[0]}",
         "#{reconWrapperArgs}",
         "-i#{sim_file}",
         "-o#{rec_file}",
-      ] if RunReconstruction
-      # analysis
-      plot_file = out_file particle, "rec_plots.#{rad_name}.root"
-      cmds << [
-        'root', '-b', '-q',
       ]
-      case reconMethod
-      when :juggler
-        cmds.last << "scripts/src/momentum_scan_juggler_draw.C(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})"
-      when :eicrecon
-        ana_file = rec_file.sub /\.root/, '.ana.root'
-        cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})"
-      end
+    end
+    # analysis
+    plot_file = out_file particle, "rec_plots.#{rad_name}.root"
+    cmds << [ 'root', '-b', '-q' ]
+    case reconMethod
+    when :juggler
+      cmds.last << "scripts/src/momentum_scan_juggler_draw.C'(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})'"
+    when :eicrecon
+      ana_file = rec_file.sub /\.root/, '.ana.root'
+      cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C'(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})'"
     end
     # spawn thread
     Thread.new do
       cmds.each_with_index do |cmd,i|
-        puts cmd.join ' '
+        cmd_shell = cmd.join ' '
+        puts cmd_shell
         mode = i==0 ? 'w' : 'a'
         Open3.pipeline(
-          cmd,
+          cmd_shell,
           out: [out_file(particle,"#{rad_name}.log.out"),mode],
           err: [out_file(particle,"#{rad_name}.log.err"),mode],
         )
@@ -146,6 +149,23 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
   end
   # wait for pool to finish
   pool.each &:join
+end
+
+# draw 2D hadd plots
+if reconMethod == :eicrecon
+  radiator_h.each do |rad_name,rad|
+    # calculate n_group_rebin, for rebinning the momentum bins:
+    # n_group_rebin => ceiling[ num momentum bins * (maxMomentum here) / (maxMomentum in histogram) * (1/NumPoints) ]
+    # FIXME: automate the hard-coded numbers
+    n_group_rebin = ( 500.0 * rad[:maxMomentum]/70.0 * 1.0/NumPoints ).to_i + 1
+    drawArgs = [
+      "\"#{OutputDir}/*.rec.#{rad_name}.ana.root\"",
+      "\"#{OutputDir}/_theta_scan_2D.#{rad_name}\"",
+      rad[:id],
+      n_group_rebin
+    ].join ','
+    system "root -b -q scripts/src/momentum_scan_2D_draw.C'(#{drawArgs})'"
+  end
 end
 
 # print errors for one of the particles
@@ -269,8 +289,19 @@ radiator_h.each do |rad_name,rad|
           rad[:maxTheta] = [rad[:maxTheta],plot.GetMaximum].max        # max point
         end
       end
-      plot.GetXaxis.SetRangeUser(0,rad[:maxMomentum])
-      plot.GetYaxis.SetRangeUser(0,1.1*rad[:maxTheta]) if plot_name.match?(/^theta_/)
+
+      # set plot ranges
+      plot.GetXaxis.SetRangeUser 0, 1.1*rad[:maxMomentum]
+      case plot_name
+      when /^thetaResid_/
+        plot.GetYaxis.SetRangeUser -40, 40
+      when /^theta_/
+        plot.GetYaxis.SetRangeUser 0, 1.1*rad[:maxTheta]
+      when /^npe_/
+        plot.GetYaxis.SetRangeUser 0, rad[:maxNPE]
+      when /^nphot_/
+        plot.GetYaxis.SetRangeUser 0, MaxNphot
+      end
 
     end
 

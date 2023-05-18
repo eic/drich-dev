@@ -132,16 +132,32 @@ case $method in
     collections=(
       DRICHHits
       DRICHRawHits
-      # DRICHAerogelTracks DRICHGasTracks
-      # DRICHIrtCherenkovParticleID
+      DRICHRawHitsAssociations
+
+      DRICHAerogelTracks
+      DRICHGasTracks
+
+      DRICHAerogelIrtCherenkovParticleID
+      DRICHGasIrtCherenkovParticleID
+      DRICHMergedCherenkovParticleID
+
+      # ReconstructedChargedParticles
+      # ReconstructedChargedParticleAssociations
+
+      ReconstructedChargedParticlesWithDRICHPID
+      ReconstructedChargedParticleAssociationsWithDRICHPID
     )
 
     # list of additional plugins to use
     plugins=(
-      # janadot
+      benchmarks_pid
+      janadot
       # dump_flags
-      # benchmarks_pid
     )
+
+    # override settings
+    # set_config "DRICH:DRICHTracks:Aerogel:numPlanes" "2"
+    # set_config "DRICH:DRICHTracks:Gas:numPlanes"     "4"
 
     # general common settings
     set_config "plugins"                          $(join plugins)
@@ -153,13 +169,14 @@ case $method in
     set_config "acts:MaterialMap"                 "calibrations/materials-map.cbor"
 
     # log levels
-    set_log_level "eicrecon"                          "info"
-    set_log_level "richgeo"                           "info"
-    set_log_level "DRICH:DRICHRawHits"                "info"
-    set_log_level "DRICH:DRICHAerogelTracks"          "info"
-    set_log_level "DRICH:DRICHGasTracks"              "info"
-    # set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
-    # set_log_level "benchmarks_pid"                    "info"
+    set_log_level "eicrecon"                                     "info"
+    set_log_level "richgeo"                                      "info"
+    set_log_level "DRICH:DRICHRawHits"                           "info"
+    set_log_level "DRICH:DRICHTracks"                            "info"
+    set_log_level "DRICH:DRICHIrtCherenkovParticleID"            "info"
+    set_log_level "DRICH:DRICHMergedCherenkovParticleID"         "info"
+    # set_log_level "DRICH:ChargedParticlesWithAssociationsAndPID" "info"
+    set_log_level "benchmarks_pid"                               "info"
 
     # input file from simulation
     cmd+=" $sim_file"

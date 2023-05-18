@@ -4,7 +4,7 @@
 *.png
 *.exe
 
-prefix
+prefix*
 bin
 lib
 macro
@@ -24,6 +24,7 @@ EICrecon
 reconstruction_benchmarks
 NPDet
 DD4hep
+Catch2
 
 juggler
 ip6
