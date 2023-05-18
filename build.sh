@@ -88,6 +88,9 @@ case $module in
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
     genOpt EICRECON_VERBOSE_CMAKE=ON
     ;;
+  reconstruction_benchmarks)
+    prefix=$module/install
+    ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
     nproc=2 # maybe memory hungry

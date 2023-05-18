@@ -8,3 +8,4 @@ set -e
 source environ.sh
 ./build.sh EICrecon $*
 #./build.sh juggler  $*  # NOTE: may be incompatible with EICrecon; build one or the other, but not both
+#./build.sh reconstruction_benchmarks $*
