@@ -32,7 +32,7 @@ using std::endl;
 int main(int argc, char** argv) {
 
   // args, figure out which RICH you are reading
-  TString infileN="out/sim.root";
+  TString infileN="out/sim.edm4hep.root";
   if(argc<=1) {
     fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
     fmt::print("    [d/p]: d for dRICH\n");

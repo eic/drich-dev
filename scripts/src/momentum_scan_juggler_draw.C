@@ -16,7 +16,7 @@ enum rad_enum {kAgl=0, kGas=1};
 //=========================================================
 
 void momentum_scan_juggler_draw(
-    std::string rec_file_name  = "out/rec.root",
+    std::string rec_file_name  = "out/rec.edm4hep.root",
     std::string out_file_name  = "out/rec.scan_plots.root",
     std::string det_name       = "DRICH", // or PFRICH
     unsigned    which_radiator = 0 // see `rad_enum` above

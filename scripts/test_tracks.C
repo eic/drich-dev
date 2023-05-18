@@ -24,7 +24,7 @@ class radiator_config {
 
 
 
-void test_tracks(TString infileN = "out/rec.root") {
+void test_tracks(TString infileN = "out/rec.edm4hep.root") {
   auto infile = new TFile(infileN);
   auto tr = (TTree*) infile->Get("events");
   TTreeReader tr_reader("events", infile);
