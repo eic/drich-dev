@@ -442,16 +442,28 @@ corresponding executables and install them to `bin/`
 
 ## IRT: Indirect Ray Tracing
 
-NOTE: this documentation is primarily for the Juggler version; the EICrecon version will be documented
-later, when at least a basic version is merged to `main`, but in the meantime, see
-[the README in EICrecon](https://github.com/eic/EICrecon/tree/main/src/detectors/DRICH).
-
-We currently use `irt` both as a standalone reconstruction algorithm and integrated in `juggler`
-as `IRTAlgorithm`. The `juggler` implementation was used for ATHENA, and is supported for EPIC
-until the migration to `EICrecon` is complete.
-
-To use Juggler (or EICrecon) with IRT, you must be on the correct set of branches. See
+To use reconstruction with IRT, you must be on the correct set of branches. See
 the [tables of branches](doc/branches.md) for guidance.
+
+### EICrecon
+
+The EICrecon version will be better documented later, when at least a basic
+version is merged to `main`, but in the meantime, see
+[the README in EICrecon](https://github.com/eic/EICrecon/tree/main/src/detectors/DRICH)
+(if you see nothing there, change to the appropriate branch).
+
+To run the reconstruction with EICrecon:
+```bash
+recon.rb -h  # see usage guide (run with no arguments to run with defaults)
+```
+
+There are various configuration files available in `config/`, which depends on which branch
+of EICrecon you are currently on.
+
+### Juggler
+
+The `juggler` implementation was used for ATHENA, and is supported for EPIC
+until the migration to `EICrecon` is complete.
 
 Procedure:
 
@@ -463,16 +475,11 @@ bin/create_irt_auxfile
 - Note: the creation of this auxiliary file requires `EICrecon` to be cloned locally, but it does
   not need to be compiled
 
-- Run the simulation, for example:
+- Then call `juggler` or the old code:
 ```bash
-simulate.py -t 1 -s -n 50
-```
-
-- Run the reconstruction via Juggler, or try the stand-alone reader macro:
-```bash
-recon.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
-recon.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
-recon.sh         # for usage guide, such as how to specify input/output files
+juggler.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
+juggler.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
+juggler.sh         # for usage guide, such as how to specify input/output files
 ```
 
 - Run the evaluation code (use `-h` for usage):
