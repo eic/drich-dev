@@ -22,6 +22,9 @@ void momentum_scan_juggler_draw(
     unsigned    which_radiator = 0 // see `rad_enum` above
     )
 {
+  // FIXME: upgrade to frame reader
+  fmt::print(stderr,"WARNING: this script still uses podio::ROOTReader, which may be deprecated soon!\n");
+
   // open event store
   podio::ROOTReader reader;
   podio::EventStore store;
