@@ -12,7 +12,6 @@ We intend to keep these tables up-to-date as development proceeds.
 | `EDM4eic`   | `main` |
 | `irt`       | `main` |
 | `EICrecon`  | `main` |
-| `juggler`   | `main` |
 
 ## IRT -- EICrecon development
 | Repository  | Branch                             | Pull Request                             |
