@@ -449,7 +449,8 @@ the [tables of branches](doc/branches.md) for guidance.
 
 The EICrecon version will be better documented later, when at least a basic
 version is merged to `main`, but in the meantime, see
-[the README in EICrecon](https://github.com/eic/EICrecon/tree/main/src/detectors/DRICH).
+[the README in EICrecon](https://github.com/eic/EICrecon/tree/main/src/detectors/DRICH)
+(if you see nothing there, change to the appropriate branch).
 
 To run the reconstruction with EICrecon:
 ```bash
