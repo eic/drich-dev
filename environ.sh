@@ -59,6 +59,14 @@ export LD_LIBRARY_PATH=$DRICH_DEV/lib:$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
 export PATH=$EIC_SHELL_PREFIX/bin:$PATH
 
+#
+#
+# TEMPORARY FOR TESTING
+export LD_LIBRARY_PATH=$DRICH_DEV/reconstruction_benchmarks/install/lib:$LD_LIBRARY_PATH
+#
+#
+#
+
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$DRICH_DEV/.rbenv
 if [ -d "$RBENV_ROOT" ]; then
