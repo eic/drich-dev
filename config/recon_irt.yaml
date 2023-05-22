@@ -40,7 +40,7 @@ log_levels:
     DRICHRawHits: info
     DRICHTracks: info
     DRICHIrtCherenkovParticleID: info
-    DRICHMergedCherenkovParticleID: info
+    DRICHMergedIrtCherenkovParticleID: info
 
 ### common settings
 jana:
