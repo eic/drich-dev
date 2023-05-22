@@ -14,6 +14,7 @@ podio:
   output_include_collections:
     ### simulation
     - DRICHHits
+    - MCParticles
     ### digitization
     - DRICHRawHits
     - DRICHRawHitsAssociations
@@ -23,7 +24,7 @@ podio:
     ### IRT PID
     - DRICHAerogelIrtCherenkovParticleID
     - DRICHGasIrtCherenkovParticleID
-    - DRICHMergedCherenkovParticleID
+    - DRICHMergedIrtCherenkovParticleID
     ### Reconstructed Particles
     - ReconstructedChargedParticles
     - ReconstructedChargedParticleAssociations
