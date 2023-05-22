@@ -13,6 +13,7 @@ podio:
   output_include_collections:
     ### simulation
     - DRICHHits
+    - MCParticles
     ### digitization
     - DRICHRawHits
     - DRICHRawHitsAssociations
