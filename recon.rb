@@ -35,7 +35,7 @@ OptionParser.new do |o|
   o.separator('')
   o.on("-a", "--ana [FILE]", "Analysis output file", "Default: #{rec2ana options.rec_file}"){ |a| options.ana_file = a }
   o.separator('')
-  o.on("-t", "--dry-run", "Dry run: just print the EICrecon command and exit"){ options.dry_run = true }
+  o.on("-d", "--dry-run", "Dry run: just print the EICrecon command and exit"){ options.dry_run = true }
   o.separator('')
   o.on("-D", "--debug", "Run in GDB debugger"){
     options.debug_run    = true
