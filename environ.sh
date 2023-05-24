@@ -63,6 +63,7 @@ export PATH=$EIC_SHELL_PREFIX/bin:$PATH
 #
 # TEMPORARY FOR TESTING
 export LD_LIBRARY_PATH=$DRICH_DEV/reconstruction_benchmarks/install/lib:$LD_LIBRARY_PATH
+export PATH=$DRICH_DEV/reconstruction_benchmarks/install/bin:$PATH
 #
 #
 #
