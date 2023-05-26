@@ -34,7 +34,6 @@ podio:
 log_levels:
   eicrecon: info
   richgeo: info
-  benchmarks_pid: info
   DRICH:
     DRICHRawHits: info
     DRICHTracks: info
