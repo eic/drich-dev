@@ -1,6 +1,11 @@
 dRICH Tutorial Series
 =====================
 
+Welcome to the dRICH Simulation Tutorials landing page! This page will link
+to all of our tutorials, and is hosted here on Github to allow for updates
+as needed. Before going through the dRICH tutorials, there are a few
+prerequisite tutorials on ePIC software in general:
+
 Prerequisite Tutorials
 ----------------------
 These are tutorials given to the general ePIC Collaboration. Before following
