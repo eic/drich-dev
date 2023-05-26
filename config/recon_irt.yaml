@@ -25,10 +25,10 @@ podio:
     - DRICHGasIrtCherenkovParticleID
     - DRICHMergedIrtCherenkovParticleID
     ### Reconstructed Particles
-    # - ReconstructedChargedParticles
-    # - ReconstructedChargedParticleAssociations
-    # - ReconstructedChargedParticlesWithDRICHPID
-    # - ReconstructedChargedParticleAssociationsWithDRICHPID
+    - ReconstructedChargedParticles
+    - ReconstructedChargedParticleAssociations
+    - ReconstructedChargedParticlesWithDRICHPID
+    - ReconstructedChargedParticleAssociationsWithDRICHPID
 
 ### EICrecon log levels
 log_levels:
