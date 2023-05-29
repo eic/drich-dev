@@ -80,6 +80,7 @@ log_levels:
   DRICH:
     DRICHRawHits: info
     DRICHTracks: info
+    DRICHMergedTracks: info
     DRICHIrtCherenkovParticleID: info
     DRICHMergedIrtCherenkovParticleID: info
 
