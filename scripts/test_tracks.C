@@ -30,10 +30,9 @@ void test_tracks(TString infileN = "out/rec.edm4hep.root") {
   TTreeReader tr_reader("events", infile);
   
   std::vector<radiator_config*> radiators = {
-    new radiator_config( 0, "AerogelTracks",       kAzure+7, kFullCircle, tr_reader ),
-    new radiator_config( 1, "GasTracks",           kRed,     kFullCircle, tr_reader ),
-    // new radiator_config( 0, "AerogelPseudoTracks", kGreen+2, kOpenCircle, tr_reader ),
-    // new radiator_config( 1, "GasPseudoTracks",     kMagenta, kOpenCircle, tr_reader )
+    new radiator_config( 0, "AerogelTracks", kAzure+7, kFullCircle, tr_reader ),
+    new radiator_config( 1, "GasTracks",     kRed,     kFullCircle, tr_reader ),
+    new radiator_config( 2, "MergedTracks",  kGreen+1, kFullCircle, tr_reader ),
   };
 
   double rmax = 1900;
