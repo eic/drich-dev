@@ -28,8 +28,6 @@ podio:
     ### Reconstructed Particles
     - ReconstructedChargedParticles
     - ReconstructedChargedParticleAssociations
-    - ReconstructedChargedParticlesWithDRICHPID
-    - ReconstructedChargedParticleAssociationsWithDRICHPID
 
 ### EICrecon log levels
 log_levels:
@@ -41,6 +39,8 @@ log_levels:
     DRICHMergedTracks: info
     DRICHIrtCherenkovParticleID: info
     DRICHMergedIrtCherenkovParticleID: info
+  pid:
+    ChargedParticlesWithAssociations: info
 
 ### common settings
 jana:
