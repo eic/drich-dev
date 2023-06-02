@@ -28,6 +28,7 @@ podio:
     ### Reconstructed Particles
     - ReconstructedChargedParticles
     - ReconstructedChargedParticleAssociations
+    - ReconstructedChargedParticleIDs
 
 ### EICrecon log levels
 log_levels:
