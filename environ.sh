@@ -16,13 +16,7 @@ echo "detected $BUILD_NPROC cpus"
 # local installation prefix
 export EIC_SHELL_PREFIX=$DRICH_DEV/prefix
 
-# # source environment from reconstruction_benchmarks
-# if [ -f "reconstruction_benchmarks/.local/bin/env.sh" ]; then
-#   pushd reconstruction_benchmarks
-#   source .local/bin/env.sh
-#   popd
-# fi
-
+# variable needed for `dawn`
 export LOCAL_DATA_PATH=$DRICH_DEV
 
 # source common upstream environment (nightly jug_xl build)
@@ -58,15 +52,6 @@ unset branch
 export LD_LIBRARY_PATH=$DRICH_DEV/lib:$EIC_SHELL_PREFIX/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$EIC_SHELL_PREFIX/python:$PYTHONPATH
 export PATH=$EIC_SHELL_PREFIX/bin:$PATH
-
-#
-#
-# TEMPORARY FOR TESTING
-export LD_LIBRARY_PATH=$DRICH_DEV/reconstruction_benchmarks/install/lib:$LD_LIBRARY_PATH
-export PATH=$DRICH_DEV/reconstruction_benchmarks/install/bin:$PATH
-#
-#
-#
 
 # use local rbenv ruby shims, if installed
 export RBENV_ROOT=$DRICH_DEV/.rbenv

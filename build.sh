@@ -89,7 +89,6 @@ case $module in
     genOpt EICRECON_VERBOSE_CMAKE=ON
     ;;
   reconstruction_benchmarks)
-    prefix=$module/install
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
