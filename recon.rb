@@ -11,16 +11,10 @@ require 'ostruct'
 options = OpenStruct.new
 options.sim_file     = 'out/sim.edm4hep.root'
 options.rec_file     = 'out/rec.edm4hep.root'
-options.ana_file     = ''
 options.config_file  = 'config/recon_irt.yaml'
 options.dry_run      = false
 options.debug_run    = false
 options.eicrecon_bin = 'eicrecon'
-
-# convert rec_file to ana_file name
-def rec2ana(name)
-  name.sub /\.edm4hep\.root$|\.root$/, '.ana\0'
-end
 
 # parse CLI options
 OptionParser.new do |o|
@@ -33,9 +27,7 @@ OptionParser.new do |o|
   o.separator('')
   o.on("-r", "--rec [FILE]", "Reconstruction output file", "Default: #{options.rec_file}"){ |a| options.rec_file = a }
   o.separator('')
-  o.on("-a", "--ana [FILE]", "Analysis output file", "Default: #{rec2ana options.rec_file}"){ |a| options.ana_file = a }
-  o.separator('')
-  o.on("-t", "--dry-run", "Dry run: just print the EICrecon command and exit"){ options.dry_run = true }
+  o.on("-d", "--dry-run", "Dry run: just print the EICrecon command and exit"){ options.dry_run = true }
   o.separator('')
   o.on("-D", "--debug", "Run in GDB debugger"){
     options.debug_run    = true
@@ -48,9 +40,6 @@ OptionParser.new do |o|
   end
 end.parse!(ARGV)
 # puts "OPTIONS: #{options}"
-
-# set hist file, if not set from CLI
-ana_file = rec2ana options.rec_file if options.ana_file.empty?
 
 # check for existence of input files
 [
@@ -99,7 +88,6 @@ end
 # append CLI settings
 arg_list += traverse({
   "podio:output_file" => options.rec_file,
-  "histsfile"         => ana_file,
 })
 
 # if debugging, override the timeout

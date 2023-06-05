@@ -20,6 +20,7 @@ podio:
     ### track projections
     - DRICHAerogelTracks
     - DRICHGasTracks
+    - DRICHMergedTracks
     ### IRT PID
     - DRICHAerogelIrtCherenkovParticleID
     - DRICHGasIrtCherenkovParticleID
@@ -27,8 +28,7 @@ podio:
     ### Reconstructed Particles
     - ReconstructedChargedParticles
     - ReconstructedChargedParticleAssociations
-    - ReconstructedChargedParticlesWithDRICHPID
-    - ReconstructedChargedParticleAssociationsWithDRICHPID
+    - ReconstructedChargedParticleIDs
 
 ### EICrecon log levels
 log_levels:
@@ -37,8 +37,11 @@ log_levels:
   DRICH:
     DRICHRawHits: debug
     DRICHTracks: info
+    DRICHMergedTracks: info
     DRICHIrtCherenkovParticleID: info
     DRICHMergedIrtCherenkovParticleID: info
+  pid:
+    ChargedParticlesWithAssociations: info
 
 ### common settings
 jana:

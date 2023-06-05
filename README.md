@@ -8,6 +8,7 @@ Resources and Tools for EPIC dRICH development
 | [Geometry and Materials](#geometry) | Detector geometry and material properties description |
 | [Simulation](#simulation)           | Running the simulation in Geant4                      |
 | [Reconstruction](#reconstruction)   | Running the reconstruction algorithms                 |
+| [Benchmarks](#benchmarks)           | Running the analysis benchmarks and performance plots |
 | [Miscellaneous](#miscellaneous)     | Additional code for support                           |
 
 | **Documentation Links**                       |                                               |
@@ -66,35 +67,50 @@ of branches for varying configurations.
 - Obtain EPIC Software modules, either clone or symlink the repositories to the
   specified paths:
   - Modules:
-    - [epic](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
+    - [`epic`](https://github.com/eic/epic) to `./epic`, for the EPIC detector geometry,
       based on [DD4hep](https://github.com/AIDASoft/DD4hep)
-    - [irt](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
-    - [EDM4eic](https://github.com/eic/EDM4eic) to `./EDM4eic`, for the data model; this extends
-      [EDM4hep](https://github.com/key4hep/EDM4hep), the common data model, which is included
+    - [`irt`](https://github.com/eic/irt) to `./irt`, for the Indirect Ray Tracing for RICH reconstruction
+    - [`EDM4eic`](https://github.com/eic/EDM4eic) to `./EDM4eic`, for the data model; this extends
+      [`EDM4hep`](https://github.com/key4hep/EDM4hep), the common data model, which is included
       in the EIC software image
-    - [EICRecon](https://github.com/eic/EICrecon) to `./EICrecon`, for the reconstruction framework
-    - [juggler](https://eicweb.phy.anl.gov/EIC/juggler) to `./juggler`, for the reconstruction
-      framework used in ATHENA, and supported while we migrate `EICrecon`
-  - Suggestion: clone with SSH, which is required for contributions:
-    ```bash
-    git clone git@github.com:eic/epic.git
-    git clone git@github.com:eic/irt.git
-    git clone git@github.com:eic/EDM4eic.git
-    git clone git@github.com:eic/EICrecon.git
-    ```
-    Since `juggler` is not on Github, but is hosted on EICweb, it is recommended to clone
-    with HTTPS:
-    ```bash
-    git clone https://eicweb.phy.anl.gov/EIC/juggler.git
-    ```
-    We will soon be moving to [`EICRecon`](https://github.com/eic/EICrecon),
-    thus it is unlikely you will need to have SSH access to `juggler`.
+    - [`EICRecon`](https://github.com/eic/EICrecon) to `./EICrecon`, for the reconstruction framework
+    - [`reconstruction_benchmarks`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to
+      `./reconstruction_benchmarks`, for the reconstruction benchmarks and performance studies
+  - Cloning:
+    - Only clone the repositories that you need or intend to modify; they are all installed in the `eic-shell`
+      image, but if you want to build the latest possible version of a repository, clone it; `drich-dev` is
+      designed to _override_ `eic-shell` image builds
+    - Clone the Github repositories with SSH, which is required for
+      contributions (you must be a member of the EIC organization and ePIC Devs
+      team), otherwise you need to clone with HTTPS (or fork and clone the fork
+      with SSH)
+      - SSH clone:
+        ```bash
+        git clone git@github.com:eic/epic.git
+        git clone git@github.com:eic/irt.git
+        git clone git@github.com:eic/EDM4eic.git
+        git clone git@github.com:eic/EICrecon.git
+        ```
+      - HTTPS clone:
+        ```bash
+        git clone https://github.com/eic/epic.git
+        git clone https://github.com/eic/irt.git
+        git clone https://github.com/eic/EDM4eic.git
+        git clone https://github.com/eic/EICrecon.git
+        ```
+    - Some repositories are still hosted on [EICweb](https://eicweb.phy.anl.gov/EIC); if you want to contribute
+      to them, you will also need an account there. Again, if you have access, clone with SSH, otherwise clone
+      with HTTPS:
+      - SSH clone:
+        ```bash
+        git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
+        ```
+      - HTTPS clone:
+        ```bash
+        git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git
+        ```
   - Checkout the appropriate branches of each repository, depending on your needs
     - see [Branches and Pull Requests](doc/branches.md)
-    - for example, currently the IRT code relies on a custom data model in
-      `EDM4eic`, which has not been merged to the main branches; the "IRT
-      Development" branches are recommended for running the IRT code for now,
-      until IRT is integrated with the new reconstruction framework
     - see also the [project page](https://github.com/orgs/eic/projects/4/views/1)
       for more up-to-date information
   - Follow directions below to build each module
@@ -128,16 +144,16 @@ of branches for varying configurations.
   ./build.sh irt
   ./build.sh epic
   ./build.sh EICrecon
-  ./build.sh juggler  # (only if you need it)
+  ./build.sh reconstruction_benchmarks
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
-    recommended order (it will not build `juggler`)
+    recommended order
 - run `source environ.sh` again, if:
   - if this is your first time building, or a clean build
   - if a module's environment has been updated, in particular `epic/templates/setup.sh.in`
 - finally, build the local `drich-dev` code:
   ```bash
-  make         # compiles
+  make         # build and install the code
   make clean   # remove built targets (only if you want to recompile from scratch)
   ```
   - this will produce several executables in `bin/` from code in `src/`
@@ -166,40 +182,6 @@ of branches for varying configurations.
 - most build scripts will run `cmake --build` multi-threaded
   - the `$BUILD_NPROC` environment variable should be set to the number of
     parellel threads you want to build with (see `environ.sh`)
-
-## Benchmarks Setup
-- TODO: in light of the reconstruction framework change, the benchmarks will need
-  to be updated; any local benchmark code will be updated or deprecated, but
-  we leave the current documentation here for reference:
-
-The benchmarks run downstream of all other modules, and are useful for running
-tests. For example, automated checks of upstream geometry changes, to see what
-happens to performance plots. They are not required for upstream development,
-but are certainly very useful. Currently we only have plots of raw hits; more
-development is needed here.
-
-Before running benchmarks, you must setup the common benchmarks:
-```bash
-pushd reconstruction_benchmarks
-git clone git@eicweb.phy.anl.gov:EIC/benchmarks/common_bench.git setup
-source setup/bin/env.sh
-./setup/bin/install_common.sh
-popd
-source environ.sh
-```
-- these directions are similar to those in the
-  [reconstruction_benchmarks Readme](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/blob/master/README.md),
-  but with some minor differences for our current setup (e.g., there is no need
-  to build another detector in `reconstruction_benchmarks/.local`)
-- the `source environ.sh` step will now set additional environment variables,
-  since you now have common benchmarks installed
-- there is no need to repeat this setup procedure, unless you want to start from
-  a clean slate or update the common benchmarks
-
-Now install the [reconstruction benchmarks](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks)
-```bash
-git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
-```
 
 ---
 
@@ -291,7 +273,7 @@ flowchart TB
     IRT[irt]:::epic
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut --> EICrecon
+  SimOut ---> EICrecon
   JANA --> EICrecon
   IRT --> EICrecon
   EICrecon --> RecOut
@@ -299,11 +281,12 @@ flowchart TB
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
     DetectorBenchmarks[detector_benchmarks]:::epic
-    RecAnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
+    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
   end
-  EICrecon --> RecAnaOut
+  AnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
   RecOut --> PhysicsBenchmarks
   RecOut --> DetectorBenchmarks
+  RecOut --> ReconstructionBenchmarks --> AnaOut
 
 ```
 
@@ -462,11 +445,17 @@ of EICrecon you are currently on.
 
 ### Juggler
 
-The `juggler` implementation was used for ATHENA, and is supported for EPIC
-until the migration to `EICrecon` is complete.
+The [`juggler`](https://eicweb.phy.anl.gov/EIC/juggler) implementation was used
+for ATHENA, and was supported for EPIC until the migration to `EICrecon` was
+complete; `juggler` is now **deprecated**, but this section contains documentation
+how to run it, in case it is needed.
 
-Procedure:
-
+- Clone it to `.juggler/`; since `juggler` is hosted on EICweb and is
+  deprecated, it is recommended to clone with HTTPS:
+  ```bash
+  git clone https://eicweb.phy.anl.gov/EIC/juggler.git
+  ```
+  Then `checkout` the appropriate development branch.
 - Create the auxiliary IRT configuration file; this is a ROOT file containing `libIRT`
   objects, such as optical boundaries, based on the dRICH geometry description.
 ```bash
@@ -487,19 +476,19 @@ juggler.sh         # for usage guide, such as how to specify input/output files
 evaluate.sh
 ```
 
-## Benchmarks
-- TODO: in light of the reconstruction framework change, the benchmarks will need
-  to be updated; any local benchmark code will be updated or deprecated, but
-  we leave the current documentation here for reference:
-  - use `./run_benchmark.sh` to run the simulation and subsequent reconstruction
-    benchmarks
-    - this is a wrapper for `reconstruction_benchmarks/benchmarks/rich/run_irt.sh`, 
-      which is executed by the benchmarks CI
-      - this script runs `npsim` and `juggler`
-    - see also `reconstruction_benchmarks/benchmarks/rich/config.yml` for the
-      commands used by the CI
-    - it is practical to edit this wrapper script during development, for testing
-      purposes; this is why several lines are commented out
+
+---
+
+<a name="benchmarks"></a>
+# Benchmarks
+
+The benchmarks run downstream of all other modules, and are useful for running
+tests. For example, automated checks of upstream geometry changes, to see what
+happens to performance plots.
+
+- obtain and build the `reconstruction_benchmarks` repository (see above)
+- run `benchmark.rb` (a symlink to the main benchmark runner script) with no arguments
+  to see the usage guide
 
 
 ---

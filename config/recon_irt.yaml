@@ -5,7 +5,6 @@
 
 ### EICrecon plugins
 plugins:
-  - benchmarks_pid
   - janadot
   # - dump_flags
 
@@ -21,6 +20,7 @@ podio:
     ### track projections
     - DRICHAerogelTracks
     - DRICHGasTracks
+    - DRICHMergedTracks
     ### IRT PID
     - DRICHAerogelIrtCherenkovParticleID
     - DRICHGasIrtCherenkovParticleID
@@ -28,19 +28,20 @@ podio:
     ### Reconstructed Particles
     - ReconstructedChargedParticles
     - ReconstructedChargedParticleAssociations
-    - ReconstructedChargedParticlesWithDRICHPID
-    - ReconstructedChargedParticleAssociationsWithDRICHPID
+    - ReconstructedChargedParticleIDs
 
 ### EICrecon log levels
 log_levels:
   eicrecon: info
   richgeo: info
-  benchmarks_pid: info
   DRICH:
     DRICHRawHits: info
     DRICHTracks: info
+    DRICHMergedTracks: info
     DRICHIrtCherenkovParticleID: info
     DRICHMergedIrtCherenkovParticleID: info
+  pid:
+    ChargedParticlesWithAssociations: info
 
 ### common settings
 jana:

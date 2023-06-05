@@ -30,8 +30,8 @@ fi
 module=$(echo $1 | sed 's;/$;;')
 shift
 if [ ! -d "$module" ]; then
-  echo "ERROR: module \"$module\" does not exist"
-  exit 1
+  echo "WARNING: module \"$module\" does not exist"
+  exit 0
 fi
 
 # determine if clean build, and set extraOpts
@@ -87,6 +87,8 @@ case $module in
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
     genOpt EICRECON_VERBOSE_CMAKE=ON
+    ;;
+  reconstruction_benchmarks)
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
