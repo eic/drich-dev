@@ -503,14 +503,6 @@ public:
   
   int setOpticalParams() {
 
-    // very approximate values
-    const double gasE[] =
-      { 2*eV, 2.5*eV, 3*eV, 3.5*eV, 4*eV, 4.5*eV, 5*eV, 5.5*eV, 6*eV, 6.5*eV, 7*eV };
-    const double gasN[] = // (n-1)*10^6
-      { 823., 829., 835., 843., 852., 863., 875., 889., 905., 923., 943. };
-    const double gasA[] =
-      { 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm };
-
     // different gas types parameters
     G4String gasType[] = { "C2F6", "CF4", "C4F10" };
 
@@ -548,9 +540,9 @@ public:
     double refn = Ksr[igas] * density + 1.;
     double wlref = 633*nm; // for density vs refractive index
     
-    int nEntries = 10;
-    double wl0 = 200.*nm;
-    double wl1 = 700.*nm;
+    int nEntries = 30;
+    double wl0 = 5.*nm;
+    double wl1 = 1500.*nm;
     double dwl = (wl1-wl0)/(nEntries-1.);
     
     if (scaledE==NULL) {
