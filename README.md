@@ -272,7 +272,7 @@ flowchart TB
     IRT[irt]:::epic
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut --> EICrecon
+  SimOut ---> EICrecon
   JANA --> EICrecon
   IRT --> EICrecon
   EICrecon --> RecOut
@@ -280,7 +280,7 @@ flowchart TB
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
     DetectorBenchmarks[detector_benchmarks]:::epic
-    ReconstructionBenchmarks[detector_benchmarks]:::epic
+    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
   end
   AnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
   RecOut --> PhysicsBenchmarks
