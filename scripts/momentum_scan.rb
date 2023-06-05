@@ -94,6 +94,7 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     # preparation
     sim_file = out_file particle, "sim.#{rad_name}.root"
     rec_file = out_file particle, "rec.#{rad_name}.root"
+    ana_file = rec_file.sub /\.root/, '.ana.root'
     cmds = []
     # simulation
     if RunSimulation
@@ -119,9 +120,11 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
         ]
       when :eicrecon
         cmds << [
-          './recon.rb',
-          "-s #{sim_file}",
-          "-r #{rec_file}",
+          './benchmark.rb',
+          '-r',
+          "--sim-file #{sim_file}",
+          "--rec-file #{rec_file}",
+          "--ana-file #{ana_file}",
         ]
       end
     end
@@ -132,7 +135,6 @@ particle_h.keys.product(radiator_h.keys).each_slice(PoolSize) do |slice|
     when :juggler
       cmds.last << "scripts/src/momentum_scan_juggler_draw.C'(\"#{rec_file}\",\"#{plot_file}\",\"#{xrich.upcase}\",#{rad[:id]})'"
     when :eicrecon
-      ana_file = rec_file.sub /\.root/, '.ana.root'
       cmds.last << "scripts/src/momentum_scan_eicrecon_draw.C'(\"#{ana_file}\",\"#{plot_file}\",#{rad[:id]})'"
     end
     # spawn thread
