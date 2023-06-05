@@ -30,8 +30,8 @@ fi
 module=$(echo $1 | sed 's;/$;;')
 shift
 if [ ! -d "$module" ]; then
-  echo "ERROR: module \"$module\" does not exist"
-  exit 1
+  echo "WARNING: module \"$module\" does not exist"
+  exit 0
 fi
 
 # determine if clean build, and set extraOpts
