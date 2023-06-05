@@ -78,7 +78,8 @@ of branches for varying configurations.
       `./reconstruction_benchmarks`, for the reconstruction benchmarks and performance studies
   - Cloning:
     - Only clone the repositories that you need or intend to modify; they are all installed in the `eic-shell`
-      image, but if you want to build the latest possible version of a repository, clone it
+      image, but if you want to build the latest possible version of a repository, clone it; `drich-dev` is
+      designed to _override_ `eic-shell` image builds
     - Clone the Github repositories with SSH, which is required for
       contributions (you must be a member of the EIC organization and ePIC Devs
       team), otherwise you need to clone with HTTPS (or fork and clone the fork
