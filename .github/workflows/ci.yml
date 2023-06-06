@@ -23,6 +23,7 @@ concurrency:
 jobs:
 
 # BUILD ---------------------------------------------------------------------------
+
   build_data_model:
     runs-on: ubuntu-latest
     strategy:
@@ -40,8 +41,7 @@ jobs:
           run: |
             echo "[CI] CLONE REPOSITORIES"
             git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
-            echo "[CI] BRANCHES"
-            check_branches.sh
+            scripts/check_ci_runner.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
@@ -62,7 +62,7 @@ jobs:
         include:
           - { repo: epic,     branch: main     }
           - { repo: irt,      branch: main     }
-          # - { repo: EICrecon, branch: irt-algo }
+          - { repo: EICrecon, branch: irt-algo }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -76,12 +76,7 @@ jobs:
           run: |
             echo "[CI] CLONE REPOSITORIES"
             git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
-            echo "[CI] LS"
-            ls
-            echo "[CI] PREFIX TREE"
-            find prefix
-            echo "[CI] BRANCHES"
-            check_branches.sh
+            scripts/check_ci_runner.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
@@ -114,12 +109,7 @@ jobs:
           run: |
             echo "[CI] CLONE REPOSITORIES"
             git clone https://eicweb.phy.anl.gov/EIC/${{matrix.repo_path}}.git --branch ${{matrix.branch}}
-            echo "[CI] LS"
-            ls
-            echo "[CI] PREFIX TREE"
-            find prefix
-            echo "[CI] BRANCHES"
-            check_branches.sh
+            scripts/check_ci_runner.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
@@ -151,12 +141,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            echo "[CI] LS"
-            ls
-            echo "[CI] PREFIX TREE"
-            find prefix
-            echo "[CI] BRANCHES"
-            check_branches.sh
+            scripts/check_ci_runner.sh
             echo "[CI] BUILD LOCAL CODE"
             make
       - uses: actions/upload-artifact@v3
@@ -176,33 +161,150 @@ jobs:
             EICrecon
             reconstruction_benchmarks
 
-# SIMULATION ----------------------------------------------------------------------
+# PIPELINE: SIMULATION, RECONSTRUCTION, BENCHMARKS ---------------------------------
 
-  # run_simulation:
-  #   needs:
-  #     - build_modules
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       test_num: [1, 4]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           echo "[CI] JOB MATRIX:"
-  #           echo "test_num = ${{matrix.test_num}}"
-  #           echo "[CI] RUN SIMULATION:"
-  #           simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}} -o out/sim.${{matrix.test_num}}.edm4hep.root
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: simulation_${{matrix.test_num}}
-  #         retention-days: 3
-  #         path: out
+  pipeline:
+    needs:
+      - build_local
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { test_num: 1 }
+          - { test_num: 4 }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_local
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/check_ci_runner.sh
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
+            echo "[CI] EVENT DISPLAY:"
+            event_display d s out/sim.edm4hep.root
+            echo "[CI] DRAW HITS:"
+            draw_hits d
+            echo "[CI] RECONSTRUCTION:"
+            recon.rb
+            echo "[CI] BENCHMARKS:"
+            benchmark.rb -b
+      - name: tree_artifacts
+        run: tree out
+      - name: rename_artifacts
+        run: mv -v out out.${{matrix.test_num}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pipeline
+          retention-days: 1
+          path: out.${{matrix.test_num}}
+
+# MISCELLANEOUS -------------------------------------------------------------------
+
+  geometry:
+    needs:
+      - build_local
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { det: d, detector: DRICH  }
+          - { det: p, detector: PFRICH }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_local
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/check_ci_runner.sh
+            echo "[CI] CREATE TGEO FILE:"
+            geometry.sh -${{matrix.det}} -o geo/${{matrix.detector}}_TGeo.root
+            echo "[CI] DUMP GEOMETRY CONSTANTS:"
+            search_compact_params.sh -e | grep ${{matrix.detector}} | tee geo/${{matrix.detector}}_constants.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: geometry
+          retention-days: 1
+          path: geo
+
+  irt_auxfiles:
+    needs:
+      - build_local
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { det: d, detector: DRICH  }
+          - { det: p, detector: PFRICH }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_local
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/check_ci_runner.sh
+            echo "[CI] CREATE IRT AUXFILE:"
+            create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
+      - uses: actions/upload-artifact@v3
+        with:
+          name: irt_auxfiles
+          retention-days: 1
+          path: geo
+
+# ARTIFACT COLLECTION -------------------------------------------------------------
+
+  collect:
+    needs:
+      - pipeline
+      - geometry
+      - irt_auxfiles
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: pipeline
+      - uses: actions/download-artifact@v3
+        with:
+          name: geometry
+      - uses: actions/download-artifact@v3
+        with:
+          name: irt_auxfiles
+      - name: tree_artifacts_before_cull
+        run: |
+          tree out*
+          tree geo
+      - name: cull
+        run: |
+          rm -v out*/*.root
+      - name: tree_artifacts_after_cull
+        run: |
+          tree out*
+          tree geo
+      - uses: actions/upload-artifact@v3
+        with:
+          name: _RESULTS
+          retention-days: 14
+          path: |
+            out*
+            geo
