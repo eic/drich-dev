@@ -239,6 +239,68 @@ jobs:
           retention-days: 1
           path: geo
 
+  visual:
+    needs:
+      - build_local
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_local
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/check_ci_runner.sh
+            echo "[CI] SET DEBUG MODE"
+            scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
+            echo "[CI] REBUILD epic"
+            build.sh epic
+            echo "[CI] VISUALIZE:"
+            exit | simulate.py -t1 -n1 -v -e pdf
+            mv out out.visual
+      - uses: actions/upload-artifact@v3
+        with:
+          name: visual
+          retention-days: 1
+          path: out.visual
+
+  optics:
+    needs:
+      - build_local
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_local
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/check_ci_runner.sh
+            echo "[CI] SET DEBUG MODE"
+            scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
+            echo "[CI] REBUILD epic"
+            build.sh epic
+            echo "[CI] VISUALIZE:"
+            exit | simulate.py -t12 -e pdf
+            mv out out.optics
+      - uses: actions/upload-artifact@v3
+        with:
+          name: optics
+          retention-days: 1
+          path: out.optics
+
   irt_auxfiles:
     needs:
       - build_local
@@ -275,6 +337,8 @@ jobs:
     needs:
       - pipeline
       - geometry
+      - visual
+      - optics
       - irt_auxfiles
     runs-on: ubuntu-latest
     strategy:
@@ -287,6 +351,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: geometry
+      - uses: actions/download-artifact@v3
+        with:
+          name: visual
+      - uses: actions/download-artifact@v3
+        with:
+          name: optics
       - uses: actions/download-artifact@v3
         with:
           name: irt_auxfiles
