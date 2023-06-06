@@ -46,10 +46,11 @@ jobs:
             build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
-          name: build_${{matrix.repo}}
+          name: build_data_model
           retention-days: 1
           path: |
             prefix
+            ${{matrix.repo}}
 
   build_github_modules:
     needs:
@@ -61,12 +62,12 @@ jobs:
         include:
           - { repo: epic,     branch: main     }
           - { repo: irt,      branch: main     }
-          - { repo: EICrecon, branch: irt-algo }
+          # - { repo: EICrecon, branch: irt-algo }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_EDM4eic
+          name: build_data_model
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -75,20 +76,105 @@ jobs:
           run: |
             echo "[CI] CLONE REPOSITORIES"
             git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
+            echo "[CI] LS"
+            ls
+            echo "[CI] PREFIX TREE"
+            find prefix
             echo "[CI] BRANCHES"
             check_branches.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
-          name: build_${{matrix.repo}}
+          name: build_github_modules
           retention-days: 1
           path: |
             prefix
+            ${{matrix.repo}}
 
-#TODO
-#- build eicweb modules
-#- build local drich-dev
+  build_eicweb_modules:
+    needs:
+      - build_data_model
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { repo: reconstruction_benchmarks, repo_path: benchmarks/reconstruction_benchmarks, branch: irt-algo }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_data_model
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            echo "[CI] CLONE REPOSITORIES"
+            git clone https://eicweb.phy.anl.gov/EIC/${{matrix.repo_path}}.git --branch ${{matrix.branch}}
+            echo "[CI] LS"
+            ls
+            echo "[CI] PREFIX TREE"
+            find prefix
+            echo "[CI] BRANCHES"
+            check_branches.sh
+            echo "[CI] BUILD REPOSITORIES"
+            build.sh ${{matrix.repo}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build_eicweb_modules
+          retention-days: 1
+          path: |
+            prefix
+            ${{matrix.repo}}
+
+  build_local:
+    needs:
+      - build_github_modules
+      - build_eicweb_modules
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_github_modules
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_eicweb_modules
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            echo "[CI] LS"
+            ls
+            echo "[CI] PREFIX TREE"
+            find prefix
+            echo "[CI] BRANCHES"
+            check_branches.sh
+            echo "[CI] BUILD LOCAL CODE"
+            make
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build_local
+          retention-days: 1
+          path: |
+            # module builds
+            prefix
+            # local build
+            bin
+            lib
+            # modules
+            EDM4eic
+            epic
+            irt
+            EICrecon
+            reconstruction_benchmarks
 
 # SIMULATION ----------------------------------------------------------------------
 
