@@ -39,7 +39,7 @@ jobs:
           setup: environ.sh
           run: |
             echo "[CI] CLONE REPOSITORIES"
-            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch_EDM4eic}}
+            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
             echo "[CI] BRANCHES"
             check_branches.sh
             echo "[CI] BUILD REPOSITORIES"
