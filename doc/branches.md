@@ -5,27 +5,27 @@ project or recommended configuration. Links to corresponding pull requests are p
 We intend to keep these tables up-to-date as development proceeds.
 
 ## Production
-| Repository  | Branch |
-| --:         | ---    |
-| `drich-dev` | `main` |
-| `epic`      | `main` |
-| `EDM4eic`   | `main` |
-| `irt`       | `main` |
-| `EICrecon`  | `main` |
-| `juggler`   | `main` |
+| Repository                  | Branch   |
+| --:                         | ---      |
+| `drich-dev`                 | `main`   |
+| `epic`                      | `main`   |
+| `EDM4eic`                   | `main`   |
+| `irt`                       | `main`   |
+| `EICrecon`                  | `main`   |
+| `reconstruction_benchmarks` | `master` |
 
 ## IRT -- EICrecon development
-| Repository  | Branch             | Pull Request                             |
-| --:         | ---                | ---                                      |
-| `drich-dev` | `irt-algo-stable`  | https://github.com/eic/drich-dev/pull/62 |
-| `epic`      | `main`             |                                          |
-| `EDM4eic`   | `main`             |                                          |
-| `irt`       | `main`             |                                          |
-| `EICrecon`  | `irt-algo-stable`  | https://github.com/eic/EICrecon/pull/393 |
+| Repository                  | Branch                             | Pull Request                                                                                       |
+| --:                         | ---                                | ---                                                                                                |
+| `drich-dev`                 | `main`                             |                                                                                                    |
+| `epic`                      | `main`                             |                                                                                                    |
+| `EDM4eic`                   | `main`                             |                                                                                                    |
+| `irt`                       | `main`                             |                                                                                                    |
+| `EICrecon`                  | `irt-algo-stable` (or `irt-algo`)  | https://github.com/eic/EICrecon/pull/393                                                           |
+| `reconstruction_benchmarks` | `irt-algo`                         | [MR 293](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/293) |
 
-**NOTES:**
-- for EICrecon development that does not involve IRT, use branch `main` in `drich-dev`
-- the branches `irt-algo-stable` are for a stable, working version; the branches `irt-algo` are for the unstable, most up-to-date version
+- the branch `irt-algo-stable` is for a stable, working version; the branch
+  `irt-algo` is for the unstable, most up-to-date version
 
 ## IRT -- Legacy Juggler Support
 | Repository  | Branch                      | Pull Request                                                                |
@@ -39,11 +39,3 @@ We intend to keep these tables up-to-date as development proceeds.
 
 NOTE: do not build `EICrecon`, since for Juggler support we only need the
 `IrtGeo*` classes which are built externally here in `drich-dev`.
-
-## Sensor Development
-| Repository  | Branch                                              | Pull Request                                                                                                 |
-| --:         | ---                                                 | ---                                                                                                          |
-| `drich-dev` | `main`                                              |                                                                                                              |
-| `epic`      | `12-drich-sensor-material-should-not-be-airoptical` | [MR at EICweb](https://eicweb.phy.anl.gov/EIC/detectors/ecce/-/merge_requests/28) - **TODO: convert to PR**  |
-| `EDM4eic`   | `main`                                              |                                                                                                              |
-| `irt`       | `main`                                              |                                                                                                              |

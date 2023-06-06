@@ -2,9 +2,9 @@
 
 # default settings
 which_rich=""
-method=""
-sim_file="out/sim.root"
-rec_file="out/rec.root"
+method="juggler"
+sim_file="out/sim.edm4hep.root"
+rec_file="out/rec.edm4hep.root"
 aux_file=""
 compact_file_base="${DETECTOR_PATH}/${DETECTOR}"
 compact_file=""
@@ -27,11 +27,6 @@ USAGE:
     -d  use dRICH data for reconstruction
     -p  use pfRICH data for reconstruction
 
-  RECONSTRUCTION METHODS: (one required)
-    -e  run reconstruction through EICrecon
-    -j  run reconstruction through juggler
-    -r  run reconstruction with stand-alone IRT reader.C macro
-
   OPTIONS
     -i <simulation_output_file>
         Input to the reconstruction: ROOT file from DD4hep + Geant4
@@ -51,6 +46,8 @@ USAGE:
             $(compact_only_name drich)
             $(compact_only_name pfrich)
         ]
+    -j  run reconstruction through juggler (default)
+    -r  run reconstruction with stand-alone IRT reader.C macro, instead of juggler
     -f  Use the full detector's compact file (likely with B-field):
             $(compact_full_name)
         [ default: use the standalone RICH, and no B-field ]
@@ -67,7 +64,6 @@ while getopts "hdpejri:o:x:c:ftD" opt; do
     h|\?) usage             ;;
     d) which_rich="drich"   ;;
     p) which_rich="pfrich"  ;;
-    e) method="EICrecon"    ;;
     j) method="juggler"     ;;
     r) method="reader"      ;;
     i) sim_file=$OPTARG     ;;
@@ -79,12 +75,6 @@ while getopts "hdpejri:o:x:c:ftD" opt; do
     D) debug_run=1          ;;
   esac
 done
-
-# use full compact file, if running EICrecon
-if [ "$method" == "EICrecon" ]; then
-  echo "Using full geometry compact file, since running EICrecon"
-  use_full=1
-fi
 
 # set default rich-dependent settings, if unspecified
 if [ -z "$which_rich" ]; then
@@ -108,76 +98,6 @@ use_full     = $use_full
 
 # run reconstruction
 case $method in
-  EICrecon)
-
-    # EICrecon geometry services use $DETECTOR_PATH and $DETECTOR_CONFIG;
-    # $DETECTOR_PATH is already set, here we extract $DETECTOR_CONFIG from $compact_file
-    export DETECTOR_CONFIG=$(basename $compact_file .xml)
-    rec_file_base=$(echo $rec_file | sed 's;\.root$;;')
-    ana_file=$rec_file_base.ana.root
-    echo """
-    DETECTOR_PATH   = $DETECTOR_PATH  
-    DETECTOR_CONFIG = $DETECTOR_CONFIG
-    """
-
-    # build `eicrecon` command #####################
-    cmd="eicrecon"
-
-    # helpers
-    set_config() { cmd+=" -P$1=$2"; } # set a JANA configuration parameter
-    set_log_level() { cmd+=" -P$1:LogLevel=$2"; } # set logger level
-    join() { n=$1[@]; a=("${!n}"); echo ${a[*]} | sed 's; ;,;g'; } # Array.join(',') in bash
-
-    # list of collections to save
-    collections=(
-      DRICHHits
-      DRICHRawHits
-      # DRICHAerogelTracks DRICHGasTracks
-      # DRICHIrtCherenkovParticleID
-    )
-
-    # list of additional plugins to use
-    plugins=(
-      # janadot
-      # dump_flags
-      # benchmarks_pid
-    )
-
-    # general common settings
-    set_config "plugins"                          $(join plugins)
-    set_config "podio:output_include_collections" $(join collections)
-    set_config "podio:output_file"                "$rec_file"
-    set_config "histsfile"                        "$ana_file"
-    set_config "jana:nevents"                     "0"
-    set_config "jana:debug_plugin_loading"        "1"
-    set_config "acts:MaterialMap"                 "calibrations/materials-map.cbor"
-
-    # log levels
-    set_log_level "eicrecon"                          "info"
-    set_log_level "richgeo"                           "info"
-    set_log_level "DRICH:DRICHRawHits"                "info"
-    set_log_level "DRICH:DRICHAerogelTracks"          "info"
-    set_log_level "DRICH:DRICHGasTracks"              "info"
-    # set_log_level "DRICH:DRICHIrtCherenkovParticleID" "trace"
-    # set_log_level "benchmarks_pid"                    "info"
-
-    # input file from simulation
-    cmd+=" $sim_file"
-
-    # run `eicrecon` #####################
-    printf "EICRECON COMMAND:\n$cmd\n\n"
-    if [ $debug_run -eq 1 ]; then
-      export SHELL=`which bash`
-      cmd="gdb --args $cmd -Pjana:timeout=0"
-    fi
-    if [ $dry_run -eq 0 ]; then
-      $cmd
-      if [[ "$cmd" =~ "run_eicrecon_reco_flags" ]]; then mv -v $rec_file_base.tree.edm4eic.root $rec_file; fi
-      printf "\nEICrecon IRT reconstruction finished\n"
-      printf " -> produced RECO file:     $rec_file\n"
-      printf " -> produced ANALYSIS file: $ana_file\n"
-    fi
-    ;;
 
   juggler)
     export JUGGLER_SIM_FILE=$sim_file

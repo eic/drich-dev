@@ -30,8 +30,8 @@ fi
 module=$(echo $1 | sed 's;/$;;')
 shift
 if [ ! -d "$module" ]; then
-  echo "ERROR: module \"$module\" does not exist"
-  exit 1
+  echo "WARNING: module \"$module\" does not exist"
+  exit 0
 fi
 
 # determine if clean build, and set extraOpts
@@ -59,6 +59,10 @@ prefix=$EIC_SHELL_PREFIX
 nproc=$BUILD_NPROC
 
 ########################################
+# override container builds with local builds
+export CMAKE_PREFIX_PATH=$prefix:$CMAKE_PREFIX_PATH
+
+########################################
 # module-specific options and preparation
 genOpts=""
 function genOpt() { genOpts+="-D$* "; }
@@ -72,8 +76,9 @@ case $module in
     ;;
   irt)
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
-    genOpt DELPHES=ON
+    genOpt DELPHES=OFF
     genOpt EVALUATION=OFF
+    genOpt IRT_ROOT_IO=ON
     ;;
   epic)
     ;;
@@ -82,6 +87,8 @@ case $module in
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
     genOpt EICRECON_VERBOSE_CMAKE=ON
+    ;;
+  reconstruction_benchmarks)
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
@@ -108,6 +115,8 @@ case $module in
     genOpt BUILD_TESTING=ON
     genOpt ROOT_DIR=$ROOTSYS
     genOpt CMAKE_BUILD_TYPE=Release
+    ;;
+  Catch2)
     ;;
 esac
 
@@ -192,8 +201,5 @@ case $module in
     ;;
   DD4hep)
     printf "\nDone. To use, run:  source scripts/this_DD4hep.sh\n\n"
-    ;;
-  EDM4hep)
-    printf "\nDone. To use, run:  export EDM4HEP_ROOT=$prefix\n\n"
     ;;
 esac

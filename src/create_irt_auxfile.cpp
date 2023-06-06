@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 // ROOT
 #include "TSystem.h"
@@ -12,13 +13,17 @@
 
 int main(int argc, char** argv) {
 
+  // logger
+  auto logger = spdlog::default_logger()->clone("richgeo");
+  logger->set_level(spdlog::level::trace);
+
   // arguments
   std::string compactFileName = "";
   std::string irtAuxFileName  = "";
   if(argc<=1) {
-    fmt::print("\nUSAGE: {} [d/p] [compact_file_name(optional)] [aux_file_name(optional)]\n\n",argv[0]);
-    fmt::print("    [d/p]: d for dRICH\n");
-    fmt::print("           p for pfRICH\n");
+    logger->info("USAGE: {} [d/p] [compact_file_name(optional)] [aux_file_name(optional)]",argv[0]);
+    logger->info("    [d/p]: d for dRICH");
+    logger->info("           p for pfRICH");
     return 2;
   }
   std::string zDirectionStr  = argv[1];
@@ -29,8 +34,19 @@ int main(int argc, char** argv) {
   WhichRICH wr(zDirectionStr);
   if(!wr.valid) return 1;
   if(zDirectionStr=="p") {
-    fmt::print("NOTE: pfRICH is only in brycecanyon; updating $DETECTOR_CONFIG\n");
+    logger->info("NOTE: pfRICH is only in brycecanyon; updating $DETECTOR_CONFIG");
     setenv("DETECTOR_CONFIG","epic_brycecanyon",1);
+  }
+
+  // get compact file
+  if(compactFileName=="") {
+    std::string DETECTOR_PATH(getenv("DETECTOR_PATH"));
+    std::string DETECTOR_CONFIG(getenv("DETECTOR_CONFIG"));
+    if(DETECTOR_PATH.empty() || DETECTOR_CONFIG.empty()) {
+      logger->error("cannot find default compact file, since env vars DETECTOR_PATH and DETECTOR_CONFIG are not set");
+      return 1;
+    }
+    compactFileName = DETECTOR_PATH + "/" + DETECTOR_CONFIG + ".xml";
   }
 
   // start auxfile
@@ -39,12 +55,12 @@ int main(int argc, char** argv) {
 
   // given DD4hep geometry from `compactFileName`, produce IRT geometry
   richgeo::IrtGeo *IG;
-  if(zDirectionStr=="d")      IG = new richgeo::IrtGeoDRICH(compactFileName, true);
-  else if(zDirectionStr=="p") IG = new richgeo::IrtGeoPFRICH(compactFileName, true);
+  if(zDirectionStr=="d")      IG = new richgeo::IrtGeoDRICH(compactFileName, logger);
+  else if(zDirectionStr=="p") IG = new richgeo::IrtGeoPFRICH(compactFileName, logger);
   else return 1;
 
   // write IRT auxiliary file
   IG->GetIrtDetectorCollection()->Write();
   irtAuxFile->Close();
-  fmt::print("\nWrote IRT Aux File: {}\n\n",irtAuxFileName);
+  logger->info("Wrote IRT Aux File: {}",irtAuxFileName);
 }

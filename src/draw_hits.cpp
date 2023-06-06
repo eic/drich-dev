@@ -29,7 +29,7 @@ TCanvas *CreateCanvas(TString name, Bool_t logx=0, Bool_t logy=0, Bool_t logz=0)
 int main(int argc, char** argv) {
 
   // args
-  TString infileN="out/sim.root";
+  TString infileN="out/sim.edm4hep.root";
   if(argc<=1) {
     fmt::print("\nUSAGE: {} [d/p] [simulation_output_file(optional)]\n\n",argv[0]);
     fmt::print("    [d/p]: d for dRICH\n");
@@ -108,8 +108,8 @@ int main(int argc, char** argv) {
   canv = CreateCanvas("hits",0,0,1);
   hitPositionHist->Draw("colz");
   if(wr.zDirection>0) {
-    hitPositionHist->GetXaxis()->SetRangeUser(100,300);
-    hitPositionHist->GetYaxis()->SetRangeUser(-100,100);
+    hitPositionHist->GetXaxis()->SetRangeUser(100,200);
+    hitPositionHist->GetYaxis()->SetRangeUser(-50,50);
   } else {
     hitPositionHist->GetXaxis()->SetRangeUser(-70,70);
     hitPositionHist->GetYaxis()->SetRangeUser(-70,70);

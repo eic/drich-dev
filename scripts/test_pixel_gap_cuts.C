@@ -9,7 +9,7 @@ R__LOAD_LIBRARY(fmt)
 
 void test_pixel_gap_cuts() {
 
-  auto infile = new TFile("out/rec.root");
+  auto infile = new TFile("out/rec.edm4hep.root");
   auto tr = (TTree*) infile->Get("events");
 
   // draw gaps in x,y

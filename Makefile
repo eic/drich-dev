@@ -16,9 +16,10 @@ DEPS += -Isrc
 LIBS += -L/usr/local/lib
 LIBS += -lDDCore -lDDRec
 LIBS += -lpodio -lpodioRootIO -ledm4hep
-LIBS += -lfmt
+LIBS += -lfmt -lspdlog
 LIBS += -lG4global -lG4materials -lG4geometry -lG4persistency
 DEPS += -I/usr/local/include
+FLAGS += -DSPDLOG_FMT_EXTERNAL
 
 #--------------------------------------------
 

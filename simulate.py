@@ -13,9 +13,18 @@ from numpy import linspace
 
 # SETTINGS
 ################################################################
-use_npdet_info = False  # use npdet_info to get envelope dimensions
-rMinBuffer = 10 # acceptance test rMin = vessel rMin + rMinBuffer [cm]
-rMaxBuffer = -5 # acceptance test rMax = vessel rMax - rMinBuffer [cm]
+acceptanceDict = {
+    'drich': {
+        # theta limits [degrees]
+        'thetaMin': 2.8,
+        'thetaMax': 30.5,
+    },
+    'pfrich': {
+        # theta limits [degrees]
+        'thetaMin': 180.0 - 10.0, # FIXME
+        'thetaMax': 180.0 - 70.0, # FIXME
+    },
+}
 
 # ARGUMENTS
 ################################################################
@@ -27,13 +36,13 @@ compactFileCustom = ''
 zDirection = 1
 particle_name = 'pi+'
 particle_momentum = 20.0 # [GeV]
+particle_theta = 23.5 # [deg]
 runType = 'run'
 numEvents = 50
 numTestSamples = 0
 restrict_sector = True
 outputImageType = ''
 outputFileName = ''
-useEDM4hepFormat = True
 
 helpStr = f'''
 {sys.argv[0]} <INPUT_FILE or TEST_NUM> [OPTIONS]
@@ -78,6 +87,7 @@ helpStr = f'''
                     - proton / anti_proton
                     - opticalphoton
                 -m [momentum]: momentum (GeV) for mono-energetic runs (default={particle_momentum})
+                -a [angle]: fixed polar angle for certain tests [deg] (default={particle_theta})
                 -n [numEvents]: number of events to process (default={numEvents})
                    - if using TEST_NUM, this is usually the number of events PER fixed momentum
                    - if using INPUT_FILE, you can set to 0 to run ALL events in the file, otherwise
@@ -87,26 +97,26 @@ helpStr = f'''
                    how many directions are tested
                    - many tests offer a similar usage of [numTestSamples]
                    - these tests also have default [numTestSamples] values
-                -a: allow azimuthal scans to cover the full 2*pi range, rather than restricting
+                -l: allow azimuthal scans to cover the full 2*pi range, rather than restricting
                     to a single sector
                 -r: run, instead of visualize (default)
                 -v: visualize, instead of run
+                   - it is HIGHLY recommended to set `DRICH_debug_sector` to `1` in `drich.xml`,
+                     which will draw one sector and set visibility such that you can see inside
+                     the dRICH
+                   - standalone mode will be automatically enabled
                 -e [output image extension]: save visual with specified type (svg,pdf,ps)
                    - useful tip: if you want to suppress the drawing of the visual, but
                      still save an output image, use Xvbf (start EIC container shell
                      as `xvfb-run eic-shell`); this is good for batch processing
                 -o [output file]: output root file name (overrides any default name)
-                -f: use TTree output format, rather than the default EDM4hep format, which
-                    is a TTree with PODIO metadata. The EDM4hep format is required
-                    for downstream reconstruction code, whereas the '-f' option produces
-                    a file which is easier to view in a TBrowser
     '''
 
 if (len(sys.argv) <= 1):
     print(helpStr)
     sys.exit(2)
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:n:k:arve:o:f')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:t:d:sc:p:m:a:n:k:lrve:o:')
 except getopt.GetoptError:
     print('\n\nERROR: invalid argument\n', helpStr, file=sys.stderr)
     sys.exit(2)
@@ -118,14 +128,14 @@ for opt, arg in opts:
     if (opt == '-c'): compactFileCustom = arg.lstrip()
     if (opt == '-p'): particle_name = arg.lstrip()
     if (opt == '-m'): particle_momentum = float(arg)
+    if (opt == '-a'): particle_theta = float(arg)
     if (opt == '-n'): numEvents = int(arg)
     if (opt == '-k'): numTestSamples = int(arg)
-    if (opt == '-a'): restrict_sector = False
+    if (opt == '-l'): restrict_sector = False
     if (opt == '-r'): runType = 'run'
     if (opt == '-v'): runType = 'vis'
     if (opt == '-e'): outputImageType = arg.lstrip()
     if (opt == '-o'): outputFileName = arg.lstrip()
-    if (opt == '-f'): useEDM4hepFormat = False
 if (testNum < 0 and inputFileName == ''):
     print('\n\nERROR: Please specify either an input file (`-i`) or a test number (`-t`).\n', helpStr, file=sys.stderr)
     sys.exit(2)
@@ -144,6 +154,8 @@ if (testNum >= 10):
 if (particle_name == "opticalphoton"):
     particle_momentum = 3e-9
     print(f'optical photons test: using energy {particle_momentum}')
+if runType == 'vis':
+    standalone = True
 
 ### helper functions
 # convert momentum -> kinetic energy
@@ -177,16 +189,12 @@ if inputFileName != '':
     if not bool(re.search('^/', inputFileName)): inputFileName = workDir + "/" + inputFileName
 ##### ensure output file name has absolute path (and generate default name, if unspecified)
 if outputFileName == '':
-    outputFileName = workDir + "/out/sim.root"  # default name
+    outputFileName = workDir + "/out/sim.edm4hep.root"  # default name
 elif not bool(re.search('^/', outputFileName)):
     outputFileName = workDir + "/" + outputFileName  # convert relative path to absolute path
 ##### get output file basename
 outputName = re.sub('\.root$', '', outputFileName)
 outputName = re.sub('^.*/', '', outputName)
-##### set output file name for `npsim`, which is sensitive to file extension
-outputFileName_npsim = outputFileName
-if useEDM4hepFormat:
-    outputFileName_npsim = re.sub('\.root$', '.edm4hep.root', outputFileName_npsim)
 
 ### set RICH names, based on zDirection
 zDirection /= abs(zDirection)
@@ -221,6 +229,7 @@ print("** simulation args **")
 print(f'inputFileName  = {inputFileName}')
 print(f'testNum        = {testNum}')
 print(f'particle       = {particle_name}')
+print(f'particle_theta = {particle_theta} deg')
 print(f'numEvents      = {numEvents}')
 print(f'numTestSamples = {numTestSamples}')
 print(f'runType        = {runType}')
@@ -276,76 +285,19 @@ m.write(f'/gps/position 0 0 0 cm\n')
 # ACCEPTANCE LIMITS
 ################################################################
 
-### RICH envelope parameters
-params = {}
-if detMain=='athena':
-    print('This is ATHENA, calling npdet_info to determine acceptance limits')
-    use_npdet_info = True
-if use_npdet_info:
-    ### call `npdet_info` to obtain most up-to-date RICH attributes and values
-    paramListFileN = f'{outDir}/params_{outputName}.txt'
-    with open(paramListFileN, 'w') as paramListFile:
-        cmd = f'npdet_info search {XRICH} --value {compactFileFull}'
-        print(sep)
-        print('EXECUTE: ' + cmd)
-        print(sep)
-        subprocess.call(shlex.split(cmd), stdout=paramListFile)
-    for paramLine in open(paramListFileN, 'r'):
-        print(paramLine)
-        paramLineKV = paramLine.strip().split('=')
-        if (len(paramLineKV) == 2): 
-            try:
-                params.update({paramLineKV[0].strip(): float(paramLineKV[1].strip())})
-            except ValueError:
-                pass # ignore string constants
-else:
-    ### hard-coded values (faster and reliable, but maybe out of date)
-    # dRICH:
-    params['DRICH_rmin1'] = 15.332
-    params['DRICH_rmax2'] = 180.0
-    params['DRICH_zmin']  = 195.0
-    params['DRICH_zmax']  = 315.0
-    # pfRICH
-    params['PFRICH_rmin1'] = 5.945
-    params['PFRICH_rmax']  = 63.0
-    params['PFRICH_zmin']  = -118.6
-    params['PFRICH_proximity_gap'] = 30.0
-    params['PFRICH_aerogel_thickness'] = 3.0
-
-### set envelope limits
-if (zDirection < 0):
-    rMin = params['PFRICH_rmin1'] + rMinBuffer
-    rMax = params['PFRICH_rmax'] - rMaxBuffer
-    zMax = -1*params['PFRICH_zmin'] + params['PFRICH_aerogel_thickness'] + params['PFRICH_proximity_gap']  # must be positive
-else:
-    rMin = params['DRICH_rmin1'] + rMinBuffer
-    rMax = params['DRICH_rmax2'] - rMaxBuffer
-    zMax = params['DRICH_zmax']
-print('** constants from DD4hep **')
-pprint.pprint(params)
-print(sep)
-print('** acceptance limits **')
-print(f'rMin = {rMin} cm')
-print(f'rMax = {rMax} cm')
-print(f'zMax = {zMax} cm')
-
 ### set angular acceptance limits
-thetaMin = math.atan2(rMin, zMax)
-thetaMax = math.atan2(rMax, zMax)
+thetaMin = math.radians(acceptanceDict[xrich]['thetaMin'])
+thetaMax = math.radians(acceptanceDict[xrich]['thetaMax'])
 def theta_to_eta(th):
     return -math.log(math.tan(0.5 * th))
 etaMin = theta_to_eta(thetaMax)
 etaMax = theta_to_eta(thetaMin)
+print(sep)
+print('** acceptance limits **')
 print(f'thetaMin = {math.degrees(thetaMin)} deg')
 print(f'thetaMax = {math.degrees(thetaMax)} deg')
 print(f'etaMin = {etaMin}')
 print(f'etaMax = {etaMax}')
-print(sep)
-
-### set "ideal" angle for testing -> fill rings, middle of acceptance
-# thetaMid = (thetaMin+thetaMax)/2.0
-thetaMid = math.radians(23.5)
-print(f'thetaMid = {math.degrees(thetaMid)} deg')
 print(sep)
 
 evnum = 0 # event number counter (for logging)
@@ -357,9 +309,9 @@ evnum = 0 # event number counter (for logging)
 
 if testNum == 1:
     m.write(f'\n# aim at +x {xRICH} sector\n')
-    x = math.sin(thetaMid)
+    x = math.sin(math.radians(particle_theta))
     y = 0.0
-    z = math.cos(thetaMid) * zDirection
+    z = math.cos(math.radians(particle_theta)) * zDirection
     m.write(f'/gps/direction {x} {y} {z}\n')
     m.write(f'/run/beamOn {numEvents}\n')
 
@@ -431,9 +383,9 @@ elif testNum == 6:
 elif testNum == 7 or testNum == 8:
     m.write(f'\n# momentum scan\n')
     numMomPoints = 10 if numTestSamples==0 else numTestSamples # number of momenta
-    x = math.sin(thetaMid)
+    x = math.sin(math.radians(particle_theta))
     y = 0.0
-    z = math.cos(thetaMid) * zDirection
+    z = math.cos(math.radians(particle_theta)) * zDirection
     m.write(f'/gps/direction {x} {y} {z}\n')
     momMax = 60
     if testNum == 7:
@@ -468,15 +420,18 @@ elif testNum == 11:
     m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 12:
-    numBeams = 5 if numTestSamples==0 else numTestSamples  # number of beams within theta acceptance
+    numTheta = 5 if numTestSamples==0 else numTestSamples # number of theta steps
     m.write(f'\n# opticalphoton parallel-to-point focusing\n')
     #m.write(f'/vis/scene/endOfEventAction accumulate\n')
     #m.write(f'/vis/scene/endOfRunAction accumulate\n')
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
-    for rVal in list(linspace(rMin, rMax, numBeams)):
-        m.write(f'/gps/ang/rot1 -{zMax} 0 {rVal}\n')
-        m.write(f'/gps/pos/rot1 -{zMax} 0 {rVal}\n')
+    for theta in list(linspace(thetaMin, thetaMax, numTheta)):
+        x = math.sin(theta)
+        y = 0.0
+        z = math.cos(theta) * zDirection
+        m.write(f'/gps/ang/rot1 -{z} {y} {x}\n') # different coordinate system...
+        m.write(f'/gps/pos/rot1 -{z} {y} {x}\n')
         m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width
         m.write(f'/run/beamOn {numEvents}\n')
 
@@ -559,7 +514,7 @@ cmd = [
         # f'{localDir}/NPDet/install/bin/npsim', # call local npsim
         f'--runType {runType}',
         f'--compactFile {compactFile}',
-        f'--outputFile {outputFileName_npsim}',
+        f'--outputFile {outputFileName}',
         "--part.userParticleHandler=''", # necessary for opticalphotons truth output
         # '--random.seed 1',
         # '--part.keepAllParticles True',
@@ -582,9 +537,6 @@ else:
 cmdShell = shlex.split(" ".join(cmd))
 print(f'{sep}\nRUN SIMULATION:\n{shlex.join(cmdShell)}\n{sep}')
 subprocess.run(cmdShell, cwd=detPath)
-
-### correct the output file name to the specified name
-os.rename(outputFileName_npsim, outputFileName)
 
 ### cleanup
 # os.remove(m.name) # remove macro
