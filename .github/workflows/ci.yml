@@ -40,9 +40,8 @@ jobs:
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
           platform-release: "jug_xl:nightly"
+          setup: environ.sh
           run: |
-            echo "[CI] ENVIRONMENT"
-            source environ.sh
             echo "[CI] CLONE REPOSITORIES"
             git clone https://github.com/eic/epic.git --branch ${{env.branch_epic}}
             git clone https://github.com/eic/irt.git --branch ${{env.branch_irt}}
@@ -91,9 +90,8 @@ jobs:
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
           platform-release: "jug_xl:nightly"
+          setup: environ.sh
           run: |
-            echo "[CI] ENVIRONMENT"
-            source environ.sh
             echo "[CI] JOB MATRIX:"
             echo "test_num = ${{matrix.test_num}}"
             echo "[CI] RUN SIMULATION:"
