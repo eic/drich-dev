@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2023 Christopher Dilks
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # git repository branches
+  branch_epic: main
+  branch_EDM4eic: main
+  branch_irt: main
+  branch_EICrecon: irt-algo
+  branch_reconstruction_benchmarks: irt-algo
+  # common parameters
+  num_events: 10
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+# BUILD ---------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            echo "[CI] CLONE REPOSITORIES"
+            git clone https://github.com/eic/epic.git --branch ${{env.branch_epic}}
+            git clone https://github.com/eic/irt.git --branch ${{env.branch_irt}}
+            git clone https://github.com/eic/EDM4eic.git --branch ${{env.branch_EDM4eic}}
+            git clone https://github.com/eic/EICrecon.git --branch ${{env.branch_EICrecon}}
+            git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch ${{env.branch_reconstruction_benchmarks}}
+            echo "[CI] BRANCHES"
+            check_branches.sh
+            echo "[CI] BUILD REPOSITORIES"
+            rebuild_all.sh
+            echo "[CI] BUILD LOCAL CODE"
+            make
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          retention-days: 1
+          path: |
+            # modules' installation
+            prefix
+            # local code installation
+            lib
+            bin
+            # module source code, for any internal scripts
+            epic
+            irt
+            EDM4eic
+            EICrecon
+            reconstruction_benchmarks
+
+# SIMULATION ----------------------------------------------------------------------
+
+  run_simulation:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        test_num: [1, 4]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            echo "[CI] JOB MATRIX:"
+            echo "test_num = ${{matrix.test_num}}"
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}} -o out/sim.${{matrix.test_num}}.edm4hep.root
+      - uses: actions/upload-artifact@v3
+        with:
+          name: simulation_${{matrix.test_num}}
+          retention-days: 3
+          path: out
