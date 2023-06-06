@@ -27,14 +27,14 @@ source /opt/detector/setup.sh
 # - prioritizes `$EIC_SHELL_PREFIX/lib` in `$LD_LIBRARY_PATH`
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
-# source EICrecon installation
+# source EICrecon installation + environment patches
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
-  ### PATCH: exclude container's EICrecon plugins from $JANA_PLUGIN_PATH
+  echo "PATCH: exclude container's EICrecon plugins from JANA_PLUGIN_PATH"
   exc="/usr/local/lib/EICrecon/plugins"
   export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
-  ### SOURCE EICrecon
+  echo "ENVIRONMENT: source EICrecon"
   source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-  ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
+  echo "PATCH: source thisroot.sh removes /usr/local/bin from PATH; add it back"
   export PATH="$PATH:/usr/local/bin"
 fi
 
