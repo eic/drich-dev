@@ -14,13 +14,6 @@ defaults:
     shell: bash
 
 env:
-  # git repository branches
-  branch_epic: main
-  branch_EDM4eic: main
-  branch_irt: main
-  branch_EICrecon: irt-algo
-  branch_reconstruction_benchmarks: irt-algo
-  # common parameters
   num_events: 10
 
 concurrency:
@@ -30,10 +23,13 @@ concurrency:
 jobs:
 
 # BUILD ---------------------------------------------------------------------------
-  build:
+  build_data_model:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
+      matrix:
+        include:
+          - { repo: EDM4eic, branch: main }
     steps:
       - uses: actions/checkout@v3
       - uses: cvmfs-contrib/github-action-cvmfs@v3
@@ -43,61 +39,84 @@ jobs:
           setup: environ.sh
           run: |
             echo "[CI] CLONE REPOSITORIES"
-            git clone https://github.com/eic/epic.git --branch ${{env.branch_epic}}
-            git clone https://github.com/eic/irt.git --branch ${{env.branch_irt}}
-            git clone https://github.com/eic/EDM4eic.git --branch ${{env.branch_EDM4eic}}
-            git clone https://github.com/eic/EICrecon.git --branch ${{env.branch_EICrecon}}
-            git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch ${{env.branch_reconstruction_benchmarks}}
+            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch_EDM4eic}}
             echo "[CI] BRANCHES"
             check_branches.sh
             echo "[CI] BUILD REPOSITORIES"
-            rebuild_all.sh
-            echo "[CI] BUILD LOCAL CODE"
-            make
+            build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
-          name: build
+          name: build_${{matrix.repo}}
           retention-days: 1
           path: |
-            # modules' installation
             prefix
-            # local code installation
-            lib
-            bin
-            # module source code, for any internal scripts
-            epic
-            irt
-            EDM4eic
-            EICrecon
-            reconstruction_benchmarks
 
-# SIMULATION ----------------------------------------------------------------------
-
-  run_simulation:
+  build_github_modules:
     needs:
-      - build
+      - build_data_model
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        test_num: [1, 4]
+        include:
+          - { repo: epic,     branch: main     }
+          - { repo: irt,      branch: main     }
+          - { repo: EICrecon, branch: irt-algo }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build
+          name: build_EDM4eic
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            echo "[CI] JOB MATRIX:"
-            echo "test_num = ${{matrix.test_num}}"
-            echo "[CI] RUN SIMULATION:"
-            simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}} -o out/sim.${{matrix.test_num}}.edm4hep.root
+            echo "[CI] CLONE REPOSITORIES"
+            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
+            echo "[CI] BRANCHES"
+            check_branches.sh
+            echo "[CI] BUILD REPOSITORIES"
+            build.sh ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
-          name: simulation_${{matrix.test_num}}
-          retention-days: 3
-          path: out
+          name: build_${{matrix.repo}}
+          retention-days: 1
+          path: |
+            prefix
+
+#TODO
+#- build eicweb modules
+#- build local drich-dev
+
+# SIMULATION ----------------------------------------------------------------------
+
+  # run_simulation:
+  #   needs:
+  #     - build_modules
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       test_num: [1, 4]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build
+  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
+  #     - uses: eic/run-cvmfs-osg-eic-shell@main
+  #       with:
+  #         platform-release: "jug_xl:nightly"
+  #         setup: environ.sh
+  #         run: |
+  #           echo "[CI] JOB MATRIX:"
+  #           echo "test_num = ${{matrix.test_num}}"
+  #           echo "[CI] RUN SIMULATION:"
+  #           simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}} -o out/sim.${{matrix.test_num}}.edm4hep.root
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: simulation_${{matrix.test_num}}
+  #         retention-days: 3
+  #         path: out
