@@ -541,8 +541,8 @@ public:
     double wlref = 633*nm; // for density vs refractive index
     
     int nEntries = 30;
-    double wl0 = 5.*nm;
-    double wl1 = 1500.*nm;
+    double wl0 = 80.*nm;
+    double wl1 = 1000.*nm;
     double dwl = (wl1-wl0)/(nEntries-1.);
     
     if (scaledE==NULL) {
