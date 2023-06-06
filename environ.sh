@@ -29,13 +29,18 @@ source /opt/detector/setup.sh
 
 # source EICrecon installation + environment patches
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
-  echo "PATCH: exclude container's EICrecon plugins from JANA_PLUGIN_PATH"
-  exc="/usr/local/lib/EICrecon/plugins"
-  export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
-  echo "ENVIRONMENT: source EICrecon"
-  source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-  echo "PATCH: source thisroot.sh removes /usr/local/bin from PATH; add it back"
-  export PATH="$PATH:/usr/local/bin"
+  if [ -z "$CI" ]; then
+    echo "PATCH: exclude container's EICrecon plugins from JANA_PLUGIN_PATH"
+    exc="/usr/local/lib/EICrecon/plugins"
+    export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
+    echo "ENVIRONMENT: source EICrecon"
+    source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
+    echo "PATCH: source thisroot.sh removes /usr/local/bin from PATH; add it back"
+    export PATH="$PATH:/usr/local/bin"
+  else
+    echo "On CI runner; only setting JANA_PLUGIN_PATH"
+    export JANA_PLUGIN_PATH=$EIC_SHELL_PREFIX/lib/EICrecon/plugins${JANA_PLUGIN_PATH:+:${JANA_PLUGIN_PATH}}
+  fi
 fi
 
 # check if we have ROOT I/O enabled for IRT

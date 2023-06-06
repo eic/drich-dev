@@ -1,4 +1,5 @@
 #!/bin/bash
+# list some objects on the CI runner
 echo "[CI] ls -t $(pwd)"
 ls -ltp
 echo "[CI] PREFIX TREE"
