@@ -422,8 +422,8 @@ elif testNum == 11:
 elif testNum == 12:
     numTheta = 5 if numTestSamples==0 else numTestSamples # number of theta steps
     m.write(f'\n# opticalphoton parallel-to-point focusing\n')
-    #m.write(f'/vis/scene/endOfEventAction accumulate\n')
-    #m.write(f'/vis/scene/endOfRunAction accumulate\n')
+    m.write(f'/vis/scene/endOfEventAction accumulate\n')
+    m.write(f'/vis/scene/endOfRunAction accumulate\n')
     m.write(f'/gps/pos/type Beam\n')
     m.write(f'/gps/ang/type beam1d\n')
     for theta in list(linspace(thetaMin, thetaMax, numTheta)):
