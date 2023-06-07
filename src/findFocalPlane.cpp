@@ -87,9 +87,6 @@ int main(int argc, char** argv) {
   if(argc>1) infileN = TString(argv[1]);
 
   RDataFrame dfIn("events",infileN.Data());
-  TString outfileN = infileN;
-  outfileN(TRegexp("\\.root$"))=".";
-  TFile *outfile = new TFile(outfileN+"plots.root","RECREATE");
   gStyle->SetOptStat(0);
 
   /* lambdas
@@ -138,7 +135,7 @@ int main(int argc, char** argv) {
     ;
   
   df1.Foreach(
-	      [d,e,fp,dirout,nphotons,nAcc](RVec<bool> refl, RVec<TVector3> dir, RVec<TVector3> end){		
+	      [](RVec<bool> refl, RVec<TVector3> dir, RVec<TVector3> end){		
 		if( refl[0]  ){  d.push_back(dir[0]); e.push_back(end[0]); nAcc++;}
 		nphotons++;
 		if(nphotons==50){
