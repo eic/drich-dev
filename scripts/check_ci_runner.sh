@@ -8,4 +8,4 @@ echo "[CI] BRANCHES"
 check_branches.sh
 echo "[CI] UPDATE PERMISSIONS"
 [ -d "bin" ] && chmod 755 bin -Rv || echo "no bin dir"
-[ -d "prefix" ] && chmod 755 prefix/bin -Rv || echo "no prefix tree"
+[ -d "prefix/bin" ] && chmod 755 prefix/bin -Rv || echo "no prefix tree"
