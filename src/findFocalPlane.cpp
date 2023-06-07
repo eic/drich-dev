@@ -78,7 +78,7 @@ TVector3 avgDir(std::vector<TVector3> dvec){
 
 int main(int argc, char** argv) {
   // setup
-  TString infileN="sim_rich_vis.root";
+  TString infileN="out/sim.edm4hep.root";
   if(argc>1) infileN = TString(argv[1]);
 
   RDataFrame dfIn("events",infileN.Data());
