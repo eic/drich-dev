@@ -7,5 +7,5 @@ echo "[CI] PREFIX TREE"
 echo "[CI] BRANCHES"
 check_branches.sh
 echo "[CI] UPDATE PERMISSIONS"
-chmod 755 bin -Rv
-[ -d "prefix" ] && chmod 755 prefix/bin -Rv
+[ -d "bin" ] && chmod 755 bin -Rv || echo "no bin dir"
+[ -d "prefix" ] && chmod 755 prefix/bin -Rv || echo "no prefix tree"
