@@ -70,6 +70,8 @@ helpStr = f'''
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=0 )
                 13:   evenly distributed sensor hits test
                         ( recommend: optDbg=3 / mirDbg=0 / sensDbg=0 )
+                14:   parallel-to-point focal test, beams over entire acceptance
+                        ( recommend: optDbg=4 / mirDbg=0 / sensDbg=0)
 
 [OPTIONAL ARGUMENTS]
 
@@ -148,7 +150,7 @@ if (testNum >= 10):
     print("optics test, overriding some settings...")
     particle_name = 'opticalphoton'
     standalone = True
-    if (testNum in [10,11,12]):
+    if (testNum in [10,11]):
         print("-- this is a visual test --")
         runType = 'vis'
 if (particle_name == "opticalphoton"):

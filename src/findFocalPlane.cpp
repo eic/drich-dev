@@ -1,6 +1,11 @@
 // After using debug optics mode 4/simulate.py test 14, calculate
 // points of closest approach of reflected parallel photon beams,
-// to get approximate focal region. 
+// to get approximate focal region.
+
+// Produces text file of focal point positions and directions.
+// To draw these points alongside dRICH geometry, set
+// DRICH_debug_optics mode 5 and DRICH_FP_file to the generated
+// text file.
 #include <cstdlib>
 #include <iostream>
 
@@ -91,17 +96,8 @@ int main(int argc, char** argv) {
    * - most of these transform an `RVec<T1>` to an `RVec<T2>` using `VecOps::Map` or `VecOps::Filter`
    * - see NPdet/src/dd4pod/dd4hep.yaml for POD syntax
    */
-  cout << 0 << endl;
   // calculate number of hits
   auto numHits = [](RVec<SimTrackerHitData> hits) { return hits.size(); };
-  // calculate momentum magnitude for each particle (units=GeV)
-  // TODO: edm4hep::Vector3f really has no magnitude function!?
-  auto momentum = [](RVec<MCParticleData> parts){
-    return Map(parts,[](auto p){
-        auto mom = p.momentum;
-        return sqrt( mom[0]*mom[0] + mom[1]*mom[1] + mom[2]*mom[2] );
-        });
-  };
   // filter for thrown particles
   auto isThrown = [](RVec<MCParticleData> parts){
     return Filter(parts,[](auto p){
@@ -158,9 +154,7 @@ int main(int argc, char** argv) {
 	      },
 	      {"reflectedPhotons","direcVec","endVec"}
 	      );
-  auto dfFinal = df1;
-  cout << 1 << endl;
-  cout << "dir len " << dirout.size() << endl;
+  auto dfFinal = df1;  
   FILE * outtxt = fopen("focalPoints.txt","w");
   for(int i = 0 ; i < fp.size(); i++){
     if( std::abs(fp[i].X()) < 1000 && std::abs(fp[i].Y()) < 1000 && std::abs(fp[i].Z()) < 1000){      
