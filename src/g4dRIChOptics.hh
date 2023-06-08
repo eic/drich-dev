@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <functional>
+#include <vector>
+#include <algorithm>
 #include "Geant4/G4Material.hh"
 #include "Geant4/G4SystemOfUnits.hh"
 #include "Geant4/G4MaterialPropertiesTable.hh"
@@ -672,24 +674,49 @@ public:
     G4String surfaceName = pSurfName + "phseSurf";
     G4String skinSurfaceName = pSurfName + "phseSkinSurf";
     
-    double E[] = {1.*eV, 4.*eV, 7.*eV };
-    double SE[] = {1.0, 1.0, 1.0 };
-    double N[] = {1.92, 1.92, 1.92 };
-    double IN[] = {1.69, 1.69, 1.69 }; 
+    // quantum effiency, from SiPM model S13361-3050NE-08
+    std::vector<std::pair<double,double>> QE = { // wavelength [nm], quantum efficiency
+      {325*nm, 0.04},
+      {340*nm, 0.10},
+      {350*nm, 0.20},
+      {370*nm, 0.30},
+      {400*nm, 0.35},
+      {450*nm, 0.40},
+      {500*nm, 0.38},
+      {550*nm, 0.35},
+      {600*nm, 0.27},
+      {650*nm, 0.20},
+      {700*nm, 0.15},
+      {750*nm, 0.12},
+      {800*nm, 0.08},
+      {850*nm, 0.06},
+      {900*nm, 0.04}
+    };
+    std::reverse(QE.begin(), QE.end()); // order in increasing energy
+    const int N_POINTS = QE.size();
+    double E[N_POINTS], SE[N_POINTS], N[N_POINTS], IN[N_POINTS];
+    int i_QE = 0;
+    for(auto [w,q] : QE) {
+      E[i_QE]  = wl2e(w);
+      SE[i_QE] = q;
+      N[i_QE]  = 1.92;
+      IN[i_QE] = 1.69;
+      i_QE++;
+    }
 
-    scaledE  = new double[3];
-    scaledSE = new double[3];
-    scaledN  = new double[3];
-    scaledIN = new double[3];
+    scaledE  = new double[N_POINTS];
+    scaledSE = new double[N_POINTS];
+    scaledN  = new double[N_POINTS];
+    scaledIN = new double[N_POINTS];
 
-    for (int i=0;i<3;i++) {
+    for (int i=0;i<N_POINTS;i++) {
       scaledE[i] = E[i];
       scaledSE[i] = SE[i];
       scaledN[i] = N[i];
       scaledIN[i] = IN[i];
     }
     
-    G4MaterialPropertiesTable * pT = addSkinPropTable(3);
+    G4MaterialPropertiesTable * pT = addSkinPropTable(N_POINTS);
     
     pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_dielectric);
     pOps->SetMaterialPropertiesTable(pT);
