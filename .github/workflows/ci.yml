@@ -44,6 +44,8 @@ jobs:
             scripts/configure_CI.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
+      - name: rm_buildsystem
+        run: rm -rf ${{matrix.repo}}/build
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
@@ -83,6 +85,8 @@ jobs:
             scripts/configure_CI.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
+      - name: rm_buildsystem
+        run: rm -rf ${{matrix.repo}}/build
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
@@ -120,6 +124,8 @@ jobs:
             scripts/configure_CI.sh
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
+      - name: rm_buildsystem
+        run: rm -rf ${{matrix.repo}}/build
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
