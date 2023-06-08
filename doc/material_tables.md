@@ -6,6 +6,7 @@ Guide to generate material property tables for XML files for `DD4hep`.
 2. Execute `bin/generate_material_tables`. This will produce XML nodes for each
    material and optical-surface property table, which can be copied into any
    relevant XML files. Plots of the property tables will also be produced.
+3. Extrapolate tables to broader ranges using `scripts/extrapolate_material_tables.py`
 
 ### Code
 - [`src/g4dRIChOptics.hh`](../src/g4dRIChOptics.hh): Common class hierarchy for
