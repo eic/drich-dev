@@ -70,6 +70,8 @@ helpStr = f'''
                         ( recommend: optDbg=1 / mirDbg=0 / sensDbg=0 )
                 13:   evenly distributed sensor hits test
                         ( recommend: optDbg=3 / mirDbg=0 / sensDbg=0 )
+                14:   parallel-to-point focal test, beams over entire acceptance
+                        ( recommend: optDbg=4 / mirDbg=0 / sensDbg=0)
 
 [OPTIONAL ARGUMENTS]
 
@@ -455,6 +457,36 @@ elif testNum == 13:
         y = math.sin(theta) * math.sin(phi)
         z = math.cos(theta) * zDirection
         m.write(f'/gps/direction {x} {y} {z}\n')
+        m.write(f'/run/beamOn {numEvents}\n')
+        
+elif testNum == 14:
+    m.write(f'\n# opticalphoton parallel-to-point focusing, full coverage\n')
+    #m.write(f'/vis/scene/endOfEventAction accumulate\n')
+    #m.write(f'/vis/scene/endOfRunAction accumulate\n')
+    m.write(f'/gps/pos/type Beam\n')
+    m.write(f'/gps/ang/type beam1d\n')
+    import numpy as np
+    def makeBasicAngles(theta_min, theta_max, num_theta, num_phi):
+        angles = []
+        thetas = np.linspace(theta_min, theta_max, num=num_theta)
+        phis = np.linspace(-math.pi/6, math.pi/6, num=num_phi)
+        for i in range(num_phi):
+            if phis[i] < 0:
+                phis[i] = phis[i]+2*np.pi
+        for i in thetas:
+            for j in phis:
+                angles.append(tuple((i,j)))
+        return angles
+    angles = makeBasicAngles(thetaMin, thetaMax, 50, 50)
+
+    for angle in angles:
+        theta, phi = angle[0], angle[1]
+        if math.pi / 6 < phi < (2 * math.pi - math.pi / 6): continue  # restrict to one sector                                                                                                  
+        x = math.sin(theta) * math.cos(phi)
+        y = math.sin(theta) * math.sin(phi)
+        z = math.cos(theta) * zDirection
+        m.write(f'/gps/direction {x} {y} {z} \n')
+        m.write(f'/gps/pos/halfx 16 cm\n')  # parallel beam width                                                                                                                                          
         m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum > 0:
