@@ -45,12 +45,12 @@ jobs:
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.tar prefix ${{matrix.repo}}
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
           name: build_data_model
           retention-days: 1
-          path: artifacts.tar
+          path: artifacts.${{matrix.repo}}.tar
 
   build_github_modules:
     needs:
@@ -70,8 +70,8 @@ jobs:
           name: build_data_model
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -84,12 +84,12 @@ jobs:
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.tar prefix ${{matrix.repo}}
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
           name: build_github_modules
           retention-days: 1
-          path: artifacts.tar
+          path: artifacts.${{matrix.repo}}.tar
 
   build_eicweb_modules:
     needs:
@@ -107,8 +107,8 @@ jobs:
           name: build_data_model
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -121,12 +121,12 @@ jobs:
             echo "[CI] BUILD REPOSITORIES"
             build.sh ${{matrix.repo}}
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.tar prefix ${{matrix.repo}}
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
       - uses: actions/upload-artifact@v3
         with:
           name: build_eicweb_modules
           retention-days: 1
-          path: artifacts.tar
+          path: artifacts.${{matrix.repo}}.tar
 
   build_local:
     needs:
@@ -142,15 +142,15 @@ jobs:
           name: build_github_modules
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
       - uses: actions/download-artifact@v3
         with:
           name: build_eicweb_modules
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -161,12 +161,12 @@ jobs:
             echo "[CI] BUILD LOCAL CODE"
             make
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.tar prefix bin lib EDM4eic epic irt EICrecon reconstruction_benchmarks
+        run: tar cvf build.tar prefix bin lib EDM4eic epic irt EICrecon reconstruction_benchmarks
       - uses: actions/upload-artifact@v3
         with:
           name: build_local
           retention-days: 1
-          path: artifacts.tar
+          path: build.tar
 
 # PIPELINE: SIMULATION, RECONSTRUCTION, BENCHMARKS ---------------------------------
 
@@ -187,8 +187,8 @@ jobs:
           name: build_local
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          tar xvf build.tar
+          rm -v build.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -235,8 +235,8 @@ jobs:
           name: build_local
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          tar xvf build.tar
+          rm -v build.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -267,8 +267,8 @@ jobs:
           name: build_local
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          tar xvf build.tar
+          rm -v build.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -302,8 +302,8 @@ jobs:
           name: build_local
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          tar xvf build.tar
+          rm -v build.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
@@ -341,8 +341,8 @@ jobs:
           name: build_local
       - name: untar_artifacts
         run: |
-          tar xvf artifacts.tar
-          rm -v artifacts.tar
+          tar xvf build.tar
+          rm -v build.tar
       - uses: cvmfs-contrib/github-action-cvmfs@v3
       - uses: eic/run-cvmfs-osg-eic-shell@main
         with:
