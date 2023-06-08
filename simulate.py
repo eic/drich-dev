@@ -150,7 +150,7 @@ if (testNum >= 10):
     print("optics test, overriding some settings...")
     particle_name = 'opticalphoton'
     standalone = True
-    if (testNum in [10,11]):
+    if (testNum in [10,11,12]):
         print("-- this is a visual test --")
         runType = 'vis'
 if (particle_name == "opticalphoton"):
