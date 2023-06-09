@@ -187,7 +187,7 @@ Here in `drich-dev`, we have a wrapper of `npsim` specific for the dRICH: `simul
 simulate.py
 ```
 
-Let's run test 1 with 10 events, which will throw 10 pi+s at the angle of theta=23.5 degrees, 20 GeV each (at the time of writing this tutorial):
+Let's run test 1 with 10 events, which will throw 10 pi+s at the angle of theta=23.5 degrees, 20 GeV each (the defaults, at the time of writing this tutorial):
 ```bash
 simulate.py -t1 -n10
 ```
@@ -258,6 +258,12 @@ View the image in `out/ev/`.
 
 ![sim-ev-all](img/sim-ev-all.png)
 
+You may also draw one event at a time (see the usage guide)
+```bash
+event_display d s out/sim.edm4hep.root 0 0
+```
+View the images in `out/ev/`.
+
 Each green box is a single SiPM, and each histogram bin is a single SiPM pixel (8x8 pixels per SiPM). If you want to zoom in, edit `src/event_display.cpp` and uncomment the line
 ```cpp
 #define INTERACTIVE_USE
@@ -265,12 +271,6 @@ Each green box is a single SiPM, and each histogram bin is a single SiPM pixel (
 Then re-compile (`make`) and rerun. This will keep the `TCanvas` open and allow you to zoom in. For example, here is a closeup of the gas ring:
 
 ![sim-ev-all-zoom](img/sim-ev-all-zoom.png)
-
-You may also draw one event at a time (see the usage guide)
-```bash
-event_display d s out/sim.edm4hep.root 0 0
-```
-View the images in `out/ev/`.
 
 ### Event Visualization
 
