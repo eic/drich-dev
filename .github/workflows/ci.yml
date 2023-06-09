@@ -51,7 +51,7 @@ jobs:
 
   build_2:
     needs:
-      - build_1:
+      - build_1
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
