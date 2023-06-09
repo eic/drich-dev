@@ -111,7 +111,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh EICrecon # need EICrecon to build `create_irt_auxfile`
+            scripts/configure_CI.sh EICrecon
             echo "[CI] BUILD LOCAL CODE"
             make
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
@@ -149,7 +149,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh reconstruction_benchmarks # need benchmark scripts
+            scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
             simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
             echo "[CI] EVENT DISPLAY:"
