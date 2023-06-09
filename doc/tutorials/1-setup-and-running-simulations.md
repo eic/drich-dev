@@ -105,7 +105,7 @@ rebuild_all.sh clean  # remove the cmake buildsystems, and then build
 
 Notice that the build scripts allow for a `clean` option, which is useful for starting over from a clean state. In case you want to clean everything and start over, simply remove the `./prefix` directory, then run `rebuild_all.sh clean`. This is also useful to do after upgrading your `eic-shell` image (run `eic-shell --upgrade`), which you should do regularly, unless you are using a CVMFS build.
 
-After you have build the repositories, sourcing the environment variables file will set some additional variables to complete the override of `eic-shell`; run it again:
+After you have built the repositories, sourcing the environment variables file will set some additional variables to complete the override of `eic-shell`; run it again:
 ```bash
 source environ.sh
 ```
@@ -127,7 +127,7 @@ geometry.sh      # print the usage guide
 geometry.sh -d   # make a TGeo ROOT file for the dRICH only
 geometry.sh -e   # make a TGeo ROOT file for the full ePIC detector
 ```
-By default the output file will be `geo/detector_geometry.root`. You may open it with ROOT, but it is better to open it with [JSROOT](https://root.cern/js/). You may use a hosted instance (found in the aforementioned link), or you may host your own instance (see below; this is convenient if you intend to make many geometry changes).
+By default the output file will be `geo/detector_geometry.root`. You may open it with ROOT or [JSROOT](https://root.cern/js/). For JSROOT, you may use a hosted instance (found in the aforementioned link), or you may host your own instance (see below; this is convenient if you intend to make many geometry changes).
 
 Coordinate system:
 - x axis is horizontal, to the left when facing the dRICH
