@@ -83,279 +83,279 @@ jobs:
           retention-days: 1
           path: artifacts.${{matrix.repo}}.tar
 
-  # build_3:
-  #   needs:
-  #     - build_2
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_1
-  #     - name: untar_artifacts
-  #       run: |
-  #         ls artifacts.*.tar | xargs -I_ tar xvf _
-  #         rm -v artifacts.*.tar
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_2
-  #     - name: untar_artifacts
-  #       run: |
-  #         ls artifacts.*.tar | xargs -I_ tar xvf _
-  #         rm -v artifacts.*.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh EICrecon
-  #           echo "[CI] BUILD LOCAL CODE"
-  #           make
-  #     - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-  #       run: tar cvf build.tar prefix bin lib
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: build_3
-  #         retention-days: 1
-  #         path: build.tar
+  build_3:
+    needs:
+      - build_2
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_1
+      - name: untar_artifacts
+        run: |
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_2
+      - name: untar_artifacts
+        run: |
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh EICrecon
+            echo "[CI] BUILD LOCAL CODE"
+            make
+      - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
+        run: tar cvf build.tar prefix bin lib
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build_3
+          retention-days: 1
+          path: build.tar
 
-# # PIPELINE: SIMULATION, RECONSTRUCTION, BENCHMARKS ---------------------------------
+# PIPELINE: SIMULATION, RECONSTRUCTION, BENCHMARKS ---------------------------------
 
-  # pipeline:
-  #   needs:
-  #     - build_3
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       include:
-  #         - { test_num: 1 }
-  #         - { test_num: 4 }
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_3
-  #     - name: untar_artifacts
-  #       run: |
-  #         tar xvf build.tar
-  #         rm -v build.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh reconstruction_benchmarks
-  #           echo "[CI] RUN SIMULATION:"
-  #           simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
-  #           echo "[CI] EVENT DISPLAY:"
-  #           event_display d s out/sim.edm4hep.root
-  #           echo "[CI] DRAW HITS:"
-  #           draw_hits d
-  #           echo "[CI] RECONSTRUCTION:"
-  #           recon.rb
-  #           echo "[CI] BENCHMARKS:"
-  #           benchmark.rb -b
-  #     - name: tree_artifacts
-  #       run: tree out
-  #     - name: rename_artifacts
-  #       run: mv -v out out.${{matrix.test_num}}
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: pipeline
-  #         retention-days: 1
-  #         path: out.${{matrix.test_num}}
+  pipeline:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { test_num: 1 }
+          - { test_num: 4 }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh reconstruction_benchmarks
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
+            echo "[CI] EVENT DISPLAY:"
+            event_display d s out/sim.edm4hep.root
+            echo "[CI] DRAW HITS:"
+            draw_hits d
+            echo "[CI] RECONSTRUCTION:"
+            recon.rb
+            echo "[CI] BENCHMARKS:"
+            benchmark.rb -b
+      - name: tree_artifacts
+        run: tree out
+      - name: rename_artifacts
+        run: mv -v out out.${{matrix.test_num}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pipeline
+          retention-days: 1
+          path: out.${{matrix.test_num}}
 
-# # MISCELLANEOUS -------------------------------------------------------------------
+# MISCELLANEOUS -------------------------------------------------------------------
 
-  # geometry:
-  #   needs:
-  #     - build_3
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       include:
-  #         - { det: d, detector: DRICH  }
-  #         - { det: p, detector: PFRICH }
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_3
-  #     - name: untar_artifacts
-  #       run: |
-  #         tar xvf build.tar
-  #         rm -v build.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh none
-  #           echo "[CI] CREATE TGEO FILE:"
-  #           geometry.sh -${{matrix.det}} -o geo/${{matrix.detector}}_TGeo.root
-  #           echo "[CI] DUMP GEOMETRY CONSTANTS:"
-  #           search_compact_params.sh -e | grep ${{matrix.detector}} | tee geo/${{matrix.detector}}_constants.txt
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: geometry
-  #         retention-days: 1
-  #         path: geo
+  geometry:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { det: d, detector: DRICH  }
+          - { det: p, detector: PFRICH }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] CREATE TGEO FILE:"
+            geometry.sh -${{matrix.det}} -o geo/${{matrix.detector}}_TGeo.root
+            echo "[CI] DUMP GEOMETRY CONSTANTS:"
+            search_compact_params.sh -e | grep ${{matrix.detector}} | tee geo/${{matrix.detector}}_constants.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: geometry
+          retention-days: 1
+          path: geo
 
-  # visual:
-  #   needs:
-  #     - build_3
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_3
-  #     - name: untar_artifacts
-  #       run: |
-  #         tar xvf build.tar
-  #         rm -v build.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh none
-  #           echo "[CI] SET DEBUG MODE"
-  #           scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
-  #           echo "[CI] REBUILD epic"
-  #           build.sh epic
-  #           echo "[CI] VISUALIZE:"
-  #           exit | simulate.py -t1 -n1 -v -e pdf
-  #           mv out out.visual
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: visual
-  #         retention-days: 1
-  #         path: out.visual
+  visual:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] SET DEBUG MODE"
+            scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
+            echo "[CI] REBUILD epic"
+            build.sh epic
+            echo "[CI] VISUALIZE:"
+            exit | simulate.py -t1 -n1 -v -e pdf
+            mv out out.visual
+      - uses: actions/upload-artifact@v3
+        with:
+          name: visual
+          retention-days: 1
+          path: out.visual
 
-  # optics:
-  #   needs:
-  #     - build_3
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_3
-  #     - name: untar_artifacts
-  #       run: |
-  #         tar xvf build.tar
-  #         rm -v build.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh none
-  #           echo "[CI] SET DEBUG MODE"
-  #           scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
-  #           echo "[CI] REBUILD epic"
-  #           build.sh epic
-  #           echo "[CI] VISUALIZE:"
-  #           exit | simulate.py -t12 -e pdf
-  #           mv out out.optics
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: optics
-  #         retention-days: 1
-  #         path: out.optics
+  optics:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] SET DEBUG MODE"
+            scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
+            echo "[CI] REBUILD epic"
+            build.sh epic
+            echo "[CI] VISUALIZE:"
+            exit | simulate.py -t12 -e pdf
+            mv out out.optics
+      - uses: actions/upload-artifact@v3
+        with:
+          name: optics
+          retention-days: 1
+          path: out.optics
 
-  # irt_auxfiles:
-  #   needs:
-  #     - build_3
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       include:
-  #         - { det: d, detector: DRICH  }
-  #         - { det: p, detector: PFRICH }
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_3
-  #     - name: untar_artifacts
-  #       run: |
-  #         tar xvf build.tar
-  #         rm -v build.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh none
-  #           echo "[CI] CREATE IRT AUXFILE:"
-  #           create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: irt_auxfiles
-  #         retention-days: 1
-  #         path: geo
+  irt_auxfiles:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { det: d, detector: DRICH  }
+          - { det: p, detector: PFRICH }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] CREATE IRT AUXFILE:"
+            create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
+      - uses: actions/upload-artifact@v3
+        with:
+          name: irt_auxfiles
+          retention-days: 1
+          path: geo
 
-# # ARTIFACT COLLECTION -------------------------------------------------------------
+# ARTIFACT COLLECTION -------------------------------------------------------------
 
-  # collect:
-  #   needs:
-  #     - pipeline
-  #     - geometry
-  #     - visual
-  #     - optics
-  #     - irt_auxfiles
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: pipeline
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: geometry
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: visual
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: optics
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: irt_auxfiles
-  #     - name: tree_artifacts_before_cull
-  #       run: |
-  #         tree out*
-  #         tree geo
-  #     - name: cull
-  #       run: |
-  #         rm -v out*/*.root
-  #     - name: tree_artifacts_after_cull
-  #       run: |
-  #         tree out*
-  #         tree geo
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: _RESULTS
-  #         retention-days: 14
-  #         path: |
-  #           out*
-  #           geo
+  collect:
+    needs:
+      - pipeline
+      - geometry
+      - visual
+      - optics
+      - irt_auxfiles
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: pipeline
+      - uses: actions/download-artifact@v3
+        with:
+          name: geometry
+      - uses: actions/download-artifact@v3
+        with:
+          name: visual
+      - uses: actions/download-artifact@v3
+        with:
+          name: optics
+      - uses: actions/download-artifact@v3
+        with:
+          name: irt_auxfiles
+      - name: tree_artifacts_before_cull
+        run: |
+          tree out*
+          tree geo
+      - name: cull
+        run: |
+          rm -v out*/*.root
+      - name: tree_artifacts_after_cull
+        run: |
+          tree out*
+          tree geo
+      - uses: actions/upload-artifact@v3
+        with:
+          name: _RESULTS
+          retention-days: 14
+          path: |
+            out*
+            geo
