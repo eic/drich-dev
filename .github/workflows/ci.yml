@@ -24,13 +24,12 @@ jobs:
 
 # BUILD ---------------------------------------------------------------------------
 
-  build_data_model:
+  build_1:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        include:
-          - { repo: EDM4eic, branch: main }
+        repo: [EDM4eic, irt, epic]
     steps:
       - uses: actions/checkout@v3
       - uses: cvmfs-contrib/github-action-cvmfs@v3
@@ -39,37 +38,30 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            echo "[CI] CLONE REPOSITORIES"
-            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
-            scripts/configure_CI.sh
-            echo "[CI] BUILD REPOSITORIES"
+            scripts/configure_CI.sh ${{matrix.repo}}
+            echo "[CI] BUILD REPOSITORY"
             build.sh ${{matrix.repo}}
-      - name: rm_buildsystem
-        run: rm -rf ${{matrix.repo}}/build
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix
       - uses: actions/upload-artifact@v3
         with:
-          name: build_data_model
+          name: build_1
           retention-days: 1
           path: artifacts.${{matrix.repo}}.tar
 
-  build_github_modules:
+  build_2:
     needs:
-      - build_data_model
+      - build_1:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        include:
-          - { repo: epic,     branch: main     }
-          - { repo: irt,      branch: main     }
-          - { repo: EICrecon, branch: irt-algo }
+        repo: [EICrecon, reconstruction_benchmarks]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_data_model
+          name: build_1
       - name: untar_artifacts
         run: |
           ls artifacts.*.tar | xargs -I_ tar xvf _
@@ -80,64 +72,20 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            echo "[CI] CLONE REPOSITORIES"
-            git clone https://github.com/eic/${{matrix.repo}}.git --branch ${{matrix.branch}}
-            scripts/configure_CI.sh
-            echo "[CI] BUILD REPOSITORIES"
+            scripts/configure_CI.sh ${{matrix.repo}}
+            echo "[CI] BUILD REPOSITORY"
             build.sh ${{matrix.repo}}
-      - name: rm_buildsystem
-        run: rm -rf ${{matrix.repo}}/build
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix
       - uses: actions/upload-artifact@v3
         with:
-          name: build_github_modules
+          name: build_2
           retention-days: 1
           path: artifacts.${{matrix.repo}}.tar
 
-  build_eicweb_modules:
+  build_3:
     needs:
-      - build_data_model
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - { repo: reconstruction_benchmarks, repo_path: benchmarks/reconstruction_benchmarks, branch: irt-algo }
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build_data_model
-      - name: untar_artifacts
-        run: |
-          ls artifacts.*.tar | xargs -I_ tar xvf _
-          rm -v artifacts.*.tar
-      - uses: cvmfs-contrib/github-action-cvmfs@v3
-      - uses: eic/run-cvmfs-osg-eic-shell@main
-        with:
-          platform-release: "jug_xl:nightly"
-          setup: environ.sh
-          run: |
-            echo "[CI] CLONE REPOSITORIES"
-            git clone https://eicweb.phy.anl.gov/EIC/${{matrix.repo_path}}.git --branch ${{matrix.branch}}
-            scripts/configure_CI.sh
-            echo "[CI] BUILD REPOSITORIES"
-            build.sh ${{matrix.repo}}
-      - name: rm_buildsystem
-        run: rm -rf ${{matrix.repo}}/build
-      - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf artifacts.${{matrix.repo}}.tar prefix ${{matrix.repo}}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build_eicweb_modules
-          retention-days: 1
-          path: artifacts.${{matrix.repo}}.tar
-
-  build_local:
-    needs:
-      - build_github_modules
-      - build_eicweb_modules
+      - build_2
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -145,14 +93,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_github_modules
+          name: build_1
       - name: untar_artifacts
         run: |
           ls artifacts.*.tar | xargs -I_ tar xvf _
           rm -v artifacts.*.tar
       - uses: actions/download-artifact@v3
         with:
-          name: build_eicweb_modules
+          name: build_2
       - name: untar_artifacts
         run: |
           ls artifacts.*.tar | xargs -I_ tar xvf _
@@ -163,14 +111,14 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh EICrecon # need EICrecon to build `create_irt_auxfile`
             echo "[CI] BUILD LOCAL CODE"
             make
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-        run: tar cvf build.tar prefix bin lib EDM4eic epic irt EICrecon reconstruction_benchmarks
+        run: tar cvf build.tar prefix bin lib
       - uses: actions/upload-artifact@v3
         with:
-          name: build_local
+          name: build_3
           retention-days: 1
           path: build.tar
 
@@ -178,7 +126,7 @@ jobs:
 
   pipeline:
     needs:
-      - build_local
+      - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -190,7 +138,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_local
+          name: build_3
       - name: untar_artifacts
         run: |
           tar xvf build.tar
@@ -201,7 +149,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh reconstruction_benchmarks # need benchmark scripts
             echo "[CI] RUN SIMULATION:"
             simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
             echo "[CI] EVENT DISPLAY:"
@@ -226,7 +174,7 @@ jobs:
 
   geometry:
     needs:
-      - build_local
+      - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -238,7 +186,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_local
+          name: build_3
       - name: untar_artifacts
         run: |
           tar xvf build.tar
@@ -249,7 +197,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh none
             echo "[CI] CREATE TGEO FILE:"
             geometry.sh -${{matrix.det}} -o geo/${{matrix.detector}}_TGeo.root
             echo "[CI] DUMP GEOMETRY CONSTANTS:"
@@ -262,7 +210,7 @@ jobs:
 
   visual:
     needs:
-      - build_local
+      - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -270,7 +218,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_local
+          name: build_3
       - name: untar_artifacts
         run: |
           tar xvf build.tar
@@ -281,7 +229,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh none
             echo "[CI] SET DEBUG MODE"
             scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
             echo "[CI] REBUILD epic"
@@ -297,7 +245,7 @@ jobs:
 
   optics:
     needs:
-      - build_local
+      - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -305,7 +253,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_local
+          name: build_3
       - name: untar_artifacts
         run: |
           tar xvf build.tar
@@ -316,7 +264,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh none
             echo "[CI] SET DEBUG MODE"
             scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
             echo "[CI] REBUILD epic"
@@ -332,7 +280,7 @@ jobs:
 
   irt_auxfiles:
     needs:
-      - build_local
+      - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -344,7 +292,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: build_local
+          name: build_3
       - name: untar_artifacts
         run: |
           tar xvf build.tar
@@ -355,7 +303,7 @@ jobs:
           platform-release: "jug_xl:nightly"
           setup: environ.sh
           run: |
-            scripts/configure_CI.sh
+            scripts/configure_CI.sh none
             echo "[CI] CREATE IRT AUXFILE:"
             create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
       - uses: actions/upload-artifact@v3
