@@ -49,39 +49,39 @@ jobs:
           retention-days: 1
           path: artifacts.${{matrix.repo}}.tar
 
-  # build_2:
-  #   needs:
-  #     - build_1:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #       repo: [EICrecon, reconstruction_benchmarks]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
-  #       with:
-  #         name: build_1
-  #     - name: untar_artifacts
-  #       run: |
-  #         ls artifacts.*.tar | xargs -I_ tar xvf _
-  #         rm -v artifacts.*.tar
-  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
-  #     - uses: eic/run-cvmfs-osg-eic-shell@main
-  #       with:
-  #         platform-release: "jug_xl:nightly"
-  #         setup: environ.sh
-  #         run: |
-  #           scripts/configure_CI.sh ${{matrix.repo}}
-  #           echo "[CI] BUILD REPOSITORY"
-  #           build.sh ${{matrix.repo}}
-  #     - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
-  #       run: tar cvf artifacts.${{matrix.repo}}.tar prefix
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: build_2
-  #         retention-days: 1
-  #         path: artifacts.${{matrix.repo}}.tar
+  build_2:
+    needs:
+      - build_1:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        repo: [EICrecon, reconstruction_benchmarks]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_1
+      - name: untar_artifacts
+        run: |
+          ls artifacts.*.tar | xargs -I_ tar xvf _
+          rm -v artifacts.*.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh ${{matrix.repo}}
+            echo "[CI] BUILD REPOSITORY"
+            build.sh ${{matrix.repo}}
+      - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
+        run: tar cvf artifacts.${{matrix.repo}}.tar prefix
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build_2
+          retention-days: 1
+          path: artifacts.${{matrix.repo}}.tar
 
   # build_3:
   #   needs:
