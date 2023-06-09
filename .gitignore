@@ -15,6 +15,7 @@ tmp
 !tmp/.keep
 jana.dot
 jana.pdf
+!doc/tutorials/img/*.png
 
 irt
 epic
