@@ -13,18 +13,25 @@ root_file = r.TFile.Open('out/optical_materials_drich.root', 'READ')
 # --------------------------------------------------------------------------
 
 class MPT:
-    def __init__(self, graph, func, fit_xmin, fit_xmax):
-        self.graph    = graph
-        self.func     = func
-        self.fit_xmin = fit_xmin
-        self.fit_xmax = fit_xmax
+    def __init__(self, graph, func, fit_range, extrap_range):
+        self.graph        = graph
+        self.func         = func
+        self.fit_range    = fit_range
+        self.extrap_range = extrap_range
 
-    def fit(self):
+    def extrap(self):
+        # perform the fit
         print(f'Fit graph "{self.graph.GetName()}" to function:')
         self.func.Print()
-        self.graph.Fit(self.func, '', '', self.fit_xmin, self.fit_xmax)
-
-    def draw(self):
+        self.graph.Fit(self.func, '', '', self.fit_range[0], self.fit_range[1])
+        # extrapolate
+        self.graph_extrap = r.TGraph()
+        self.graph_extrap.SetName(self.graph.GetName())
+        self.graph_extrap.SetTitle(self.graph.GetTitle())
+        #
+        # TODO
+        #
+        # draw the results
         self.graph.Draw('APE')
         self.func.Draw('SAME')
 
@@ -72,8 +79,8 @@ sellmeier.SetParLimits(1,0.01,400)
 tabs['aerogel']['rindex'] = MPT(
         root_file.Get('graph_Aerogel_RINDEX'),
         sellmeier,
-        200,
-        650
+        [200, 650],
+        [100, 1000]
         )
 tabs['aerogel']['rindex'].set_fake_errors(0.0001)
 
@@ -82,5 +89,4 @@ tabs['aerogel']['rindex'].set_fake_errors(0.0001)
 # --------------------------------------------------------------------------
 for obj_name, obj in tabs.items():
     for tab_name, tab in obj.items():
-        tab.fit()
-        tab.draw()
+        tab.extrap()
