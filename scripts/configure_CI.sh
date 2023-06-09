@@ -8,19 +8,19 @@ echo "[CI] CLONING REPOSITORIES: $repo_list"
 for repo in $repo_list; do
   case $repo in
     epic)
-      echo git clone https://github.com/eic/epic.git --branch main
+      git clone https://github.com/eic/epic.git --branch main
       ;;
     EDM4eic)
-      echo git clone https://github.com/eic/EDM4eic.git --branch main
+      git clone https://github.com/eic/EDM4eic.git --branch main
       ;;
     irt)
-      echo git clone https://github.com/eic/irt.git --branch main
+      git clone https://github.com/eic/irt.git --branch main
       ;;
     EICrecon)
-      echo git clone https://github.com/eic/EICrecon.git --branch irt-algo
+      git clone https://github.com/eic/EICrecon.git --branch irt-algo
       ;;
     reconstruction_benchmarks)
-      echo git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
+      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
       ;;
     none)
       echo "Not cloning any repositories"
