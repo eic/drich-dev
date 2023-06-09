@@ -66,13 +66,15 @@ During development, you may make changes to multiple different repositories, and
 ## Building Repositories
 The `eic-shell` image contains all of the necessary software to run ePIC simulations and reconstruction, including builds of the repositories that you cloned above. We make our own clones here in `drich-dev`, so that you may override the `eic-shell` image builds and make changes.
 
+From here on, you must be in an `eic-shell` container shell.
+
 You can find which versions of software are installed in `eic-shell` by running:
 ```bash
 eic-info
 ```
 You may also find the installations themselves at `/usr/local`, which is useful if you want to check header files or libraries.
 
-Let's now build the local repositories, which will override the `eic-shell` builds. From here on, you must be in an `eic-shell` container shell.
+Let's now build the local repositories, which will override the `eic-shell` builds.
 
 First, set the environment variables:
 ```bash
