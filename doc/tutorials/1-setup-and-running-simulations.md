@@ -268,7 +268,10 @@ Each green box is a single SiPM, and each histogram bin is a single SiPM pixel (
 ```cpp
 #define INTERACTIVE_USE
 ```
-Then re-compile (`make`) and rerun. This will keep the `TCanvas` open and allow you to zoom in. For example, here is a closeup of the gas ring:
+Then re-compile (`make`) and rerun. This will keep the `TCanvas` open and allow you to zoom in. For example, here is a closeup of the gas ring from a single event, by running
+```bash
+event_display d s out/sim.edm4hep.root 0
+```
 
 ![sim-ev-all-zoom](img/sim-ev-all-zoom.png)
 
