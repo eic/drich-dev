@@ -55,7 +55,7 @@ $(EXECUTABLES): $(BIN_TARGET)/%: src/%.cpp
 	$(RM) $@.o
 
 $(IRTGEO_LIB): $(IRTGEO_HEADERS) $(IRTGEO_SOURCES)
-ifeq ($(IRT_ROOT_DICT_FOUND),"1")
+ifeq ($(IRT_ROOT_DICT_FOUND),1)
 	mkdir -p $(LIB_TARGET)
 	@echo "----- build $@ -----"
 	$(CXX) $(IRTGEO_SOURCES) -shared -o $@ $(FLAGS) $(DEPS) $(LIBS)
@@ -64,7 +64,7 @@ else
 endif
 
 $(IRT_AUXFILE_EXECUTABLE): $(IRT_AUXFILE_SOURCE) $(IRTGEO_LIB)
-ifeq ($(IRT_ROOT_DICT_FOUND),"1")
+ifeq ($(IRT_ROOT_DICT_FOUND),1)
 	mkdir -p $(BIN_TARGET)
 	@echo "----- build $@.o -----"
 	$(CXX) -c $< -o $@.o $(FLAGS) $(DEPS)
@@ -77,5 +77,5 @@ endif
 
 clean:
 	@echo "CLEAN ======================================================"
-	$(RM) $(EXECUTABLES) $(IRTGEO_LIB)
+	$(RM) $(EXECUTABLES) $(IRT_AUXFILE_EXECUTABLE) $(IRTGEO_LIB)
 
