@@ -146,12 +146,12 @@ search_compact_params.sh -e | grep DRICH   # dump all of the constants for the d
 The first column is the constant name, the second is the raw value (numbers in standard DD4hep units), and the third column is the original formula or specification used for the constant). Length units are centimeters.
 
 ### Aside: Checking for overlaps
-Checking for geometry overlaps is a computationally intensive procedure; therefore, it is better to let the Continuous Integration (CI) to run overlap checks. CI jobs are triggered by every commit to a branch associated with a pull request. If you want to run overlap checks locally, run `overlap_check.sh`.
+Checking for geometry overlaps is a computationally intensive procedure; therefore, it is better to let the Continuous Integration (CI) run overlap checks. CI jobs are triggered by every commit to a branch associated with a pull request. If you want to run overlap checks locally, run `overlap_check.sh`.
 
 ### Aside: Hosting JSROOT Yourself
 Using a remotely hosted JSROOT instance has its limitations; namely, every time you make a change to the geometry you must re-upload the TGeo ROOT file. For better productivity, consider self-hosting by following this guide.
 
-First, download a [release of JSROOT] and unpack it to somewhere, for example `~/jsroot`.
+First, download a [release of JSROOT](https://github.com/root-project/jsroot/releases) and unpack it to somewhere, for example `~/jsroot`.
 
 Make a symbolic link to the `drich-dev/geo` subdirectory
 ```bash
