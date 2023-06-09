@@ -15,6 +15,8 @@ Running Reconstruction and Benchmarks
   - Expected common-level refactoring to `toml`
   - `DRICH.cc` level config
   - Algorithm level default configs
+- `event_display`
+  - compare simulation to reconstruction
 - Benchmarks
   - Checking the output
 
