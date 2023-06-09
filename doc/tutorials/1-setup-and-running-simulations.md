@@ -13,6 +13,7 @@ First, clone the necessary repositories from [Github](https://github.com) and fr
 In today's tutorial we will only be working with the following repositories:
 - `drich-dev`
 - `epic`
+- `EICrecon` (some `drich-dev` local code is dependent on this)
 
 These are the only ones you need to clone for today. Future tutorials will use other repositories, so after today's tutorial, it is recommended to clone those as well. Here are the clone commands:
 
@@ -98,7 +99,7 @@ build.sh <REPOSITORY> clean  # remove the cmake buildsystem, and then build
 ```
 By default, the installation prefix (`CMAKE_INSTALL_PREFIX`) will be `$EIC_SHELL_PREFIX`. Running `source environ.sh` has modified your default `$EIC_SHELL_PREFIX` to a local directory: `./prefix`; this directory is where all the software that `build.sh` builds will be installed.
 
-Today, we only need to build `epic`:
+Today, we only need to build `epic` (you do not need to build `EICrecon` yet):
 ```bash
 build.sh epic
 ```
