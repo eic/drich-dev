@@ -38,6 +38,13 @@ if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
   export PATH="$PATH:/usr/local/bin"
 fi
 
+# check if we have ROOT I/O enabled for IRT
+export IRT_ROOT_DICT_FOUND=0
+if [ -f $EIC_SHELL_PREFIX/lib/libIRT_rdict.pcm -a -f $EIC_SHELL_PREFIX/lib/libIRT.rootmap ]; then
+  export IRT_ROOT_DICT_FOUND=1
+elif [ -f /usr/local/lib/libIRT_rdict.pcm -a -f /usr/local/lib/libIRT.rootmap ]; then
+  export IRT_ROOT_DICT_FOUND=1
+fi
 
 # environment overrides:
 # - prefer local juggler build
@@ -111,10 +118,11 @@ LD_LIBRARY_PATH:
   $(echo $LD_LIBRARY_PATH | sed 's/:/\n  /g')
 
 Common:
-  DRICH_DEV        = $DRICH_DEV
-  BUILD_NPROC      = $BUILD_NPROC
-  EIC_SHELL_PREFIX = $EIC_SHELL_PREFIX
-  JANA_PLUGIN_PATH = $JANA_PLUGIN_PATH
-  DETECTOR_PATH    = $DETECTOR_PATH
+  DRICH_DEV           = $DRICH_DEV
+  BUILD_NPROC         = $BUILD_NPROC
+  EIC_SHELL_PREFIX    = $EIC_SHELL_PREFIX
+  JANA_PLUGIN_PATH    = $JANA_PLUGIN_PATH
+  DETECTOR_PATH       = $DETECTOR_PATH
+  IRT_ROOT_DICT_FOUND = $IRT_ROOT_DICT_FOUND
 
 """

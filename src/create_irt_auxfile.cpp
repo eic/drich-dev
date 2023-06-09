@@ -8,8 +8,8 @@
 
 // local
 #include "WhichRICH.h"
-#include "IrtGeoDRICH.h"
-#include "IrtGeoPFRICH.h"
+#include <IrtGeoDRICH.h>
+#include <IrtGeoPFRICH.h>
 
 int main(int argc, char** argv) {
 
