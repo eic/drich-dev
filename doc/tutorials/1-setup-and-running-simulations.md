@@ -340,7 +340,7 @@ simulate.py -t12
 ```
 Use the `-n` option to change the number of photons per beam, and the `-k` option to change the number of beams. For example,
 ```bash
-simulate.py -t12 -k3 -n10
+simulate.py -t12 -k3 -n30
 ```
 
 ![sim-optics](img/sim-optics.png)
