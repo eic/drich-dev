@@ -81,6 +81,16 @@ First, set the environment variables:
 source environ.sh
 ```
 
+Check if the number of CPUs was detected correctly:
+```bash
+echo $BUILD_NPROC
+```
+If it is wrong, then we need to fix the number detection in `environ.sh`; for now just hard code the correct number in `environ.sh` and run `source environ.sh` again, or just run
+```bash
+export BUILD_NPROC=<CORRECT_NUMBER>
+```
+replacing `<CORRECT_NUMBER>` with the correct number
+
 Practically all repositories use `cmake`, so you may proceed using the typical `cmake` commands. For convenience, `drich-dev` provides a `cmake` wrapper `build.sh` to build any local repository. The syntax is:
 ```bash
 build.sh <REPOSITORY>        # build a repository named <REPOSITORY>
