@@ -171,7 +171,7 @@ python -m http.server
 popd
 ```
 
-Run `jsroot` from your shell (not `eic-shell`) and open one of the URLs in your browser. As you make changes to the geometry in `epic`, you just need to:
+Run `jsroot` from your shell (not `eic-shell`) and open one of the URLs in your browser (when you are done, you may terminate the HTTP server by pressing `^C`). As you make changes to the geometry in `epic`, you just need to:
 ```
 build.sh epic && geometry.sh -d   # or your preferred option, such as -e
 ```
