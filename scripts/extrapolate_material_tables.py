@@ -6,6 +6,11 @@
 
 import ROOT as r
 import sys
+from numpy import linspace
+
+##### SETTINGS #########################
+FULL_WAVELENGTH_RANGE = [200, 1000]
+########################################
 
 root_file = r.TFile.Open('out/optical_materials_drich.root', 'READ')
 
@@ -13,11 +18,16 @@ root_file = r.TFile.Open('out/optical_materials_drich.root', 'READ')
 # --------------------------------------------------------------------------
 
 class MPT:
-    def __init__(self, graph, func, fit_range, extrap_range):
-        self.graph        = graph
-        self.func         = func
-        self.fit_range    = fit_range
-        self.extrap_range = extrap_range
+    def __init__(self, graph, func, fit_range, extrap_range, extrap_npoints):
+        self.graph          = graph
+        self.func           = func
+        self.fit_range      = fit_range
+        self.extrap_range   = extrap_range
+        self.extrap_npoints = extrap_npoints
+        self.graph_range = [
+            self.graph.GetPointX(0),
+            self.graph.GetPointX(self.graph.GetN()-1)
+        ]
 
     def extrap(self):
         # perform the fit
@@ -25,15 +35,43 @@ class MPT:
         self.func.Print()
         self.graph.Fit(self.func, '', '', self.fit_range[0], self.fit_range[1])
         # extrapolate
-        self.graph_extrap = r.TGraph()
-        self.graph_extrap.SetName(self.graph.GetName())
-        self.graph_extrap.SetTitle(self.graph.GetTitle())
-        #
-        # TODO
-        #
+        self.multi_gr = r.TMultiGraph()
+        self.multi_gr.SetName(self.graph.GetName()+"_multi_gr")
+        self.multi_gr.SetTitle(self.graph.GetTitle())
+        self.multi_gr.Add(self.graph)
+        self.graph_extrap = [ r.TGraphErrors(), r.TGraphErrors() ]
+        self.graph_extrap[0].SetName(self.graph.GetName()+"_extrap_low")
+        self.graph_extrap[1].SetName(self.graph.GetName()+"_extrap_high")
+        self.graph_extrap[0].SetMarkerColor(r.kRed)
+        self.graph_extrap[1].SetMarkerColor(r.kGreen+1)
+        for i in range(2):
+            self.graph_extrap[i].SetTitle(self.graph.GetTitle())
+            self.graph_extrap[i].SetMarkerStyle(r.kStar)
+            if( ( i==0 and self.extrap_range[i]<self.graph_range[i] ) or ( i==1 and self.extrap_range[i]>self.graph_range[i] )):
+                self.multi_gr.Add(self.graph_extrap[i])
+                extrap_points = list(linspace(self.extrap_range[i], self.graph_range[i], self.extrap_npoints[i]+1))
+                del extrap_points[-1]
+                if( i==1 ):
+                    extrap_points.reverse()
+                for x in extrap_points:
+                    self.graph_extrap[i].AddPoint(x, self.func.Eval(x))
         # draw the results
-        self.graph.Draw('APE')
+        canv_name = f'{self.graph.GetName()}_canv'
+        self.canv = r.TCanvas(canv_name, canv_name, 1000, 800)
+        self.canv.SetGrid(1,1)
+        self.multi_gr.Draw('APE')
         self.func.Draw('SAME')
+        # print the table
+        self.table = []
+        for gr in [ self.graph_extrap[0], self.graph, self.graph_extrap[1] ]:
+            for i in range(gr.GetN()):
+                energy = 1239.841875 / gr.GetPointX(i)
+                val = gr.GetPointY(i)
+                self.table.append(f'  {energy:.5f}*eV   {val:.5f}')
+        self.table.reverse()
+        print(f'TABLE: {self.graph.GetName()}')
+        for line in self.table:
+            print(line)
 
     def set_fake_errors(self, err):
         for i in range(self.graph.GetN()):
@@ -71,18 +109,33 @@ def make_sellmeier(order):
 # fits
 # --------------------------------------------------------------------------
 
-# aerogel - RINDEX
-# - fit to 2nd order Sellmeier function
+### aerogel - RINDEX
+### - fit to 2nd order Sellmeier function
 tabs['aerogel'] = {}
-sellmeier = r.TF1("aerogel_rindex", make_sellmeier(2), 0, 1000)
-sellmeier.SetParLimits(1,0.01,400)
+sellmeier_aerogel = r.TF1("aerogel_rindex", make_sellmeier(2), *FULL_WAVELENGTH_RANGE)
+sellmeier_aerogel.SetParLimits(1,0.01,400)
 tabs['aerogel']['rindex'] = MPT(
         root_file.Get('graph_Aerogel_RINDEX'),
-        sellmeier,
+        sellmeier_aerogel,
         [200, 650],
-        [100, 1000]
+        FULL_WAVELENGTH_RANGE,
+        [10, 10]
         )
 tabs['aerogel']['rindex'].set_fake_errors(0.0001)
+
+### aerogel - ABSLENGTH
+linear_aerogel = r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1])
+tabs['aerogel']['abslength'] = MPT(
+        root_file.Get('graph_Aerogel_ABSLENGTH'),
+        linear_aerogel,
+        [350, 600],
+        FULL_WAVELENGTH_RANGE,
+        [0, 10]
+        )
+tabs['aerogel']['abslength'].set_fake_errors(0.0001)
+
+
+
 
 
 # extrapolate

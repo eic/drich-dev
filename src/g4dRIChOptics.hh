@@ -145,15 +145,23 @@ public:
   int getMaterialPropertyTableSize() { return int(getMaterialPropertyNames().size()); }
 
   // execute lambda function `block(energy,value)` for each entry (energy,value) in the material property table
-  void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block) {
+  void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block, bool reverseOrder=false) {
     auto tab = getMaterialPropertyTable();
     if(tab==nullptr) return;
     auto prop = tab->GetProperty(propName);
     if(prop==nullptr) return;
-    for(std::size_t i=0; i<prop->GetVectorLength(); ++i) {
-      auto energy = prop->Energy(i);
-      auto value  = prop->operator[](i);
-      block(energy,value);
+    if(reverseOrder) {
+      for(int i=prop->GetVectorLength()-1; i>=0; i--) {
+        auto energy = prop->Energy(i);
+        auto value  = prop->operator[](i);
+        block(energy,value);
+      }
+    } else {
+      for(int i=0; i<prop->GetVectorLength(); i++) {
+        auto energy = prop->Energy(i);
+        auto value  = prop->operator[](i);
+        block(energy,value);
+      }
     }
   }
 
@@ -543,7 +551,7 @@ public:
     double wlref = 633*nm; // for density vs refractive index
     
     int nEntries = 30;
-    double wl0 = 80.*nm;
+    double wl0 = 200.*nm;
     double wl1 = 1000.*nm;
     double dwl = (wl1-wl0)/(nEntries-1.);
     

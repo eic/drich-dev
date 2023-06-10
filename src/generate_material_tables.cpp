@@ -113,16 +113,11 @@ template<class MAT> class MaterialTable {
         graph->SetName(TString("graph_"+name+"_"+propName));
         std::string xTitle = vsWavelength ? "wavelength [nm]" : "energy [eV]";
         graph->SetTitle(TString(name+" "+propName+units.title+";"+xTitle));
-        int cnt=0;
-        auto makeGraph = [&graph,&cnt,&units] (G4double energy, G4double value) {
+        auto makeGraph = [&graph,&units] (G4double energy, G4double value) {
           auto xval = vsWavelength ? g4dRIChOptics::e2wl(energy)/nm : energy/eV;
-          graph->SetPoint(
-              cnt++,
-              xval,
-              value / units.divisor
-              );
+          graph->AddPoint(xval, value / units.divisor);
         };
-        mpt->loopMaterialPropertyTable(propName,makeGraph);
+        mpt->loopMaterialPropertyTable(propName,makeGraph, vsWavelength);
         graph->SetMarkerStyle(kFullCircle);
         graph->SetMarkerColor(kAzure);
         graph->GetXaxis()->SetLabelSize(0.05);
