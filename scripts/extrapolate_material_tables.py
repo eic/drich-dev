@@ -112,27 +112,39 @@ def make_sellmeier(order):
 ### aerogel - RINDEX
 ### - fit to 2nd order Sellmeier function
 tabs['aerogel'] = {}
-sellmeier_aerogel = r.TF1("aerogel_rindex", make_sellmeier(2), *FULL_WAVELENGTH_RANGE)
-sellmeier_aerogel.SetParLimits(1,0.01,400)
+aerogel_rindex_fn = r.TF1("aerogel_rindex", make_sellmeier(2), *FULL_WAVELENGTH_RANGE)
+aerogel_rindex_fn.SetParLimits(1,0.01,400)
 tabs['aerogel']['rindex'] = MPT(
         root_file.Get('graph_Aerogel_RINDEX'),
-        sellmeier_aerogel,
+        aerogel_rindex_fn,
         [200, 650],
         FULL_WAVELENGTH_RANGE,
         [10, 10]
         )
-tabs['aerogel']['rindex'].set_fake_errors(0.0001)
+tabs['aerogel']['rindex'].set_fake_errors(3e-5)
 
 ### aerogel - ABSLENGTH
-linear_aerogel = r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1])
+### - linear fit to 350 nm and above only
 tabs['aerogel']['abslength'] = MPT(
         root_file.Get('graph_Aerogel_ABSLENGTH'),
-        linear_aerogel,
+        r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1]),
         [350, 600],
         FULL_WAVELENGTH_RANGE,
         [0, 10]
         )
-tabs['aerogel']['abslength'].set_fake_errors(0.0001)
+tabs['aerogel']['abslength'].set_fake_errors(0.5)
+
+### aerogel - RAYLEIGH
+### - fit to lambda^4 dependence
+aerogel_rayleigh_fn = r.TF1("aerogel_rayleigh", "[0]+[1]*x^4", *FULL_WAVELENGTH_RANGE)
+tabs['aerogel']['rayleigh'] = MPT(
+        root_file.Get('graph_Aerogel_RAYLEIGH'),
+        aerogel_rayleigh_fn,
+        [350, 600],
+        FULL_WAVELENGTH_RANGE,
+        [0, 10]
+        )
+tabs['aerogel']['rayleigh'].set_fake_errors(4)
 
 
 
