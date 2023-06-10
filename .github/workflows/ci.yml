@@ -163,7 +163,7 @@ jobs:
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.${{matrix.test_num}}
+        run: mv -v out out.test${{matrix.test_num}}
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
@@ -206,7 +206,7 @@ jobs:
         with:
           name: geometry
           retention-days: 1
-          path: geo
+          path: geo*/
 
 # EVENT VISUALIZATION -------------------------------------------------------------
 
@@ -322,7 +322,7 @@ jobs:
         with:
           name: irt_auxfiles
           retention-days: 1
-          path: geo
+          path: geo*/
 
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
@@ -359,7 +359,8 @@ jobs:
           tree geo
       - name: cull
         run: |
-          # rm -v out*/*.root
+          rm -v out*/sim*.root
+          rm -v out*/rec*.root
           find -name .keep | xargs rm -v
       - name: tree_artifacts_after_cull
         run: |
