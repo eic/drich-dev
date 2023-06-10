@@ -168,9 +168,9 @@ jobs:
         with:
           name: pipeline
           retention-days: 1
-          path: out.${{matrix.test_num}}
+          path: out.*/
 
-# MISCELLANEOUS -------------------------------------------------------------------
+# GEOMETRY ------------------------------------------------------------------------
 
   geometry:
     needs:
@@ -208,75 +208,87 @@ jobs:
           retention-days: 1
           path: geo
 
-  visual:
-    needs:
-      - build_3
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build_3
-      - name: untar_artifacts
-        run: |
-          tar xvf build.tar
-          rm -v build.tar
-      - uses: cvmfs-contrib/github-action-cvmfs@v3
-      - uses: eic/run-cvmfs-osg-eic-shell@main
-        with:
-          platform-release: "jug_xl:nightly"
-          setup: environ.sh
-          run: |
-            scripts/configure_CI.sh none
-            echo "[CI] SET DEBUG MODE"
-            scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
-            echo "[CI] REBUILD epic"
-            build.sh epic
-            echo "[CI] VISUALIZE:"
-            exit | simulate.py -t1 -n1 -v -e pdf
-            mv out out.visual
-      - uses: actions/upload-artifact@v3
-        with:
-          name: visual
-          retention-days: 1
-          path: out.visual
+# EVENT VISUALIZATION -------------------------------------------------------------
 
-  optics:
-    needs:
-      - build_3
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build_3
-      - name: untar_artifacts
-        run: |
-          tar xvf build.tar
-          rm -v build.tar
-      - uses: cvmfs-contrib/github-action-cvmfs@v3
-      - uses: eic/run-cvmfs-osg-eic-shell@main
-        with:
-          platform-release: "jug_xl:nightly"
-          setup: environ.sh
-          run: |
-            scripts/configure_CI.sh none
-            echo "[CI] SET DEBUG MODE"
-            scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
-            echo "[CI] REBUILD epic"
-            build.sh epic
-            echo "[CI] VISUALIZE:"
-            exit | simulate.py -t12 -e pdf
-            mv out out.optics
-      - uses: actions/upload-artifact@v3
-        with:
-          name: optics
-          retention-days: 1
-          path: out.optics
+###
+### FIXME: not sure how to make these work on CI runners
+### - locally:
+###     run `xvfb-run eic-shell` (to suppress graphics)
+###     call `exit | simulate.py -t1 -n1 -v -e svg`
+###
+
+  # visual:
+  #   needs:
+  #     - build_3
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build_3
+  #     - name: untar_artifacts
+  #       run: |
+  #         tar xvf build.tar
+  #         rm -v build.tar
+  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
+  #     - uses: eic/run-cvmfs-osg-eic-shell@main
+  #       with:
+  #         platform-release: "jug_xl:nightly"
+  #         setup: environ.sh
+  #         run: |
+  #           scripts/configure_CI.sh none
+  #           echo "[CI] SET DEBUG MODE"
+  #           scripts/set_optics_debug_mode.sh DRICH_debug_sector 1
+  #           echo "[CI] REBUILD epic"
+  #           build.sh epic
+  #           echo "[CI] VISUALIZE:"
+  #           exit | simulate.py -t1 -n1 -v -e pdf
+  #           mv out out.visual
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: visual
+  #         retention-days: 1
+  #         path: out.*/
+
+  # optics:
+  #   needs:
+  #     - build_3
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build_3
+  #     - name: untar_artifacts
+  #       run: |
+  #         tar xvf build.tar
+  #         rm -v build.tar
+  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
+  #     - uses: eic/run-cvmfs-osg-eic-shell@main
+  #       with:
+  #         platform-release: "jug_xl:nightly"
+  #         setup: environ.sh
+  #         run: |
+  #           scripts/configure_CI.sh none
+  #           echo "[CI] SET DEBUG MODE"
+  #           scripts/set_optics_debug_mode.sh DRICH_debug_optics 1
+  #           echo "[CI] REBUILD epic"
+  #           build.sh epic
+  #           echo "[CI] VISUALIZE:"
+  #           exit | simulate.py -t12 -e pdf
+  #           mv out out.optics
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: optics
+  #         retention-days: 1
+  #         path: out.*/
+
+# GENERATE IRT AUXFILES -----------------------------------------------------------
+# - to test it is still possbile
 
   irt_auxfiles:
     needs:
@@ -318,8 +330,8 @@ jobs:
     needs:
       - pipeline
       - geometry
-      - visual
-      - optics
+      # - visual
+      # - optics
       - irt_auxfiles
     runs-on: ubuntu-latest
     strategy:
@@ -332,12 +344,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: geometry
-      - uses: actions/download-artifact@v3
-        with:
-          name: visual
-      - uses: actions/download-artifact@v3
-        with:
-          name: optics
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: visual
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: optics
       - uses: actions/download-artifact@v3
         with:
           name: irt_auxfiles
@@ -347,7 +359,8 @@ jobs:
           tree geo
       - name: cull
         run: |
-          rm -v out*/*.root
+          # rm -v out*/*.root
+          find -name .keep | xargs rm -v
       - name: tree_artifacts_after_cull
         run: |
           tree out*
