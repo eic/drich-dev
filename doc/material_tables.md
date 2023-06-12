@@ -30,13 +30,13 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ### Material
 - using CLAS12 experimental points rescaled by Alessio/GEMC, in range 200 to 660 nm
 - needed to do curve fits for extrapolation
-- [x] **CHANGE**: extrapolate refractive index
+- [x] **EXTRAPOLATION**: refractive index
   - fit to 2nd order Sellmeier function
   - upper limit 660 nm extrapolated to 1000 nm
-- [x] **CHANGE**: extrapolate absorption length
+- [x] **EXTRAPOLATION**: absorption length
   - linear fit to 350 nm and above only
   - upper limit 660 nm extrapolated to 1000 nm
-- [x] **CHANGE**: extrapolate Rayleigh scattering length
+- [x] **EXTRAPOLATION**: Rayleigh scattering length
   - fit to `lambda^4` dependence
   - upper limit 660 nm extrapolated to 1000 nm
 ### Surface
@@ -59,10 +59,10 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ### Material
 - currently 200-700nm, 10 points
 - straightforward to adjust in Evaristo's code, `g4dRIChOptics.hh`
-- [x] **CHANGE**: extrapolate refractive index
+- [x] **EXTRAPOLATION**: refractive index
   - extrapolated to 200-1000nm, 16 points
   - done for both C2F6 and C4F10
-- [x] **CHANGE**: extrapolate absorption length
+- [x] **EXTRAPOLATION**: absorption length
   - is constant
   - same range as refractive index
   - done for both C2F6 and C4F10
@@ -88,5 +88,5 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ### Surface
 - table `EFFICIENCY` is set to constant 1 for all wavelengths 1-7 eV = 177-1240nm
 - actual quantum efficiency is applied downstream in reconstruction
-- [x] **CHANGE**: minor change, extrapolating the end points of the QE curve down to zero
+- [x] **EXTRAPOLATION**: minor change, extrapolating the end points of the QE curve down to zero
   - done by eye, adding 2 new points with QE=0 at 315 nm and at 1000 nm
