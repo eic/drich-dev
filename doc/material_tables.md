@@ -88,5 +88,3 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ### Surface
 - table `EFFICIENCY` is set to constant 1 for all wavelengths 1-7 eV = 177-1240nm
 - actual quantum efficiency is applied downstream in reconstruction
-- [x] **EXTRAPOLATION**: minor change, extrapolating the end points of the QE curve down to zero
-  - done by eye, adding 2 new points with QE=0 at 315 nm and at 1000 nm
