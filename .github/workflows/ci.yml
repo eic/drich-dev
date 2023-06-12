@@ -13,9 +13,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  num_events: 10
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -131,9 +128,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        particle: [pi+, kaon+, proton]
         include:
-          - { test_num: 1 }
-          - { test_num: 4 }
+          - { test_num: 1, num_events: 50 }
+          - { test_num: 5, num_events: 20 }
+          - { test_num: 7, num_events: 20 }
+          - { test_num: 8, num_events: 20 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -151,9 +151,9 @@ jobs:
           run: |
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
-            simulate.py -t ${{matrix.test_num}} -n ${{env.num_events}}
+            simulate.py -t ${{matrix.test_num}} -n ${{matrix.num_events}} -p ${{matrix.particle}}
             echo "[CI] EVENT DISPLAY:"
-            event_display d s out/sim.edm4hep.root
+            event_display d s out/sim.edm4hep.root 0 0
             echo "[CI] DRAW HITS:"
             draw_hits d
             echo "[CI] RECONSTRUCTION:"
