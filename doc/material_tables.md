@@ -19,7 +19,7 @@ Guide to generate material property tables for XML files for `DD4hep`.
   generation of property tables
 - [`src/generate_material_tables.cpp`](../src/generate_material_tables.cpp):
   Executable for generating the XML nodes and plots
-- [`scripts/extrapolate_material_tables.py`](scripts/extrapolate_material_tables.py):
+- [`scripts/extrapolate_material_tables.py`](../scripts/extrapolate_material_tables.py):
   Extrapolate material property tables beyond `g4dRIChOptics`
 - [`src/surfaceEnums.h`](../src/surfaceEnums.h): helper methods for Geant4 surface
   properties
