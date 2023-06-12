@@ -11,11 +11,12 @@ Resources and Tools for EPIC dRICH development
 | [Benchmarks](#benchmarks)           | Running the analysis benchmarks and performance plots |
 | [Miscellaneous](#miscellaneous)     | Additional code for support                           |
 
-| **Documentation Links**                       |                                               |
-| --:                                           | ---                                           |
-| [Links](doc/links.md)                         | Collection of dRICH Software and Resources    |
-| [Branches and Pull Requests](doc/branches.md) | Active development branches and pull requests |
-| [Project Board](https://github.com/orgs/eic/projects/4) | Issues tracking                     |
+| **Documentation Links**                                 |                                               |
+| --:                                                     | ---                                           |
+| [Links](doc/links.md)                                   | Collection of dRICH Software and Resources    |
+| [Branches and Pull Requests](doc/branches.md)           | Active development branches and pull requests |
+| [Project Board](https://github.com/orgs/eic/projects/4) | Issues and Pull Request Tracking              |
+| [Material Properties](doc/material_tables.md)           | Generation of Material Property Tables        |
 
 ## Notes
 EPIC Software is modular: see [the flowchart below](#flowchart) for

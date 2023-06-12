@@ -5,16 +5,18 @@
 #include "g4dRIChOptics.hh"
 #include "surfaceEnums.h"
 
-#include "TCanvas.h"
-#include "TGraph.h"
-#include "TAxis.h"
+#include <TCanvas.h>
+#include <TGraphErrors.h>
+#include <TAxis.h>
+#include <TFile.h>
 
 ///////////////////////////////////
 // SETTINGS
 const int    aerOptModel  = 3;      // aerogel optical model used to estimate the refractive Index
 const double filter_thr   = 300*nm; // wavelength filter cutoff
 const bool   vsWavelength = true;   // if true, make plots vs. wavelength
-const std::string xmlOutput = "out/optical_materials_drich.xml";
+const std::string xmlOutput      = "out/optical_materials_drich.xml";
+const TString     root_file_name = "out/optical_materials_drich.root";
 ///////////////////////////////////
 
 // other global vars
@@ -53,7 +55,7 @@ template<class MAT> class MaterialTable {
       // function to print a row
       auto PrintRow = [] (int indentation, UnitDef units) {
         return [indentation,&units] (G4double energy, G4double value) {
-          fmt::print(xmlFile,"{:{}}{:<#.6g}{}   {:>#.6g}{}\n",
+          fmt::print(xmlFile,"{:{}}{:<#.6g}{}   {:>#.7g}{}\n",
               "",                  indentation,
               energy/eV,           "*eV",
               value/units.divisor, units.xml
@@ -107,26 +109,22 @@ template<class MAT> class MaterialTable {
         canv->GetPad(pad)->SetGrid(1,1);
         canv->GetPad(pad)->SetLeftMargin(0.2);
         canv->GetPad(pad)->SetRightMargin(0.15);
-        auto graph = new TGraph();
+        auto graph = new TGraphErrors();
         graph->SetName(TString("graph_"+name+"_"+propName));
         std::string xTitle = vsWavelength ? "wavelength [nm]" : "energy [eV]";
         graph->SetTitle(TString(name+" "+propName+units.title+";"+xTitle));
-        int cnt=0;
-        auto makeGraph = [&graph,&cnt,&units] (G4double energy, G4double value) {
+        auto makeGraph = [&graph,&units] (G4double energy, G4double value) {
           auto xval = vsWavelength ? g4dRIChOptics::e2wl(energy)/nm : energy/eV;
-          graph->SetPoint(
-              cnt++,
-              xval,
-              value / units.divisor
-              );
+          graph->AddPoint(xval, value / units.divisor);
         };
-        mpt->loopMaterialPropertyTable(propName,makeGraph);
+        mpt->loopMaterialPropertyTable(propName,makeGraph, vsWavelength);
         graph->SetMarkerStyle(kFullCircle);
         graph->SetMarkerColor(kAzure);
         graph->GetXaxis()->SetLabelSize(0.05);
         graph->GetYaxis()->SetLabelSize(0.05);
         graph->GetXaxis()->SetTitleOffset(1.3);
         graph->Draw("AP");
+        graph->Write();
       }
       canv->SaveAs(pngName); 
     }
@@ -160,8 +158,9 @@ template<class MAT> class MaterialTable {
 
 int main(int argc, char** argv) {
 
-  // start XML file
+  // start XML file and ROOT file
   xmlFile = std::fopen(xmlOutput.c_str(),"w");
+  auto root_file = new TFile(root_file_name,"RECREATE");
 
   // build detector by text file
   fmt::print("[+] read model text file\n");
@@ -212,6 +211,7 @@ int main(int argc, char** argv) {
 
   // cleanup
   std::fclose(xmlFile);
+  root_file->Close();
   fmt::print("\nwrote XML nodes to {}\n\n",xmlOutput);
 
 } // main
