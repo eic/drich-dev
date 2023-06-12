@@ -45,13 +45,13 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ## Airgap
 - using common `AirOptical`
 - no effect switching to `C2F6` (which disables it)
-- no changes
+- no extrapolation
 
 ## Acrylic Filter
 ### Material
 - using (adjustable) cutoff of 300 nm
 - no effect switching to `C2F6` (which disables it)
-- no changes
+- no extrapolation
 ### Surface
 - [ ] **TODO**
 
@@ -78,7 +78,7 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ### Surface
 - model exists from Evaristo's code, but we are not using this since reflectivity seems too low
 - instead, using constant 0.9 reflectivity for all wavelengths: 1-7 eV = 177-1240nm
-- no changes at this time, since wavelength range is large enough
+- no extrapolation, since wavelength range is large enough
 - [ ] **TODO**: update to a more realistic model or measurement
 
 ## Sensors
