@@ -55,7 +55,7 @@ template<class MAT> class MaterialTable {
       // function to print a row
       auto PrintRow = [] (int indentation, UnitDef units) {
         return [indentation,&units] (G4double energy, G4double value) {
-          fmt::print(xmlFile,"{:{}}{:<#.6g}{}   {:>#.6g}{}\n",
+          fmt::print(xmlFile,"{:{}}{:<#.6g}{}   {:>#.7g}{}\n",
               "",                  indentation,
               energy/eV,           "*eV",
               value/units.divisor, units.xml

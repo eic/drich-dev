@@ -550,7 +550,7 @@ public:
     double refn = Ksr[igas] * density + 1.;
     double wlref = 633*nm; // for density vs refractive index
     
-    int nEntries = 30;
+    int nEntries = 16;
     double wl0 = 200.*nm;
     double wl1 = 1000.*nm;
     double dwl = (wl1-wl0)/(nEntries-1.);
@@ -684,6 +684,7 @@ public:
     
     // quantum effiency, from SiPM model S13361-3050NE-08
     std::vector<std::pair<double,double>> QE = { // wavelength [nm], quantum efficiency
+      {315*nm, 0.00},
       {325*nm, 0.04},
       {340*nm, 0.10},
       {350*nm, 0.20},
@@ -698,7 +699,8 @@ public:
       {750*nm, 0.12},
       {800*nm, 0.08},
       {850*nm, 0.06},
-      {900*nm, 0.04}
+      {900*nm, 0.04},
+      {1000*nm, 0.00}
     };
     std::reverse(QE.begin(), QE.end()); // order in increasing energy
     const int N_POINTS = QE.size();

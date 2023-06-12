@@ -18,12 +18,14 @@ root_file = r.TFile.Open('out/optical_materials_drich.root', 'READ')
 # --------------------------------------------------------------------------
 
 class MPT:
-    def __init__(self, graph, func, fit_range, extrap_range, extrap_npoints):
+    def __init__(self, graph, func, fit_range, extrap_range, extrap_npoints, units='', sigfigs=[5,9,5]):
         self.graph          = graph
         self.func           = func
         self.fit_range      = fit_range
         self.extrap_range   = extrap_range
         self.extrap_npoints = extrap_npoints
+        self.units          = units
+        self.sigfigs        = sigfigs
         self.graph_range = [
             self.graph.GetPointX(0),
             self.graph.GetPointX(self.graph.GetN()-1)
@@ -67,11 +69,17 @@ class MPT:
             for i in range(gr.GetN()):
                 energy = 1239.841875 / gr.GetPointX(i)
                 val = gr.GetPointY(i)
-                self.table.append(f'  {energy:.5f}*eV   {val:.5f}')
+                line = f'      {energy:<.{self.sigfigs[0]}f}*eV  {val:>{self.sigfigs[1]}.{self.sigfigs[2]}f}'
+                if(self.units!=''):
+                    line += f'*{self.units}'
+                self.table.append(line)
         self.table.reverse()
+        print('-'*80)
         print(f'TABLE: {self.graph.GetName()}')
+        print('-'*80)
         for line in self.table:
             print(line)
+        print('-'*80)
 
     def set_fake_errors(self, err):
         for i in range(self.graph.GetN()):
@@ -119,7 +127,9 @@ tabs['aerogel']['rindex'] = MPT(
         aerogel_rindex_fn,
         [200, 650],
         FULL_WAVELENGTH_RANGE,
-        [10, 10]
+        [10, 10],
+        '',
+        [5, 7, 5]
         )
 tabs['aerogel']['rindex'].set_fake_errors(3e-5)
 
@@ -130,7 +140,9 @@ tabs['aerogel']['abslength'] = MPT(
         r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1]),
         [350, 600],
         FULL_WAVELENGTH_RANGE,
-        [0, 10]
+        [0, 10],
+        'mm',
+        [5, 7, 3]
         )
 tabs['aerogel']['abslength'].set_fake_errors(0.5)
 
@@ -142,12 +154,11 @@ tabs['aerogel']['rayleigh'] = MPT(
         aerogel_rayleigh_fn,
         [350, 600],
         FULL_WAVELENGTH_RANGE,
-        [0, 10]
+        [0, 10],
+        'mm',
+        [5, 7, 3]
         )
 tabs['aerogel']['rayleigh'].set_fake_errors(4)
-
-
-
 
 
 # extrapolate
