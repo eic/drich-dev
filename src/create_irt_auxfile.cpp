@@ -21,14 +21,14 @@ int main(int argc, char** argv) {
   std::string compactFileName = "";
   std::string irtAuxFileName  = "";
   if(argc<=1) {
-    logger->info("USAGE: {} [d/p] [compact_file_name(optional)] [aux_file_name(optional)]",argv[0]);
+    logger->info("USAGE: {} [d/p] [aux_file_name(optional)] [compact_file_name(optional)]",argv[0]);
     logger->info("    [d/p]: d for dRICH");
     logger->info("           p for pfRICH");
     return 2;
   }
   std::string zDirectionStr  = argv[1];
-  if(argc>2) compactFileName = std::string(argv[2]);
-  if(argc>3) irtAuxFileName  = std::string(argv[3]);
+  if(argc>2) irtAuxFileName  = std::string(argv[2]);
+  if(argc>3) compactFileName = std::string(argv[3]);
 
   // RICH-specific settings (also checks `zDirectionStr`)
   WhichRICH wr(zDirectionStr);
