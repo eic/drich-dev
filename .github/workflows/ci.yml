@@ -153,8 +153,12 @@ jobs:
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
             simulate.py -t ${{matrix.test_num}} -n ${{matrix.num_events}} -p ${{matrix.particle}}
-            echo "[CI] EVENT DISPLAY:"
+            echo "[CI] EVENT DISPLAY SINGLES:"
             event_display d s out/sim.edm4hep.root 0 0
+            mv out/ev out/ev.singles
+            echo "[CI] EVENT DISPLAY INTEGRATED:"
+            event_display d s out/sim.edm4hep.root
+            mv out/ev out/ev.all_events
             echo "[CI] DRAW HITS:"
             draw_hits d
             echo "[CI] RECONSTRUCTION:"
