@@ -129,6 +129,7 @@ jobs:
       fail-fast: true
       matrix:
         particle: [pi+, kaon+, proton]
+        test_num: [1, 5, 7, 8]
         include:
           - { test_num: 1, num_events: 50 }
           - { test_num: 5, num_events: 20 }
@@ -160,6 +161,10 @@ jobs:
             recon.rb
             echo "[CI] BENCHMARKS:"
             benchmark.rb -b
+      - name: cull
+        run: |
+          rm -v out*/sim*.root
+          rm -v out*/rec*.root
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
@@ -359,8 +364,6 @@ jobs:
           tree geo
       - name: cull
         run: |
-          rm -v out*/sim*.root
-          rm -v out*/rec*.root
           find -name .keep | xargs rm -v
       - name: tree_artifacts_after_cull
         run: |
