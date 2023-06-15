@@ -273,9 +273,11 @@ flowchart TB
   subgraph Reconstruction
     JANA(JANA2):::dep
     IRT[irt]:::epic
-    RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
-    RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
     subgraph EICrecon
+      subgraph Algorithms
+        RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
+        RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
+      end
       EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
       EICreconFactories{{EICrecon<br/>Factories}}:::obj
       EICreconServices{{EICrecon<br/>Services}}:::obj
