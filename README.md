@@ -259,7 +259,7 @@ flowchart TB
       DDCompact{{Compact files}}:::obj
       DDMat{{Material Properties}}:::obj
     end
-    DDPlugin{{C++ Plugins}}:::obj
+    DDPlugin{{Geometry Plugins}}:::obj
   end
   SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
   DD4hep    --> Gun
@@ -273,19 +273,24 @@ flowchart TB
   subgraph Reconstruction
     JANA(JANA2):::dep
     IRT[irt]:::epic
-    RecoPlugins{{EICrecon<br/>Plugins}}:::obj
-    RecoFactories{{EICrecon<br/>Factories}}:::obj
-    EICrecon[EICrecon]:::epic
     RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
+    subgraph EICrecon
+      EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
+      EICreconFactories{{EICrecon<br/>Factories}}:::obj
+      EICreconServices{{EICrecon<br/>Services}}:::obj
+      EICreconRepo[EICrecon]:::epic
+    end
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut         ---> EICrecon
-  JANA           -->  EICrecon
-  IRT            -->  EICrecon
-  RecoPlugins    -->  EICrecon
-  RecoAlgorithms -->  RecoFactories
-  RecoFactories  -->  EICrecon
-  EICrecon       -->  RecOut
+  SimOut            ---> EICrecon
+  JANA              -->  EICreconRepo
+  IRT               -->  EICreconServices
+  IRT               -->  RecoAlgorithms
+  EICreconServices  -->  EICreconFactories
+  RecoAlgorithms    -->  EICreconFactories
+  EICreconPlugins   -->  EICrecon
+  EICreconFactories -->  EICrecon
+  EICrecon          -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
