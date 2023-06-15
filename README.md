@@ -288,9 +288,9 @@ flowchart TB
   IRT               -->  RecoAlgorithms
   EICreconServices  -->  EICreconFactories
   RecoAlgorithms    -->  EICreconFactories
-  EICreconPlugins   -->  EICrecon
-  EICreconFactories -->  EICrecon
-  EICrecon          -->  RecOut
+  EICreconFactories -->  EICreconRepo
+  EICreconPlugins   -->  EICreconRepo
+  EICreconRepo      -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
