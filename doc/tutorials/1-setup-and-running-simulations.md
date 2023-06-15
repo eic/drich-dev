@@ -1,6 +1,9 @@
 Tutorial 1: Setup and Running Simulations
 =========================================
 
+- [TUTORIAL RECORDING](https://duke.zoom.us/rec/play/Yw-MIwAVHgFw4XthFR1UMrXr5Byal0OaPAC1Q3TFoicZNJz3SUDnzCSfHp8BFv4Er-KoBVXTnUXV6GCK.eCqPDXFZFlyfCmZF?canPlayFromShare=true&from=my_recording&continueMode=true&componentName=rec-play&originRequestUrl=https%3A%2F%2Fduke.zoom.us%2Frec%2Fshare%2Fp8LyFsMFfAI1iKG5uaO_HITYEH1-mVHMGEkECwdl9_eRrReVg_FcsM_ksIbkI0o.SdMdb6ha55uUOTYJ)
+- [Return to Tutorial Landing Page](README.md)
+
 This is the first tutorial of the [dRICH Tutorial Series](README.md), which will cover setup and running of dRICH simulations.
 
 ## Prerequisite Common Training

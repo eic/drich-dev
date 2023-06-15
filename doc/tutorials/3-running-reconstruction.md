@@ -1,5 +1,9 @@
-Running Reconstruction and Benchmarks
-=====================================
+Tutorial 3: Running Reconstruction and Benchmarks
+=================================================
+
+- [TUTORIAL RECORDING]()
+- [Return to Tutorial Landing Page](README.md)
+
 - our `mermaid` diagram
   - JANA calls only what it needs
   - Show other `mermaid` diagrams, if needed

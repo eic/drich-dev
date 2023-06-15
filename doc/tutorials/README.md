@@ -28,8 +28,8 @@ These tutorials are organized in weekly sessions, first focusing on running the
 code with examples, then reading through the corresponding code and providing a
 tour of the implementation details.
 
-1. [Setup and Running Simulations](1-setup-and-running-simulations.md) (under construction)
-2. [dRICH ePIC Geometry Code](2-geometry-code.md) (under construction)
+1. [Setup and Running Simulations](1-setup-and-running-simulations.md)
+2. [dRICH Visualization, Continuous Integration, Geometry Code](2-geometry-code.md)
 3. [Running Reconstruction and Benchmarks](3-running-reconstruction.md) (under construction)
 4. [Reconstruction Code Part I](4-reconstruction-code-part-1.md) (under construction)
 5. [Reconstruction Code Part II](5-reconstruction-code-part-2.md) (under construction)

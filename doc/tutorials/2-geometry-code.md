@@ -1,5 +1,8 @@
-Tutorial 2: dRICH Visualization and Code
-========================================
+Tutorial 2: dRICH Visualization, Continuous Integration, and Geometry Code
+==========================================================================
+
+- [TUTORIAL RECORDING]()
+- [Return to Tutorial Landing Page](README.md)
 
 ## Visualization
 
