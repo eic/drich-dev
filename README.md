@@ -297,8 +297,8 @@ flowchart TB
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
-    DetectorBenchmarks[detector_benchmarks]:::epic
     ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
+    DetectorBenchmarks[detector_benchmarks]:::epic
   end
   AnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
   SimOut --> DetectorBenchmarks
