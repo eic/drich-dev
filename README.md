@@ -283,15 +283,15 @@ flowchart TB
     RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut               ---> EICrecon
+  SimOut               ----> EICrecon
   EICreconServices     -->  EICreconFactories
-  EICreconFactories    -->  RecoAlgorithmConfigs
   EICreconFactories    -->  EICrecon
   EICreconPlugins      -->  EICrecon
-  IRT                  -->  EICreconServices
+  IRT                  --->  EICreconServices
   IRT                  -->  RecoAlgorithms
-  RecoAlgorithms       -->  EICreconFactories
+  RecoAlgorithms       --->  EICreconFactories
   RecoAlgorithmConfigs -->  RecoAlgorithms
+  EICreconFactories    --->  RecoAlgorithmConfigs
   JANA                 -->  EICrecon
   EICrecon         -->  RecOut
 
