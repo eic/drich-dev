@@ -1,5 +1,5 @@
-Setup and Running Simulations
-=============================
+Tutorial 1: Setup and Running Simulations
+=========================================
 
 This is the first tutorial of the [dRICH Tutorial Series](README.md), which will cover setup and running of dRICH simulations.
 
@@ -288,64 +288,3 @@ event_display d s out/sim.edm4hep.root 0
 
 ![sim-ev-all-zoom](img/sim-ev-all-zoom.png)
 
-### Event Visualization
-
-To visualize the charged particle and photon paths, [try following the event visualization tutorial](https://indico.bnl.gov/event/18360/). Unfortunately, this procedure does not work for all graphics cards and we have been unable to test this for the dRICH.
-
-As an alternative, the non-interactive visual from Geant4 may work on a broader range of hardware. To use this, first rebuild the dRICH geometry with one sector only (to make it easier to visualize). Change the geometry constant `DRICH_debug_sector` from `0` to `1`, as [defined in `epic/compact/pid/drich.xml`](https://github.com/eic/epic/blob/d14e80b98cc51fb7acf014f6984caf8fe347aed1/compact/pid/drich.xml#L46). Open the compact file:
-```bash
-nano epic/compact/pid/drich.xml  # or your preferred text editor; you may need to do this outside of 'eic-shell'
-```
-Change the line
-```xml
-<constant name="DRICH_debug_sector"    value="0"/>
-```
-to
-```xml
-<constant name="DRICH_debug_sector"    value="1"/>
-```
-Save and quit; if using `nano`, press `^X`, then `y`, then `enter`. Now rebuild `epic`:
-```bash
-build.sh epic
-```
-You can confirm only one sector is drawn by running `geometry.sh` as before.
-
-Now run `simulate.py` in visual mode (`-v`). Let's throw only one pion at the dRICH using test 1:
-```bash
-simulate.py -t1 -n1 -v
-```
-A static image will appear, showing the thrown pion and corresponding Cherenkov photons. This is a top view of a single sector; edit `simulate.py` to change the view angle. Your shell will be in a Geant4 prompt; type `exit` and press Enter to exit.
-
-![sim-vis](img/sim-vis.png)
-
-When you are done, revert the changes in `epic/compact/pid/drich.xml` so that `DRICH_debug_sector` is set to `0`, then rebuild `epic`.
-
-### Optics Studies
-
-Some tests in `simulate.py` are used for optical studies. In particular, test 12 sends wide, collimated photon beams from the IP at varying angles aimed at the mirror. The focus of each beam is the parallel-to-point focal region, and tends to be consistent with where the best Cherenkov ring resolution is found. As suggested by the `simulate.py` usage guide, set `DRICH_debug_optics` to `1`. In `epic/compact/pid/drich.xml`, change the line
-```xml
-<constant name="DRICH_debug_optics"    value="0"/>
-```
-to
-```xml
-<constant name="DRICH_debug_optics"    value="1"/>
-```
-and rebuild `epic`:
-```bash
-build.sh epic
-```
-Now run test 12:
-```bash
-simulate.py -t12
-```
-Use the `-n` option to change the number of photons per beam, and the `-k` option to change the number of beams. For example,
-```bash
-simulate.py -t12 -k3 -n30
-```
-
-![sim-optics](img/sim-optics.png)
-
-As before, type `exit` and press Enter to exit the Geant4 prompt.
-When you are done, revert the changes in `epic/compact/pid/drich.xml` so that `DRICH_debug_optics` is set to `0`, then rebuild `epic`.
-
-_Exercise_: edit `epic/compact/pid/drich.xml` to try to move around some components of the dRICH. Rebuild `epic` and check the geometry to see what moved. Then re-check the distribution of hits in the event display as well as the parallel-to-point focal region. Can you improve the ring resolution?
