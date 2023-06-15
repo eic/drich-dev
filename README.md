@@ -231,17 +231,19 @@ flowchart TB
     ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
     DetectorBenchmarks[detector_benchmarks]:::epic
   end
+
+  EventGeneration --> epic --> EICrecon
+  epic     --> DetectorBenchmarks
+  EICrecon --> PhysicsBenchmarks
+  EICrecon --> ReconstructionBenchmarks
+  irt      --> EICrecon
   EDM4hep  --> EDM4eic
   EDM4eic  --> EICrecon
   EDM4eic  --> ReconstructionBenchmarks
   EDM4eic  --> PhysicsBenchmarks
-  Geant    --> DD4hep --> epic --> EICrecon
+  Geant    --> DD4hep --> epic
   EDM4hep  --> DD4hep
-  irt      --> EICrecon
   JANA     --> EICrecon
-  epic     --> DetectorBenchmarks
-  EICrecon --> PhysicsBenchmarks
-  EICrecon --> ReconstructionBenchmarks
 ```
 
 ```mermaid
