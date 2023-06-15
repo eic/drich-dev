@@ -198,8 +198,8 @@ wraps functionality in dRICH-specific code stored here in `drich-dev`.
 flowchart TB
   classDef epic fill:#ff8888,color:black
 
+  EventGeneration[Event<br/>Generation]:::epic
   subgraph Simulation
-    EventGeneration[Event<br/>Generation]:::epic
     epic[<strong>epic</strong><br/>Geometry<br/>Simulation]:::epic
   end
   subgraph Reconstruction
