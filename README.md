@@ -198,21 +198,27 @@ wraps functionality in dRICH-specific code stored here in `drich-dev`.
 flowchart TB
   classDef epic fill:#ff8888,color:black
 
-  EventGeneration[Event<br/>Generation]:::epic
   EDM4eic[EDM4eic<br/>Data Model]:::epic
-  epic[epic<br/>Geometry<br/>Simulation]:::epic
-  irt[irt<br/>PID Algorithm]:::epic
-  EICrecon[EICrecon<br/>Reconstruction]:::epic
-  PhysicsBenchmarks[physics_benchmarks]:::epic
-  ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
-  DetectorBenchmarks[detector_benchmarks]:::epic
+  subgraph Simulation
+    EventGeneration[Event<br/>Generation]:::epic
+    epic[epic<br/>Geometry<br/>Simulation]:::epic
+  end
+  subgraph Reconstruction
+    irt[irt<br/>PID Algorithm]:::epic
+    EICrecon[EICrecon<br/>Reconstruction]:::epic
+  end
+  subgraph Benchmarks
+    PhysicsBenchmarks[physics_benchmarks]:::epic
+    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
+    DetectorBenchmarks[detector_benchmarks]:::epic
+  end
 
   EventGeneration --> epic --> EICrecon
-  EDM4eic         --> EICrecon
   irt             --> EICrecon
   epic            --> DetectorBenchmarks
   EICrecon        --> PhysicsBenchmarks
   EICrecon        --> ReconstructionBenchmarks
+  EDM4eic         --> EICrecon
   EDM4eic         --> PhysicsBenchmarks
   EDM4eic         --> ReconstructionBenchmarks
 ```
