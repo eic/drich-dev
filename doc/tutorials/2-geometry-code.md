@@ -102,11 +102,40 @@ Since we are talking about visualization, let's look at the `DAWN` views.
 ![sim-dawn-view1-top](img/sim-dawn-view1_top.png)
 
 
-----------------------------------------------------------
+---
 
-# TODO
+## Geometry Code
 
-- common compact files (materials, definitions, etc.)
-- dRICH compact file
-- dRICH plugin
-- describe that these are installed in `prefix/` (`$DETECTOR_PATH/`)
+Now let's explore the geometry code. The recording of this tutorial goes through the code interactively; here we just provide links to the code that was shown. These links are permalinks, from the time this tutorial was given, so be sure to also take a look at the most recent versions.
+
+### Common Files
+- `compact/`: these are "compact `xml` files"
+  - `definitions.xml`: common constants shared by all of ePIC, such positioning and length of the trackers, calorimeters, and PID subsystems; if you want to change the dRICH envelope and positioning, this is where to start
+  - `display.xml` and `colors.xml`: visualization settings
+  - Material and Surface properties:
+    - `materials.xml`: material definitions
+    - `optical_materials.xml`: optical material and surface property tables
+      - anything used by the dRICH includes the string `DRICH` in the name (except for common materials such as `Aluminum`)
+      - see [material property documentation](../material_tables.md) for notes on how these tables were generated for the dRICH
+- Configurations
+  - Various combinations of detector subsystems are defined by configuration files in `configurations/`
+    - `full.yml`: the full ePIC configuration
+    - `arches.yml` and `brycecanyon.yml`: configurations for Arches and Brycecanyon design options
+    - `drich_only.yml`: standalone dRICH (includes magnetic field)
+  - Each of these are rendered as compact files during `cmake` (during `build.sh epic` from `drich-dev`)
+    - you can find them in `$DETECTOR_PATH/`; these are the compact files that are used by simulation
+    - rendering is done by templates in the `templates/` directory together with these configuration files
+
+### Subsystem Specific Files
+- Geometry compact files: `compact/`
+  - each subsystem has at least one geometry compact file; the PID subsystems are found in `compact/pid/`
+  - dRICH: `compact/pid/drich.xml`, contains all of our geometry constants and more
+- C++ Plugin files: `src/`
+  - each subsystem also includes at least one C++ plugin file
+    - the compact file can be though of as the "numbers" for the geometry, tunable externally (with `xml` parsers) without the need to recompile
+    - the plugin file is the actual geometry implementation: it uses the compact files and generates the DD4hep geometry
+  - `src/DRICH_geo.cpp` is the plugin for the dRICH
+    - creates all aspects of the geometry
+    - includes algorithms, such as:
+      - spherical tiling of sensors on a sphere
+      - mirror focusing
