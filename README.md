@@ -274,6 +274,7 @@ flowchart TB
     JANA(JANA2):::dep
     IRT[irt]:::epic
     RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
+    RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
     subgraph EICrecon
       EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
       EICreconFactories{{EICrecon<br/>Factories}}:::obj
@@ -282,15 +283,17 @@ flowchart TB
     end
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut            ---> EICrecon
-  JANA              -->  EICreconRepo
-  IRT               -->  EICreconServices
-  IRT               -->  RecoAlgorithms
-  EICreconServices  -->  EICreconFactories
-  RecoAlgorithms    -->  EICreconFactories
-  EICreconFactories -->  EICreconRepo
-  EICreconPlugins   -->  EICreconRepo
-  EICreconRepo      -->  RecOut
+  SimOut               ---> EICrecon
+  JANA                 -->  EICreconRepo
+  IRT                  -->  EICreconServices
+  IRT                  -->  RecoAlgorithms
+  RecoAlgorithmConfigs -->  RecoAlgorithms
+  EICreconServices     -->  EICreconFactories
+  RecoAlgorithms       -->  EICreconFactories
+  EICreconFactories    -->  RecoAlgorithmConfigs
+  EICreconFactories    -->  EICreconRepo
+  EICreconPlugins      -->  EICreconRepo
+  EICreconRepo         -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
