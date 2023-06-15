@@ -284,15 +284,15 @@ flowchart TB
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
   SimOut               ---> EICrecon
-  IRT                  -->  EICreconServices
-  IRT                  -->  RecoAlgorithms
-  RecoAlgorithmConfigs -->  RecoAlgorithms
+  JANA                 -->  EICrecon
   EICreconServices     -->  EICreconFactories
-  RecoAlgorithms       -->  EICreconFactories
   EICreconFactories    -->  RecoAlgorithmConfigs
   EICreconFactories    -->  EICrecon
   EICreconPlugins      -->  EICrecon
-  JANA                 -->  EICrecon
+  IRT                  -->  EICreconServices
+  IRT                  -->  RecoAlgorithms
+  RecoAlgorithmConfigs -->  RecoAlgorithms
+  RecoAlgorithms       -->  EICreconFactories
   EICrecon         -->  RecOut
 
   subgraph Benchmarks
