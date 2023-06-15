@@ -273,12 +273,10 @@ flowchart TB
   subgraph Reconstruction
     JANA(JANA2):::dep
     IRT[irt]:::epic
-    subgraph EICrecon
-      RecoPlugins{{Plugins}}:::obj
-      RecoFactories{{Factories}}:::obj
-      EICrecon[EICrecon]:::epic
-    end
-    RecoAlgorithms{{Algorithms}}:::obj
+    RecoPlugins{{EICrecon<br/>Plugins}}:::obj
+    RecoFactories{{EICrecon<br/>Factories}}:::obj
+    EICrecon[EICrecon]:::epic
+    RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
   SimOut         ---> EICrecon
