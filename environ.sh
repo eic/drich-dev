@@ -27,17 +27,29 @@ source /opt/detector/setup.sh
 # - prioritizes `$EIC_SHELL_PREFIX/lib` in `$LD_LIBRARY_PATH`
 [ -f $EIC_SHELL_PREFIX/setup.sh ] && source $EIC_SHELL_PREFIX/setup.sh
 
-# source EICrecon installation
+# source EICrecon installation + environment patches
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
-  ### PATCH: exclude container's EICrecon plugins from $JANA_PLUGIN_PATH
-  exc="/usr/local/lib/EICrecon/plugins"
-  export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
-  ### SOURCE EICrecon
-  source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-  ### PATCH: `source thisroot.sh` removes `/usr/local/bin`
-  export PATH="$PATH:/usr/local/bin"
+  if [ -z "$CI" ]; then
+    echo "PATCH: exclude container's EICrecon plugins from JANA_PLUGIN_PATH"
+    exc="/usr/local/lib/EICrecon/plugins"
+    export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
+    echo "ENVIRONMENT: source EICrecon"
+    source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
+    echo "PATCH: source thisroot.sh removes /usr/local/bin from PATH; add it back"
+    export PATH="$PATH:/usr/local/bin"
+  else
+    echo "On CI runner; only setting JANA_PLUGIN_PATH"
+    export JANA_PLUGIN_PATH=$EIC_SHELL_PREFIX/lib/EICrecon/plugins${JANA_PLUGIN_PATH:+:${JANA_PLUGIN_PATH}}
+  fi
 fi
 
+# check if we have ROOT I/O enabled for IRT
+export IRT_ROOT_DICT_FOUND=0
+if [ -f $EIC_SHELL_PREFIX/lib/libIRT_rdict.pcm -a -f $EIC_SHELL_PREFIX/lib/libIRT.rootmap ]; then
+  export IRT_ROOT_DICT_FOUND=1
+elif [ -f /usr/local/lib/libIRT_rdict.pcm -a -f /usr/local/lib/libIRT.rootmap ]; then
+  export IRT_ROOT_DICT_FOUND=1
+fi
 
 # environment overrides:
 # - prefer local juggler build
@@ -86,35 +98,20 @@ echo """
      ###    dRICH Development Environment    ###
      ###########################################
 
-Beam:
-  BEAMLINE_PATH           = $BEAMLINE_PATH
-  BEAMLINE_CONFIG         = $BEAMLINE_CONFIG
-  BEAMLINE_CONFIG_VERSION = $BEAMLINE_CONFIG_VERSION
-
 Detector:
   DETECTOR         = $DETECTOR
   DETECTOR_PATH    = $DETECTOR_PATH
   DETECTOR_CONFIG  = $DETECTOR_CONFIG
   DETECTOR_VERSION = $DETECTOR_VERSION
 
-Juggler (to be deprecated):
-  JUGGLER_INSTALL_PREFIX   = $JUGGLER_INSTALL_PREFIX
-  JUGGLER_DETECTOR         = $JUGGLER_DETECTOR
-  JUGGLER_DETECTOR_PATH    = $JUGGLER_DETECTOR_PATH
-  JUGGLER_DETECTOR_CONFIG  = $JUGGLER_DETECTOR_CONFIG
-  JUGGLER_DETECTOR_VERSION = $JUGGLER_DETECTOR_VERSION
-  JUGGLER_DETECTOR_PATH    = $JUGGLER_DETECTOR_PATH
-  JUGGLER_BEAMLINE_CONFIG  = $JUGGLER_BEAMLINE_CONFIG
-  JUGGLER_BEAMLINE_CONFIG_VERSION = $JUGGLER_BEAMLINE_CONFIG_VERSION
-
 LD_LIBRARY_PATH:
   $(echo $LD_LIBRARY_PATH | sed 's/:/\n  /g')
 
 Common:
-  DRICH_DEV        = $DRICH_DEV
-  BUILD_NPROC      = $BUILD_NPROC
-  EIC_SHELL_PREFIX = $EIC_SHELL_PREFIX
-  JANA_PLUGIN_PATH = $JANA_PLUGIN_PATH
-  DETECTOR_PATH    = $DETECTOR_PATH
+  DRICH_DEV           = $DRICH_DEV
+  BUILD_NPROC         = $BUILD_NPROC
+  EIC_SHELL_PREFIX    = $EIC_SHELL_PREFIX
+  JANA_PLUGIN_PATH    = $JANA_PLUGIN_PATH
+  IRT_ROOT_DICT_FOUND = $IRT_ROOT_DICT_FOUND
 
 """

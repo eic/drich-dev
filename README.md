@@ -11,12 +11,13 @@ Resources and Tools for EPIC dRICH development
 | [Benchmarks](#benchmarks)           | Running the analysis benchmarks and performance plots |
 | [Miscellaneous](#miscellaneous)     | Additional code for support                           |
 
-| **Documentation Links**                       |                                               |
-| --:                                           | ---                                           |
+| **Documentation Links**                                 |                                               |
+| --:                                                     | ---                                           |
 | [Tutorial Series](doc/tutorials/README.md)    | Series of dRICH-specific Tutorials            |
-| [Links](doc/links.md)                         | Collection of dRICH Software and Resources    |
-| [Branches and Pull Requests](doc/branches.md) | Active development branches and pull requests |
-| [Project Board](https://github.com/orgs/eic/projects/4) | Issues tracking                     |
+| [Links](doc/links.md)                                   | Collection of dRICH Software and Resources    |
+| [Branches and Pull Requests](doc/branches.md)           | Active development branches and pull requests |
+| [Project Board](https://github.com/orgs/eic/projects/4) | Issues and Pull Request Tracking              |
+| [Material Properties](doc/material_tables.md)           | Generation of Material Property Tables        |
 
 ## Notes
 EPIC Software is modular: see [the flowchart below](#flowchart) for
@@ -188,7 +189,7 @@ of branches for varying configurations.
 
 <a name="flowchart"></a>
 # ePIC Software Stack
-This is a flowchart showing the ePIC Software Stack, depenencies, and data flow, with some focus
+This is a flowchart showing the ePIC Software Stack, dependencies, and data flow, with some focus
 on parts specific for the dRICH. This `drich-dev` repository uses all of these, and in many cases,
 wraps functionality in dRICH-specific code stored here in `drich-dev`.
 
@@ -491,6 +492,21 @@ happens to performance plots.
 - run `benchmark.rb` (a symlink to the main benchmark runner script) with no arguments
   to see the usage guide
 
+## `drich-dev` Continuous Integration (CI)
+
+`drich-dev` includes a CI workflow, for rapid testing of changes to the ePIC dRICH
+- The CI workflow is triggered on every commit to a branch with an associated pull request
+- The workflow includes:
+  - Build tests: all modules are built in order of dependence
+  - Pipeline: simulation, reconstruction, benchmarks, plus some other local executables
+    from `drich-dev`
+  - Geometry generation: generate `TGeo` files and tables of constants
+  - See [workflow file](.github/workflows/ci.yml) for more details
+- Edit [`scripts/configure_CI.sh`](scripts/configure_CI.sh) to select which branch each
+  module should be on
+  - this is useful if you have made changes to more than one repository
+  - this _complements_ the CI workflows on each module, allowing dRICH developers to test the full
+    simulation-reconstruction-benchmarks pipeline on any custom combination of `git` branches
 
 ---
 

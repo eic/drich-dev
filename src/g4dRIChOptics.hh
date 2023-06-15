@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <functional>
+#include <vector>
+#include <algorithm>
 #include "Geant4/G4Material.hh"
 #include "Geant4/G4SystemOfUnits.hh"
 #include "Geant4/G4MaterialPropertiesTable.hh"
@@ -143,15 +145,23 @@ public:
   int getMaterialPropertyTableSize() { return int(getMaterialPropertyNames().size()); }
 
   // execute lambda function `block(energy,value)` for each entry (energy,value) in the material property table
-  void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block) {
+  void loopMaterialPropertyTable(G4String propName, std::function<void(G4double,G4double)> block, bool reverseOrder=false) {
     auto tab = getMaterialPropertyTable();
     if(tab==nullptr) return;
     auto prop = tab->GetProperty(propName);
     if(prop==nullptr) return;
-    for(std::size_t i=0; i<prop->GetVectorLength(); ++i) {
-      auto energy = prop->Energy(i);
-      auto value  = prop->operator[](i);
-      block(energy,value);
+    if(reverseOrder) {
+      for(int i=prop->GetVectorLength()-1; i>=0; i--) {
+        auto energy = prop->Energy(i);
+        auto value  = prop->operator[](i);
+        block(energy,value);
+      }
+    } else {
+      for(int i=0; i<prop->GetVectorLength(); i++) {
+        auto energy = prop->Energy(i);
+        auto value  = prop->operator[](i);
+        block(energy,value);
+      }
     }
   }
 
@@ -503,14 +513,6 @@ public:
   
   int setOpticalParams() {
 
-    // very approximate values
-    const double gasE[] =
-      { 2*eV, 2.5*eV, 3*eV, 3.5*eV, 4*eV, 4.5*eV, 5*eV, 5.5*eV, 6*eV, 6.5*eV, 7*eV };
-    const double gasN[] = // (n-1)*10^6
-      { 823., 829., 835., 843., 852., 863., 875., 889., 905., 923., 943. };
-    const double gasA[] =
-      { 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm, 100*cm };
-
     // different gas types parameters
     G4String gasType[] = { "C2F6", "CF4", "C4F10" };
 
@@ -548,9 +550,9 @@ public:
     double refn = Ksr[igas] * density + 1.;
     double wlref = 633*nm; // for density vs refractive index
     
-    int nEntries = 10;
+    int nEntries = 16;
     double wl0 = 200.*nm;
-    double wl1 = 700.*nm;
+    double wl1 = 1000.*nm;
     double dwl = (wl1-wl0)/(nEntries-1.);
     
     if (scaledE==NULL) {
@@ -680,24 +682,51 @@ public:
     G4String surfaceName = pSurfName + "phseSurf";
     G4String skinSurfaceName = pSurfName + "phseSkinSurf";
     
-    double E[] = {1.*eV, 4.*eV, 7.*eV };
-    double SE[] = {1.0, 1.0, 1.0 };
-    double N[] = {1.92, 1.92, 1.92 };
-    double IN[] = {1.69, 1.69, 1.69 }; 
+    // quantum effiency, from SiPM model S13361-3050NE-08
+    std::vector<std::pair<double,double>> QE = { // wavelength [nm], quantum efficiency
+      {315*nm, 0.00},
+      {325*nm, 0.04},
+      {340*nm, 0.10},
+      {350*nm, 0.20},
+      {370*nm, 0.30},
+      {400*nm, 0.35},
+      {450*nm, 0.40},
+      {500*nm, 0.38},
+      {550*nm, 0.35},
+      {600*nm, 0.27},
+      {650*nm, 0.20},
+      {700*nm, 0.15},
+      {750*nm, 0.12},
+      {800*nm, 0.08},
+      {850*nm, 0.06},
+      {900*nm, 0.04},
+      {1000*nm, 0.00}
+    };
+    std::reverse(QE.begin(), QE.end()); // order in increasing energy
+    const int N_POINTS = QE.size();
+    double E[N_POINTS], SE[N_POINTS], N[N_POINTS], IN[N_POINTS];
+    int i_QE = 0;
+    for(auto [w,q] : QE) {
+      E[i_QE]  = wl2e(w);
+      SE[i_QE] = q;
+      N[i_QE]  = 1.92;
+      IN[i_QE] = 1.69;
+      i_QE++;
+    }
 
-    scaledE  = new double[3];
-    scaledSE = new double[3];
-    scaledN  = new double[3];
-    scaledIN = new double[3];
+    scaledE  = new double[N_POINTS];
+    scaledSE = new double[N_POINTS];
+    scaledN  = new double[N_POINTS];
+    scaledIN = new double[N_POINTS];
 
-    for (int i=0;i<3;i++) {
+    for (int i=0;i<N_POINTS;i++) {
       scaledE[i] = E[i];
       scaledSE[i] = SE[i];
       scaledN[i] = N[i];
       scaledIN[i] = IN[i];
     }
     
-    G4MaterialPropertiesTable * pT = addSkinPropTable(3);
+    G4MaterialPropertiesTable * pT = addSkinPropTable(N_POINTS);
     
     pOps = new G4OpticalSurface(surfaceName, glisur, polished, dielectric_dielectric);
     pOps->SetMaterialPropertiesTable(pT);
