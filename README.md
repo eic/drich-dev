@@ -192,6 +192,30 @@ This is a flowchart showing the ePIC Software Stack, dependencies, and data flow
 on parts specific for the dRICH. This `drich-dev` repository uses all of these, and in many cases,
 wraps functionality in dRICH-specific code stored here in `drich-dev`.
 
+## Abridged Flowchart
+
+```mermaid
+flowchart TB
+  classDef epic fill:#ff8888,color:black
+
+  EventGeneration[Event<br/>Generation]:::epic
+  EDM4eic[EDM4eic]:::epic
+  epic[epic]:::epic
+  irt[irt]:::epic
+  EICrecon[EICrecon]:::epic
+  PhysicsBenchmarks[physics_benchmarks]:::epic
+  ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
+  DetectorBenchmarks[detector_benchmarks]:::epic
+
+  EventGeneration --> epic --> EICrecon
+  epic     --> DetectorBenchmarks
+  EICrecon --> PhysicsBenchmarks
+  EICrecon --> ReconstructionBenchmarks
+  irt      --> EICrecon
+```
+
+## Full Flowchart
+
 ```mermaid
 flowchart LR
   classDef epic fill:#ff8888,color:black
@@ -211,40 +235,6 @@ flowchart LR
   end
 ```
 
-```mermaid
-flowchart TB
-  classDef epic fill:#ff8888,color:black
-  classDef dep fill:#00aaaa,color:black
-
-  subgraph Abridged Flowchart
-    EventGeneration(Event<br/>Generation):::dep
-    EDM4hep(EDM4hep):::dep
-    DD4hep(DD4hep):::dep
-    Geant(Geant4):::dep
-    JANA(JANA2):::dep
-
-    EDM4eic[EDM4eic]:::epic
-    epic[epic]:::epic
-    irt[irt]:::epic
-    EICrecon[EICrecon]:::epic
-    PhysicsBenchmarks[physics_benchmarks]:::epic
-    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
-    DetectorBenchmarks[detector_benchmarks]:::epic
-  end
-
-  EventGeneration --> epic --> EICrecon
-  epic     --> DetectorBenchmarks
-  EICrecon --> PhysicsBenchmarks
-  EICrecon --> ReconstructionBenchmarks
-  irt      --> EICrecon
-  EDM4hep  --> EDM4eic
-  EDM4eic  --> EICrecon
-  EDM4eic  --> ReconstructionBenchmarks
-  EDM4eic  --> PhysicsBenchmarks
-  Geant    --> DD4hep --> epic
-  EDM4hep  --> DD4hep
-  JANA     --> EICrecon
-```
 
 ```mermaid
 flowchart TB
