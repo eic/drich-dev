@@ -1,8 +1,10 @@
 Tutorial 6: Geometry Parameter Scanning
 =======================================
 
-- [TUTORIAL RECORDING]()
+- TUTORIAL RECORDING
 - [Return to Tutorial Landing Page](README.md)
+
+## UNDER CONSTRUCTION
 
 - brute force optimizer approach
 - ruby and gems installation

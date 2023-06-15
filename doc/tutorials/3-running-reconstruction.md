@@ -1,8 +1,10 @@
 Tutorial 3: Running Reconstruction and Benchmarks
 =================================================
 
-- [TUTORIAL RECORDING]()
+- TUTORIAL RECORDING
 - [Return to Tutorial Landing Page](README.md)
+
+## UNDER CONSTRUCTION
 
 - our `mermaid` diagram
   - JANA calls only what it needs
