@@ -213,10 +213,10 @@ flowchart TB
   end
   EDM4eic[<strong>EDM4eic</strong><br/>Data Model]:::epic
 
-  EventGeneration --> epic --> EICrecon --> PhysicsBenchmarks
+  EventGeneration --> epic ---> EICrecon --> PhysicsBenchmarks
   irt             --> EICrecon
   EICrecon        --> ReconstructionBenchmarks
-  epic            --> DetectorBenchmarks
+  epic            ---> DetectorBenchmarks
   EDM4eic         --> Reconstruction
   EDM4eic         --> Benchmarks
 ```
