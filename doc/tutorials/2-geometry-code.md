@@ -69,7 +69,7 @@ When you are done, revert the changes in `epic/compact/pid/drich.xml` so that `D
 _Exercise_: edit `epic/compact/pid/drich.xml` to try to move around some components of the dRICH. Rebuild `epic` and check the geometry to see what moved. Then re-check the distribution of hits in the event display as well as the parallel-to-point focal region. Can you improve the ring resolution?
 
 
-### Geometry: DAWN Views
+### Necessary Digression: Continuous Integration
 
 All ePIC software repositories include Continuous Integration (CI) workflows. These workflows are triggered automatically for every `git commit` on a branch associated with a Pull Request (PR). For example, [see this PR](https://github.com/eic/epic/pull/445).
 - The 'Checks' tab shows the latest CI workflow run on this PR's branch; the main 'Actions' tab at the top of the page lists all of the CI workflows that are running and have run, for all PRs
@@ -93,6 +93,8 @@ All ePIC software repositories include Continuous Integration (CI) workflows. Th
     - artifacts typically have a retention period (some number of days), after which they expire and are no longer accessible (but they can be reproduced on demand)
 
 _Exercise_: `drich-dev` also has a CI workflow which runs simulation, reconstruction, and benchmarks, as a complement to the CI workflows in ePIC software repositories. Check it out, try opening a test PR in `drich-dev` to run it and check the resulting artifacts.
+
+### DAWN Views from CI
 
 Since we are talking about visualization, let's look at the `DAWN` views.
 - Choose `epic_arches_views` or `epic_brycecanyon_views` and download the `zip` file
