@@ -287,7 +287,7 @@ flowchart TB
   EICreconServices     -->  EICreconFactories
   EICreconFactories    -->  EICrecon
   EICreconPlugins      -->  EICrecon
-  IRT                  --->  EICreconServices
+  IRT                  -->  EICreconServices
   IRT                  -->  RecoAlgorithms
   RecoAlgorithms       --->  EICreconFactories
   RecoAlgorithmConfigs -->  RecoAlgorithms
