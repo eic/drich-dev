@@ -255,9 +255,11 @@ flowchart TB
 
   subgraph Geometry
     Epic[epic]:::epic
-    DDCompact{{Compact file<br/>drich.xml}}:::obj
-    DDPlugin{{C++ Plugin<br/>DRICH_geo.cpp}}:::obj
-    DDMat{{Material Properties<br/>optical_materials.xml}}:::obj
+    subgraph Compact Files
+      DDCompact{{Compact files}}:::obj
+      DDMat{{Material Properties}}:::obj
+    end
+    DDPlugin{{C++ Plugins}}:::obj
   end
   SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
   DD4hep --> Gun
@@ -285,8 +287,8 @@ flowchart TB
     ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
   end
   AnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
+  SimOut --> DetectorBenchmarks
   RecOut --> PhysicsBenchmarks
-  RecOut --> DetectorBenchmarks
   RecOut --> ReconstructionBenchmarks --> AnaOut
 
 ```
