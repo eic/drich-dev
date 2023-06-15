@@ -199,19 +199,22 @@ flowchart TB
   classDef epic fill:#ff8888,color:black
 
   EventGeneration[Event<br/>Generation]:::epic
-  EDM4eic[EDM4eic]:::epic
-  epic[epic]:::epic
-  irt[irt]:::epic
-  EICrecon[EICrecon]:::epic
+  EDM4eic[EDM4eic<br/>Data Model]:::epic
+  epic[epic<br/>Geometry<br/>Simulation]:::epic
+  irt[irt<br/>PID Algorithm]:::epic
+  EICrecon[EICrecon<br/>Reconstruction]:::epic
   PhysicsBenchmarks[physics_benchmarks]:::epic
   ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
   DetectorBenchmarks[detector_benchmarks]:::epic
 
   EventGeneration --> epic --> EICrecon
-  epic     --> DetectorBenchmarks
-  EICrecon --> PhysicsBenchmarks
-  EICrecon --> ReconstructionBenchmarks
-  irt      --> EICrecon
+  EDM4eic         --> EICrecon
+  irt             --> EICrecon
+  epic            --> DetectorBenchmarks
+  EICrecon        --> PhysicsBenchmarks
+  EICrecon        --> ReconstructionBenchmarks
+  EDM4eic         --> PhysicsBenchmarks
+  EDM4eic         --> ReconstructionBenchmarks
 ```
 
 ## Full Flowchart
