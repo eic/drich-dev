@@ -218,9 +218,8 @@ flowchart TB
   epic            --> DetectorBenchmarks
   EICrecon        --> PhysicsBenchmarks
   EICrecon        --> ReconstructionBenchmarks
-  EDM4eic         --> EICrecon
-  EDM4eic         --> PhysicsBenchmarks
-  EDM4eic         --> ReconstructionBenchmarks
+  EDM4eic         --> Reconstruction
+  EDM4eic         --> Benchmarks
 ```
 
 ## Full Flowchart
