@@ -193,6 +193,37 @@ This is a flowchart showing the ePIC Software Stack, dependencies, and data flow
 on parts specific for the dRICH. This `drich-dev` repository uses all of these, and in many cases,
 wraps functionality in dRICH-specific code stored here in `drich-dev`.
 
+## Abridged Flowchart
+
+```mermaid
+flowchart TB
+  classDef epic fill:#ff8888,color:black
+
+  EventGeneration[Event<br/>Generation]:::epic
+  subgraph Simulation
+    epic[<strong>epic</strong><br/>Geometry]:::epic
+  end
+  subgraph Reconstruction
+    irt[<strong>irt</strong><br/>PID Algorithm]:::epic
+    EICrecon[<strong>EICrecon</strong><br/>Reconstruction]:::epic
+  end
+  subgraph Benchmarks
+    PhysicsBenchmarks[<strong>physics_benchmarks</strong>]:::epic
+    ReconstructionBenchmarks[<strong>reconstruction_benchmarks</strong>]:::epic
+    DetectorBenchmarks[<strong>detector_benchmarks</strong>]:::epic
+  end
+  EDM4eic[<strong>EDM4eic</strong><br/>Data Model]:::epic
+
+  EventGeneration -->  epic ---> EICrecon --> PhysicsBenchmarks
+  irt             -->  EICrecon
+  EICrecon        -->  ReconstructionBenchmarks
+  epic            ---> DetectorBenchmarks
+  EDM4eic         -->  Reconstruction
+  EDM4eic         -->  Benchmarks
+```
+
+## Full Flowchart
+
 ```mermaid
 flowchart LR
   classDef epic fill:#ff8888,color:black
@@ -211,6 +242,7 @@ flowchart LR
     obj --> epic
   end
 ```
+
 
 ```mermaid
 flowchart TB
@@ -242,11 +274,11 @@ flowchart TB
     Gun(Particle Guns<br/>ddsim OR npsim):::dep
     GenOR{OR}:::op
   end
-  Pythia6 --> Hepmc
-  Pythia8 --> Hepmc
+  Pythia6  --> Hepmc
+  Pythia8  --> Hepmc
   OtherGen --> Hepmc
-  Hepmc --> GenOR
-  Gun --> GenOR
+  Hepmc    --> GenOR
+  Gun      --> GenOR
 
   subgraph Simulation
     DD4hep(DD4hep):::dep
@@ -256,38 +288,54 @@ flowchart TB
 
   subgraph Geometry
     Epic[epic]:::epic
-    DDCompact{{Compact file<br/>drich.xml}}:::obj
-    DDPlugin{{C++ Plugin<br/>DRICH_geo.cpp}}:::obj
-    DDMat{{Material Properties<br/>optical_materials.xml}}:::obj
+    subgraph Compact Files
+      DDCompact{{Compact files}}:::obj
+      DDMat{{Material Properties}}:::obj
+    end
+    DDPlugin{{Geometry Plugins}}:::obj
   end
   SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
-  DD4hep --> Gun
-  GenOR --> Epic
-  DD4hep --> Epic
+  DD4hep    --> Gun
+  GenOR     --> Epic
+  DD4hep    --> Epic
   DDCompact --> Epic
-  DDPlugin --> Epic
-  DDMat --> Epic
-  Epic --> SimOut
+  DDMat     --> Epic
+  DDPlugin  --> Epic
+  Epic      --> SimOut
 
-  subgraph Reconstruction
+  subgraph Reconstruction Framework
     JANA(JANA2):::dep
+    EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
+    EICreconFactories{{EICrecon<br/>Factories}}:::obj
+    EICreconServices{{EICrecon<br/>Services}}:::obj
     EICrecon[EICrecon]:::epic
+  end
+  subgraph Reconstruction Algorithms
     IRT[irt]:::epic
+    RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
+    RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut ---> EICrecon
-  JANA --> EICrecon
-  IRT --> EICrecon
-  EICrecon --> RecOut
+  IRT                  -->  RecoAlgorithms
+  EICreconServices     -->  EICreconFactories
+  EICreconFactories    -->  EICrecon
+  IRT                  -->  EICreconServices
+  RecoAlgorithmConfigs -->  RecoAlgorithms
+  RecoAlgorithms       -->  EICreconFactories
+  EICreconFactories    -->  RecoAlgorithmConfigs
+  EICreconPlugins      -->  EICrecon
+  JANA                 -->  EICrecon
+  SimOut               --> EICrecon
+  EICrecon         -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
-    DetectorBenchmarks[detector_benchmarks]:::epic
     ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
+    DetectorBenchmarks[detector_benchmarks]:::epic
   end
   AnaOut[(Reconstruction Analysis<br/>ROOT files)]:::data
+  SimOut --> DetectorBenchmarks
   RecOut --> PhysicsBenchmarks
-  RecOut --> DetectorBenchmarks
   RecOut --> ReconstructionBenchmarks --> AnaOut
 
 ```
