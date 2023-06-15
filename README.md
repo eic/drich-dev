@@ -216,6 +216,39 @@ flowchart TB
   classDef epic fill:#ff8888,color:black
   classDef dep fill:#00aaaa,color:black
 
+  subgraph Abridged Flowchart
+    EventGeneration(Event<br/>Generation):::dep
+    EDM4hep(EDM4hep):::dep
+    DD4hep(DD4hep):::dep
+    Geant(Geant4):::dep
+    JANA(JANA2):::dep
+
+    EDM4eic[EDM4eic]:::epic
+    epic[epic]:::epic
+    irt[irt]:::epic
+    EICrecon[EICrecon]:::epic
+    PhysicsBenchmarks[physics_benchmarks]:::epic
+    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
+    DetectorBenchmarks[detector_benchmarks]:::epic
+  end
+  EDM4hep  --> EDM4eic
+  EDM4eic  --> EICrecon
+  EDM4eic  --> ReconstructionBenchmarks
+  EDM4eic  --> PhysicsBenchmarks
+  Geant    --> DD4hep --> epic --> EICrecon
+  EDM4hep  --> DD4hep
+  irt      --> EICrecon
+  JANA     --> EICrecon
+  epic     --> DetectorBenchmarks
+  EICrecon --> PhysicsBenchmarks
+  EICrecon --> ReconstructionBenchmarks
+```
+
+```mermaid
+flowchart TB
+  classDef epic fill:#ff8888,color:black
+  classDef dep fill:#00aaaa,color:black
+
   subgraph Data Model
     EDM4hep(EDM4hep):::dep
     EDM4eic[EDM4eic]:::epic
