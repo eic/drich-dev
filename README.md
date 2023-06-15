@@ -201,16 +201,16 @@ flowchart TB
   EDM4eic[EDM4eic<br/>Data Model]:::epic
   subgraph Simulation
     EventGeneration[Event<br/>Generation]:::epic
-    epic[epic<br/>Geometry<br/>Simulation]:::epic
+    epic[<strong>epic<strong/><br/>Geometry<br/>Simulation]:::epic
   end
   subgraph Reconstruction
-    irt[irt<br/>PID Algorithm]:::epic
-    EICrecon[EICrecon<br/>Reconstruction]:::epic
+    irt[<strong>irt<strong/><br/>PID Algorithm]:::epic
+    EICrecon[<strong>EICrecon<strong/><br/>Reconstruction]:::epic
   end
   subgraph Benchmarks
-    PhysicsBenchmarks[physics_benchmarks]:::epic
-    ReconstructionBenchmarks[reconstruction_benchmarks]:::epic
-    DetectorBenchmarks[detector_benchmarks]:::epic
+    PhysicsBenchmarks[<strong>physics_benchmarks<strong/>]:::epic
+    ReconstructionBenchmarks[<strong>reconstruction_benchmarks<strong/>]:::epic
+    DetectorBenchmarks[<strong>detector_benchmarks<strong/>]:::epic
   end
 
   EventGeneration --> epic --> EICrecon
