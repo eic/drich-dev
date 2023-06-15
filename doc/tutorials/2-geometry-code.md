@@ -111,7 +111,7 @@ Since we are talking about visualization, let's look at the `DAWN` views.
 
 ## Geometry Code
 
-Now let's explore the geometry code. The recording of this tutorial goes through the code interactively; here we just provide links to the code that was shown. These links are permalinks, from the time this tutorial was given, so be sure to also take a look at the most recent versions.
+Now let's explore the geometry code. The recording of this tutorial goes through the code interactively; here we just provide a reference of the code that was shown.
 
 ### Common Files
 - `compact/`: these are "compact `xml` files"
@@ -137,7 +137,7 @@ Now let's explore the geometry code. The recording of this tutorial goes through
   - dRICH: `compact/pid/drich.xml`, contains all of our geometry constants and more
 - C++ Plugin files: `src/`
   - each subsystem also includes at least one C++ plugin file
-    - the compact file can be though of as the "numbers" for the geometry, tunable externally (with `xml` parsers) without the need to recompile
+    - the compact file can be though of as the "numbers" for the geometry, tunable externally (by hand or with `xml` parsers) without the need to recompile
     - the plugin file is the actual geometry implementation: it uses the compact files and generates the DD4hep geometry
   - `src/DRICH_geo.cpp` is the plugin for the dRICH
     - creates all aspects of the geometry
