@@ -266,8 +266,8 @@ flowchart TB
   GenOR     --> Epic
   DD4hep    --> Epic
   DDCompact --> Epic
-  DDPlugin  --> Epic
   DDMat     --> Epic
+  DDPlugin  --> Epic
   Epic      --> SimOut
 
   subgraph Reconstruction Framework
@@ -283,14 +283,14 @@ flowchart TB
     RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
+  IRT                  -->  RecoAlgorithms
   EICreconServices     -->  EICreconFactories
   EICreconFactories    -->  EICrecon
-  EICreconPlugins      -->  EICrecon
   IRT                  -->  EICreconServices
-  IRT                  -->  RecoAlgorithms
-  RecoAlgorithms       -->  EICreconFactories
   RecoAlgorithmConfigs -->  RecoAlgorithms
+  RecoAlgorithms       -->  EICreconFactories
   EICreconFactories    -->  RecoAlgorithmConfigs
+  EICreconPlugins      -->  EICrecon
   JANA                 -->  EICrecon
   SimOut               --> EICrecon
   EICrecon         -->  RecOut
