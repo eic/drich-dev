@@ -283,7 +283,7 @@ flowchart TB
     RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut               ----> EICrecon
+  SimOut               ----> Reconstruction Framework
   EICreconServices     -->  EICreconFactories
   EICreconFactories    -->  EICrecon
   EICreconPlugins      -->  EICrecon
