@@ -3,6 +3,7 @@ dRICH ePIC Geometry Code
 
 - NOTE: this tutorial will start with the "Event Visualization" section from tutorial 1
 
+- describe how to create `dawn` views in CI
 - common compact files (materials, definitions, etc.)
 - dRICH compact file
 - dRICH plugin
