@@ -241,11 +241,11 @@ flowchart TB
     Gun(Particle Guns<br/>ddsim OR npsim):::dep
     GenOR{OR}:::op
   end
-  Pythia6 --> Hepmc
-  Pythia8 --> Hepmc
+  Pythia6  --> Hepmc
+  Pythia8  --> Hepmc
   OtherGen --> Hepmc
-  Hepmc --> GenOR
-  Gun --> GenOR
+  Hepmc    --> GenOR
+  Gun      --> GenOR
 
   subgraph Simulation
     DD4hep(DD4hep):::dep
@@ -262,13 +262,13 @@ flowchart TB
     DDPlugin{{C++ Plugins}}:::obj
   end
   SimOut[(Simulation Output<br/>edm4hep ROOT files)]:::data
-  DD4hep --> Gun
-  GenOR --> Epic
-  DD4hep --> Epic
+  DD4hep    --> Gun
+  GenOR     --> Epic
+  DD4hep    --> Epic
   DDCompact --> Epic
-  DDPlugin --> Epic
-  DDMat --> Epic
-  Epic --> SimOut
+  DDPlugin  --> Epic
+  DDMat     --> Epic
+  Epic      --> SimOut
 
   subgraph Reconstruction
     JANA(JANA2):::dep
@@ -278,16 +278,16 @@ flowchart TB
       RecoFactories{{Factories}}:::obj
       EICrecon[EICrecon]:::epic
     end
-    RecoAlgorithms{{Plugins}}:::obj
+    RecoAlgorithms{{Algorithms}}:::obj
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
-  SimOut ---> EICrecon
-  JANA --> EICrecon
-  IRT --> EICrecon
-  RecoPlugins --> EICrecon
-  RecoAlgorithms --> RecoFactories
-  RecoFactories -- EICrecon
-  EICrecon --> RecOut
+  SimOut         ---> EICrecon
+  JANA           -->  EICrecon
+  IRT            -->  EICrecon
+  RecoPlugins    -->  EICrecon
+  RecoAlgorithms -->  RecoFactories
+  RecoFactories  -->  EICrecon
+  EICrecon       -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
