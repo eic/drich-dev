@@ -280,7 +280,7 @@ flowchart TB
     EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
     EICreconFactories{{EICrecon<br/>Factories}}:::obj
     EICreconServices{{EICrecon<br/>Services}}:::obj
-    EICreconRepo[EICrecon]:::epic
+    EICrecon[EICrecon]:::epic
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
   SimOut               ---> EICrecon
@@ -290,10 +290,10 @@ flowchart TB
   EICreconServices     -->  EICreconFactories
   RecoAlgorithms       -->  EICreconFactories
   EICreconFactories    -->  RecoAlgorithmConfigs
-  EICreconFactories    -->  EICreconRepo
-  EICreconPlugins      -->  EICreconRepo
-  JANA                 -->  EICreconRepo
-  EICreconRepo         -->  RecOut
+  EICreconFactories    -->  EICrecon
+  EICreconPlugins      -->  EICrecon
+  JANA                 -->  EICrecon
+  EICrecon         -->  RecOut
 
   subgraph Benchmarks
     PhysicsBenchmarks[physics_benchmarks]:::epic
