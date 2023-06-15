@@ -209,9 +209,11 @@ int main(int argc, char** argv) {
   std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
+    fmt::print("de_name = {}\n", de_name);
     if(de_name.find(wr.sensorNamePattern)!=std::string::npos) {
       // convert global position to hitmapX and Y
       auto posSensor = posRich + detSensor.placement().position();
+      fmt::print("  {} {} {}\n", posSensor.x(), posSensor.y(), posSensor.z());
       auto hitmapX   = Long64_t(dilation*posSensor.x() + 0.5);
       auto hitmapY   = Long64_t(dilation*posSensor.y() + 0.5);
       // convert unique cellID to module number, using the cellID decoder
