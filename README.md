@@ -272,8 +272,8 @@ flowchart TB
 
   subgraph Reconstruction
     JANA(JANA2):::dep
-    IRT[irt]:::epic
     subgraph Algorithms
+      IRT[irt]:::epic
       RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
       RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
     end
