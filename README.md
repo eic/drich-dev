@@ -270,19 +270,17 @@ flowchart TB
   DDMat     --> Epic
   Epic      --> SimOut
 
-  subgraph Reconstruction
+  subgraph Reconstruction Algorithms
+    IRT[irt]:::epic
+    RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
+    RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
+  end
+  subgraph Reconstruction Framework
     JANA(JANA2):::dep
-    subgraph Algorithms
-      IRT[irt]:::epic
-      RecoAlgorithms{{Reconstruction<br/>Algorithms}}:::obj
-      RecoAlgorithmConfigs{{Algorithm<br/>Configurations}}:::obj
-    end
-    subgraph EICrecon
-      EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
-      EICreconFactories{{EICrecon<br/>Factories}}:::obj
-      EICreconServices{{EICrecon<br/>Services}}:::obj
-      EICreconRepo[EICrecon]:::epic
-    end
+    EICreconPlugins{{EICrecon<br/>Plugins}}:::obj
+    EICreconFactories{{EICrecon<br/>Factories}}:::obj
+    EICreconServices{{EICrecon<br/>Services}}:::obj
+    EICreconRepo[EICrecon]:::epic
   end
   RecOut[(Reconstruction Output<br/>edm4hep ROOT files)]:::data
   SimOut               ---> EICrecon
