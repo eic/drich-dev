@@ -13,7 +13,7 @@ Resources and Tools for EPIC dRICH development
 
 | **Documentation Links**                                 |                                               |
 | --:                                                     | ---                                           |
-| [Tutorial Series](doc/tutorials/README.md)    | Series of dRICH-specific Tutorials            |
+| [Tutorial Series](doc/tutorials/README.md)              | Series of dRICH-specific Tutorials            |
 | [Links](doc/links.md)                                   | Collection of dRICH Software and Resources    |
 | [Branches and Pull Requests](doc/branches.md)           | Active development branches and pull requests |
 | [Project Board](https://github.com/orgs/eic/projects/4) | Issues and Pull Request Tracking              |
