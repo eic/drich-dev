@@ -1,7 +1,7 @@
 Tutorial 2: dRICH Visualization, Continuous Integration, and Geometry Code
 ==========================================================================
 
-- TUTORIAL RECORDING
+- [TUTORIAL RECORDING](https://duke.zoom.us/rec/play/xAzADPjS_bA5_LckU3kaz0BeDsqGjYen9gNpMZmndzfBAooVWlqEWwAfcSH5DzSlVrshzgrsacYhXOxJ._MoPSIDg0lOCl8Oj?canPlayFromShare=true&from=share_recording_detail&continueMode=true&componentName=rec-play&originRequestUrl=https%3A%2F%2Fduke.zoom.us%2Frec%2Fshare%2FYpwfjg8auzo6TYinWF_HVfeCK_Nbr3FmCwGc7p6xInEXr9GtZVR80scgS5_cZHn6.UxyKJKSFjAhADicc)
 - [Return to Tutorial Landing Page](README.md)
 
 ## Visualization
