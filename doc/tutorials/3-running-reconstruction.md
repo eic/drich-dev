@@ -5,11 +5,11 @@ Tutorial 3: Running Reconstruction and Benchmarks
 - [Return to Tutorial Landing Page](README.md)
 
 ## Prerequisites
-Before attending the tutorial, please build the reconstruction and benchmarks software, since this may take some time.
+Before attending this tutorial, please build the reconstruction and benchmarks software, since this may take some time; this section describes how to do so.
 
 ### Obtaining the Software
 
-At the time of writing this tutorial, dRICH PID is still not fully approved in the `main` branches of the reconstruction and benchmarks software. The current development branch is `irt-algo` for both; `irt-algo` on EICrecon is somewhat unstable, so instead I recommend you to use `irt-algo-stable` instead.
+At the time of writing this tutorial, dRICH PID is still not fully approved in the `main` branches of the reconstruction and benchmarks software. The current development branch is `irt-algo` for both; `irt-algo` on EICrecon is somewhat unstable, so instead I recommend you to use `irt-algo-stable`, which at times may be a bit behind `irt-algo`.
 
 If you already have clones of `EICrecon` and `reconstruction_benchmarks`, you can switch branches by running:
 ```bash
