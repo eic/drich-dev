@@ -25,19 +25,19 @@ popd
 
 Otherwise if you do not yet have clones of `EICrecon` and `reconstruction_benchmarks`, you can clone and checkout the appropriate branch in one command. As in [tutorial 1](1-setup-and-running-simulations.md), use HTTPS or SSH depending on your access credentials:
 
-`EICrecon` SSH:
+- `EICrecon` SSH:
 ```bash
 git clone git@github.com:eic/EICrecon.git --branch irt-algo-stable       # or irt-algo, if you want bleeding edge
 ```
-`EICrecon` HTTPS:
+- `EICrecon` HTTPS:
 ```bash
 git clone https://github.com/eic/EICrecon.git --branch irt-algo-stable   # or irt-algo, if you want bleeding edge
 ```
-`reconstruction_benchmarks` SSH:
+- `reconstruction_benchmarks` SSH:
 ```bash
 git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
 ```
-`reconstruction_benchmarks` HTTPS:
+- `reconstruction_benchmarks` HTTPS:
 ```bash
 git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
 ```
