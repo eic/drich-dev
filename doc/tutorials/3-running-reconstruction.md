@@ -11,12 +11,17 @@ Before attending this tutorial, please build the reconstruction and benchmarks s
 
 At the time of writing this tutorial, dRICH PID is still not fully approved in the `main` branches of the reconstruction and benchmarks software. The current development branch is `irt-algo` for both; `irt-algo` on EICrecon is somewhat unstable, so instead I recommend you to use `irt-algo-stable`, which at times may be a bit behind `irt-algo`.
 
-If you already have clones of `EICrecon` and `reconstruction_benchmarks`, you can switch branches by running:
+If you already have clones of `EICrecon` and `reconstruction_benchmarks`, you can switch branches by running the commands below. Most likely you have a clone of `EICrecon` (on branch `main`), but do not have a clone of `reconstruction_benchmarks` (clone commands are also given below)
+
+- `EICrecon`:
 ```bash
 pushd EICrecon
 git fetch origin
 git checkout irt-algo-stable    # or irt-algo, if you want bleeding edge
 popd
+```
+- `reconstruction_benchmarks`:
+```bash
 pushd reconstruction_benchmarks
 git fetch origin
 git checkout irt-algo    # no irt-algo-stable branch, since this code doesn't change as rapidly
