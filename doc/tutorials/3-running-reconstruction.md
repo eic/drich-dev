@@ -56,6 +56,8 @@ Verify that you are on the correct set of branches by running `./check_branches.
 
 ### Building
 
+Before anything, don't forget to be in an `eic-shell` container and to run `source environ.sh`.
+
 First, if you followed the previous tutorials, your `epic` repository may be in a non-default state. You can check this with either `./check_status.sh`, which runs `git status` on all repositories, or `cd epic` then run `git status`. If you see you have made changes, run `git diff` to show them. Revert your changes, if there are any.
 
 Regardless of whether you made any changes in `epic` or not, it is recommended to rebuild `epic` in case you forgot that you made changes and have a modified build. Run `build.sh epic` (or your preferred `cmake` commands) to rebuild.
