@@ -69,6 +69,8 @@ or just run:
 rebuild_all.sh
 ```
 
+Now you are ready to follow along with the interactive tutorial!
+
 
 ## UNDER CONSTRUCTION
 The rest of this tutorial is under construction; here is a rough outline:
