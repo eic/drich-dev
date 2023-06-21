@@ -122,8 +122,8 @@ jobs:
 # PIPELINE: SIMULATION, RECONSTRUCTION, BENCHMARKS ---------------------------------
 
   pipeline:
-    needs:
-      # - build_3
+    # needs:
+    #   - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
