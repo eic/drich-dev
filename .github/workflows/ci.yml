@@ -172,10 +172,10 @@ jobs:
             echo "[CI] RUN SIMULATION:"
             simulate.py ${{matrix.options}} -m ${{matrix.momentum}} -p ${{matrix.particle}}
             # echo "[CI] EVENT DISPLAY SINGLES:"
-            # event_display d s out/sim.edm4hep.root 0 0
+            # event_display d s out/sim.edm4hep.root n 0 0
             # mv out/ev out/ev.singles
             echo "[CI] EVENT DISPLAY INTEGRATED:"
-            event_display d s out/sim.edm4hep.root
+            event_display d s out/sim.edm4hep.root n
             mv out/ev out/ev.all_events
             echo "[CI] DRAW HITS:"
             draw_hits d

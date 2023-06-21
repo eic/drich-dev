@@ -276,17 +276,13 @@ View the image in `out/ev/`.
 
 You may also draw one event at a time (see the usage guide)
 ```bash
-event_display d s out/sim.edm4hep.root 0 0
+event_display d s out/sim.edm4hep.root n 0 0
 ```
 View the images in `out/ev/`.
 
-Each green box is a single SiPM, and each histogram bin is a single SiPM pixel (8x8 pixels per SiPM). If you want to zoom in, edit `src/event_display.cpp` and uncomment the line
-```cpp
-#define INTERACTIVE_USE
-```
-Then re-compile (`make`) and rerun. This will keep the `TCanvas` open and allow you to zoom in. For example, here is a closeup of the gas ring from a single event, by running
+Each green box is a single SiPM, and each histogram bin is a single SiPM pixel (8x8 pixels per SiPM). If you want to zoom in, use interactive mode by changing `n` to `i`, which will keep the `TCanvas` open and allow you to zoom in. For example, here is a closeup of the gas ring from a single event, by running
 ```bash
-event_display d s out/sim.edm4hep.root 0
+event_display d s out/sim.edm4hep.root i 0
 ```
 
 ![sim-ev-all-zoom](img/sim-ev-all-zoom.png)
