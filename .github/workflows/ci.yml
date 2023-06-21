@@ -123,18 +123,30 @@ jobs:
 
   pipeline:
     needs:
-      - build_3
+      # - build_3
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
         particle: [pi+, kaon+, proton]
-        test_num: [1, 5, 7, 8]
         include:
-          - { test_num: 1, num_events: 50 }
-          - { test_num: 5, num_events: 20 }
-          - { test_num: 7, num_events: 20 }
-          - { test_num: 8, num_events: 20 }
+          ### fixed |momentum|
+          - { id: fixed_angle,          options: -t 1 -n 20 }
+          - { id: geometric_acceptance, options: -t 5 -n 20 }
+          ### momentum scans: -k = number of momentum steps, -n = number of events per momentum step, -b = pseudorapidity
+          ###   momentum range is set in simulate.py (differs for aerogel and gas)
+          #### fixed (eta,phi)
+          - { id: scan_p__fixed_direction__aerogel, options: -t 7  -k 10 -n 20 }
+          - { id: scan_p__fixed_direction__gas,     options: -t 8  -k 10 -n 20 }
+          #### low eta
+          - { id: scan_p__fixed_eta_low__aerogel,   options: -t 9  -b 1.3 -k 6 -n 20 }
+          - { id: scan_p__fixed_eta_low__gas,       options: -t 10 -b 1.3 -k 6 -n 20 }
+          #### mid eta
+          - { id: scan_p__fixed_eta_mid__aerogel,   options: -t 9  -b 1.6 -k 6 -n 20 }
+          - { id: scan_p__fixed_eta_mid__gas,       options: -t 10 -b 1.6 -k 6 -n 20 }
+          #### high eta
+          - { id: scan_p__fixed_eta_high__aerogel,  options: -t 9  -b 3.6 -k 6 -n 20 }
+          - { id: scan_p__fixed_eta_high__gas,      options: -t 10 -b 3.6 -k 6 -n 20 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -152,7 +164,7 @@ jobs:
           run: |
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
-            simulate.py -t ${{matrix.test_num}} -n ${{matrix.num_events}} -p ${{matrix.particle}}
+            simulate.py -p ${{matrix.particle}} ${{matrix.options}}
             echo "[CI] EVENT DISPLAY SINGLES:"
             event_display d s out/sim.edm4hep.root 0 0
             mv out/ev out/ev.singles
@@ -165,14 +177,14 @@ jobs:
             recon.rb
             echo "[CI] BENCHMARKS:"
             benchmark.rb -b
-      - name: cull
-        run: |
-          rm -v out*/sim*.root
-          rm -v out*/rec*.root
+      # - name: cull
+      #   run: |
+      #     rm -v out*/sim*.root
+      #     rm -v out*/rec*.root
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.test${{matrix.test_num}}
+        run: mv -v out out.${{matrix.id}}
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
