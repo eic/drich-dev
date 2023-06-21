@@ -129,24 +129,19 @@ jobs:
       fail-fast: true
       matrix:
         particle: [pi+, kaon+, proton]
+        eta: [ 1.6, 2.0, 2.5, 3.0, 3.3, 3.5 ]
+        id:
+          - fixed_p
+          - scan_p__aerogel__fixed_phi
+          - scan_p__gas__fixed_phi
+          - scan_p__aerogel__varied_phi
+          - scan_p__gas__varied_phi
         include:
-          ### fixed |momentum|
-          - { id: fixed_angle,          options: -t 1 -n 20 }
-          - { id: geometric_acceptance, options: -t 5 -n 20 }
-          ### momentum scans: -k = number of momentum steps, -n = number of events per momentum step, -b = pseudorapidity
-          ###   momentum range is set in simulate.py (differs for aerogel and gas)
-          #### fixed (eta,phi)
-          - { id: scan_p__fixed_direction__aerogel, options: -t 7  -k 10 -n 20 }
-          - { id: scan_p__fixed_direction__gas,     options: -t 8  -k 10 -n 20 }
-          #### low eta
-          - { id: scan_p__fixed_eta_low__aerogel,   options: -t 9  -b 1.3 -k 6 -n 20 }
-          - { id: scan_p__fixed_eta_low__gas,       options: -t 10 -b 1.3 -k 6 -n 20 }
-          #### mid eta
-          - { id: scan_p__fixed_eta_mid__aerogel,   options: -t 9  -b 1.6 -k 6 -n 20 }
-          - { id: scan_p__fixed_eta_mid__gas,       options: -t 10 -b 1.6 -k 6 -n 20 }
-          #### high eta
-          - { id: scan_p__fixed_eta_high__aerogel,  options: -t 9  -b 3.6 -k 6 -n 20 }
-          - { id: scan_p__fixed_eta_high__gas,      options: -t 10 -b 3.6 -k 6 -n 20 }
+          - { id: fixed_p,                     options: -t 1  -n 20 }
+          - { id: scan_p__aerogel__fixed_phi,  options: -t 7  -k 10 -n 20 }
+          - { id: scan_p__gas__fixed_phi,      options: -t 8  -k 10 -n 20 }
+          - { id: scan_p__aerogel__varied_phi, options: -t 9  -k 6  -n 20 }
+          - { id: scan_p__gas__varied_phi,     options: -t 10 -k 6  -n 20 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -164,7 +159,7 @@ jobs:
           run: |
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
-            simulate.py -p ${{matrix.particle}} ${{matrix.options}}
+            simulate.py ${{matrix.options}} -b ${{matrix.eta}} -p ${{matrix.particle}}
             echo "[CI] EVENT DISPLAY SINGLES:"
             event_display d s out/sim.edm4hep.root 0 0
             mv out/ev out/ev.singles
@@ -177,14 +172,14 @@ jobs:
             recon.rb
             echo "[CI] BENCHMARKS:"
             benchmark.rb -b
-      # - name: cull
-      #   run: |
-      #     rm -v out*/sim*.root
-      #     rm -v out*/rec*.root
+      - name: cull
+        run: |
+          rm -v out*/sim*.root
+          rm -v out*/rec*.root
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.${{matrix.id}}
+        run: mv -v out out.${{matrix.id}}.${{matrix.particle}}.eta${{matrix.eta}}
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
