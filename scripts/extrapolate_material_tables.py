@@ -33,9 +33,10 @@ class MPT:
 
     def extrap(self):
         # perform the fit
-        print(f'Fit graph "{self.graph.GetName()}" to function:')
-        self.func.Print()
-        self.graph.Fit(self.func, '', '', self.fit_range[0], self.fit_range[1])
+        if self.func is not None:
+            print(f'Fit graph "{self.graph.GetName()}" to function:')
+            self.func.Print()
+            self.graph.Fit(self.func, '', '', self.fit_range[0], self.fit_range[1])
         # extrapolate
         self.multi_gr = r.TMultiGraph()
         self.multi_gr.SetName(self.graph.GetName()+"_multi_gr")
@@ -46,23 +47,25 @@ class MPT:
         self.graph_extrap[1].SetName(self.graph.GetName()+"_extrap_high")
         self.graph_extrap[0].SetMarkerColor(r.kRed)
         self.graph_extrap[1].SetMarkerColor(r.kGreen+1)
-        for i in range(2):
-            self.graph_extrap[i].SetTitle(self.graph.GetTitle())
-            self.graph_extrap[i].SetMarkerStyle(r.kStar)
-            if( ( i==0 and self.extrap_range[i]<self.graph_range[i] ) or ( i==1 and self.extrap_range[i]>self.graph_range[i] )):
-                self.multi_gr.Add(self.graph_extrap[i])
-                extrap_points = list(linspace(self.extrap_range[i], self.graph_range[i], self.extrap_npoints[i]+1))
-                del extrap_points[-1]
-                if( i==1 ):
-                    extrap_points.reverse()
-                for x in extrap_points:
-                    self.graph_extrap[i].AddPoint(x, self.func.Eval(x))
+        if self.func is not None:
+            for i in range(2):
+                self.graph_extrap[i].SetTitle(self.graph.GetTitle())
+                self.graph_extrap[i].SetMarkerStyle(r.kStar)
+                if( ( i==0 and self.extrap_range[i]<self.graph_range[i] ) or ( i==1 and self.extrap_range[i]>self.graph_range[i] )):
+                    self.multi_gr.Add(self.graph_extrap[i])
+                    extrap_points = list(linspace(self.extrap_range[i], self.graph_range[i], self.extrap_npoints[i]+1))
+                    del extrap_points[-1]
+                    if( i==1 ):
+                        extrap_points.reverse()
+                    for x in extrap_points:
+                        self.graph_extrap[i].AddPoint(x, self.func.Eval(x))
         # draw the results
         canv_name = f'{self.graph.GetName()}_canv'
         self.canv = r.TCanvas(canv_name, canv_name, 1000, 800)
         self.canv.SetGrid(1,1)
         self.multi_gr.Draw('APE')
-        self.func.Draw('SAME')
+        if self.func is not None:
+            self.func.Draw('SAME')
         # print the table
         self.table = []
         for gr in [ self.graph_extrap[0], self.graph, self.graph_extrap[1] ]:
@@ -114,6 +117,91 @@ def make_sellmeier(order):
         p += 2
     return f'sqrt({"+".join(formula)})'
 
+# replacements: replace any tables from `g4dRIChOptics`
+# --------------------------------------------------------------------------
+
+### aerogel ABSLENGTH: from ________FIXME: source needed___________
+aerogel_abslength_update_table = [  # [nm] [mm]
+    [ 890, 58.661475  ],
+    [ 880, 58.6551    ],
+    [ 870, 58.64805   ],
+    [ 860, 58.640225  ],
+    [ 850, 58.631525  ],
+    [ 840, 58.6219    ],
+    [ 830, 58.611125  ],
+    [ 820, 58.599175  ],
+    [ 810, 58.585825  ],
+    [ 800, 58.570925  ],
+    [ 790, 58.554275  ],
+    [ 780, 58.535575  ],
+    [ 770, 58.51465   ],
+    [ 760, 58.49115   ],
+    [ 750, 58.464675  ],
+    [ 740, 58.4349    ],
+    [ 730, 58.4013    ],
+    [ 720, 58.363375  ],
+    [ 710, 58.320375  ],
+    [ 700, 58.27175   ],
+    [ 690, 58.216525  ],
+    [ 680, 58.153725  ],
+    [ 670, 58.0823    ],
+    [ 660, 58.0008    ],
+    [ 650, 57.907675  ],
+    [ 640, 57.801175  ],
+    [ 630, 57.67915   ],
+    [ 620, 57.539075  ],
+    [ 610, 57.378125  ],
+    [ 600, 57.19285   ],
+    [ 590, 56.979225  ],
+    [ 580, 56.7327    ],
+    [ 570, 56.447825  ],
+    [ 560, 56.118275  ],
+    [ 550, 55.7368    ],
+    [ 540, 55.294975  ],
+    [ 530, 54.78305   ],
+    [ 520, 54.19      ],
+    [ 510, 53.503475  ],
+    [ 500, 52.709575  ],
+    [ 490, 51.79315   ],
+    [ 480, 50.73805   ],
+    [ 470, 49.52745   ],
+    [ 460, 48.14475   ],
+    [ 450, 46.574425  ],
+    [ 440, 44.8035    ],
+    [ 430, 42.8232    ],
+    [ 420, 40.630825  ],
+    [ 410, 38.23185   ],
+    [ 400, 35.641575  ],
+    [ 390, 32.886125  ],
+    [ 380, 30.00305   ],
+    [ 370, 27.039875  ],
+    [ 360, 24.05185   ],
+    [ 350, 21.098575  ],
+    [ 340, 18.239375  ],
+    [ 330, 15.529475  ],
+    [ 320, 13.0157    ],
+    [ 310, 10.7339625 ],
+    [ 300, 8.7075725  ],
+    [ 290, 6.9466825  ],
+    [ 280, 5.44934    ],
+    [ 270, 4.2030425  ],
+    [ 260, 3.1872325  ],
+    [ 250, 2.3760525  ],
+    [ 240, 1.7410525  ],
+    [ 230, 1.2535325  ],
+    [ 220, 0.88632675 ],
+    [ 210, 0.61495675 ],
+    [ 200, 0.4182277  ],
+]
+aerogel_abslength_update_table.reverse()
+aerogel_abslength_update_graph = r.TGraphErrors()
+aerogel_abslength_update_graph.SetName("graph_Aerogel_ABSLENGTH__updated")
+aerogel_abslength_update_graph.SetTitle("Aerogel ABSLENGTH [mm]")
+aerogel_abslength_update_graph.SetMarkerColor(r.kBlue)
+aerogel_abslength_update_graph.SetMarkerStyle(r.kFullCircle)
+for wl, a in aerogel_abslength_update_table:
+    aerogel_abslength_update_graph.AddPoint(wl, a)
+
 # fits
 # --------------------------------------------------------------------------
 
@@ -133,14 +221,27 @@ tabs['aerogel']['rindex'] = MPT(
         )
 tabs['aerogel']['rindex'].set_fake_errors(3e-5)
 
-### aerogel - ABSLENGTH
+### aerogel - ABSLENGTH (OLD, CLAS12-based)
 ### - linear fit to 350 nm and above only
+# tabs['aerogel']['abslength_old'] = MPT(
+#         root_file.Get('graph_Aerogel_ABSLENGTH'),
+#         r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1]),
+#         [350, 600],
+#         FULL_WAVELENGTH_RANGE,
+#         [0, 10],
+#         'mm',
+#         [5, 7, 3]
+#         )
+# tabs['aerogel']['abslength_old'].set_fake_errors(0.5)
+
+### aerogel - ABSLENGTH (UPDATED, from above)
+### - linear fit to the last few points
 tabs['aerogel']['abslength'] = MPT(
-        root_file.Get('graph_Aerogel_ABSLENGTH'),
-        r.TF1("aerogel_abslength", "[0]+[1]*x", 350, FULL_WAVELENGTH_RANGE[-1]),
-        [350, 600],
+        aerogel_abslength_update_graph,
+        r.TF1("aerogel_abslength", "[0]+[1]*x", 870, FULL_WAVELENGTH_RANGE[-1]),
+        [870, 890],
         FULL_WAVELENGTH_RANGE,
-        [0, 10],
+        [0, 11],
         'mm',
         [5, 7, 3]
         )
