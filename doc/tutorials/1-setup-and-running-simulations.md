@@ -179,11 +179,11 @@ Add the following script, named `jsroot` to your `$PATH`:
 #!/bin/bash
 pushd ${HOME}/jsroot  # change this to wherever you unpacked the jsroot release
 echo "FOR FULL DETECTOR:"
-printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark\n\n"
+printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark&opt=ctrl;\n\n"
 echo "FOR DRICH ONLY:"
-printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark&item=default/world_volume/DRICH_0/DRICH_gas_0&opt=ctrl;\n\n"
+printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark&item=default/world_volume/DRICH_0/DRICH_gas_0&opt=ctrl;vislvl8;more\n\n"
 echo "FOR PFRICH ONLY:"
-printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark&item=default/world_volume/PFRICH_0/PFRICH_gas_0&opt=ctrl;\n\n"
+printf "\nhttp://localhost:8000/?file=geo/detector_geometry.root&dark&item=default/world_volume/PFRICH_0/PFRICH_gas_0&opt=ctrl;vislvl8;more\n\n"
 echo "============================================"
 python -m http.server
 popd
