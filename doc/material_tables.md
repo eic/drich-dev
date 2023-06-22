@@ -33,13 +33,14 @@ Guide to generate material property tables for XML files for `DD4hep`.
 ## Aerogel
 ### Material
 - using CLAS12 experimental points rescaled by Alessio/GEMC, in range 200 to 660 nm
+  - except for absorption length, where we use data from Aerogel Factory
 - needed to do curve fits for extrapolation
 - [x] **EXTRAPOLATION**: refractive index
   - fit to 2nd order Sellmeier function
   - upper limit 660 nm extrapolated to 1000 nm
 - [x] **EXTRAPOLATION**: absorption length
-  - linear fit to 350 nm and above only
-  - upper limit 660 nm extrapolated to 1000 nm
+  - linear fit to 870 nm and above only
+  - upper limit extrapolated to 1000 nm
 - [x] **EXTRAPOLATION**: Rayleigh scattering length
   - fit to `lambda^4` dependence
   - upper limit 660 nm extrapolated to 1000 nm
