@@ -126,7 +126,7 @@ jobs:
       - build_3
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         particle: [pi+, kaon+, proton]
         eta: [ 1.6, 2.0, 2.5, 3.0, 3.3, 3.5 ]
