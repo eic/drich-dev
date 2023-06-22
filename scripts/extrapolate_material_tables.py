@@ -120,8 +120,9 @@ def make_sellmeier(order):
 # replacements: replace any tables from `g4dRIChOptics`
 # --------------------------------------------------------------------------
 
-### aerogel ABSLENGTH: from ________FIXME: source needed___________
-aerogel_abslength_update_table = [  # [nm] [mm]
+### aerogel ABSLENGTH: from transmittance analysis of Aerogel Factory samples
+###                    used in the dRICH prototype
+aerogel_abslength_update_table = [  # [nm] [cm]
     [ 890, 58.661475  ],
     [ 880, 58.6551    ],
     [ 870, 58.64805   ],
@@ -196,7 +197,7 @@ aerogel_abslength_update_table = [  # [nm] [mm]
 aerogel_abslength_update_table.reverse()
 aerogel_abslength_update_graph = r.TGraphErrors()
 aerogel_abslength_update_graph.SetName("graph_Aerogel_ABSLENGTH__updated")
-aerogel_abslength_update_graph.SetTitle("Aerogel ABSLENGTH [mm]")
+aerogel_abslength_update_graph.SetTitle("Aerogel ABSLENGTH [cm]")
 aerogel_abslength_update_graph.SetMarkerColor(r.kBlue)
 aerogel_abslength_update_graph.SetMarkerStyle(r.kFullCircle)
 for wl, a in aerogel_abslength_update_table:
@@ -242,7 +243,7 @@ tabs['aerogel']['abslength'] = MPT(
         [870, 890],
         FULL_WAVELENGTH_RANGE,
         [0, 11],
-        'mm',
+        'cm',
         [5, 7, 3]
         )
 tabs['aerogel']['abslength'].set_fake_errors(0.5)
