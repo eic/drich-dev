@@ -158,7 +158,6 @@ int main(int argc, char** argv) {
   const auto det = &(Detector::getInstance());
   det->fromXML(compactFile);
   const auto detRich  = det->detector(richName);
-  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(wr.XRICH+"_cell_mask")));
   const auto nSectors = wr.zDirection>0 ? det->constant<int>(wr.XRICH+"_num_sectors") : 1;
 
   // cellID decoder
@@ -186,17 +185,13 @@ int main(int argc, char** argv) {
   };
 
   // build sensor position LUT `imod2hitmapXY`
-  /* - find the sector 0 sensors, and build a map of their module number `imod` to
+  /* - find the sector 0 sensors, and build a map of their module number `pdu`,`sipm` to
    *   X and Y coordinates to use in the hitmap
    *   - these hitmap coordinates are from the sensor position X and Y, rescaled
    *     by the factor `dilation` and rounded to the nearest integer
    *   - also builds a list of `TBox`es, for drawing the sensors on the hitmap
-   * - the unique ID of the sensor `Detector`, called `imodsec`, includes `imod`
-   *   - `cellID & cellMask` should be equivalent to `imodsec`; therefore,
-   *     `imodsec` can be converted to `imod` by decoding `imodsec` the same way
-   *     we would decode `cellID`
    */
-  std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
+  std::map<std::pair<Long_t,Long64_t>,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
     if(de_name.find(wr.sensorNamePattern)!=std::string::npos) {
@@ -209,10 +204,11 @@ int main(int argc, char** argv) {
       auto hitmapX    = Long64_t(dilation*posSensorX + 0.5);
       auto hitmapY    = Long64_t(dilation*posSensorY + 0.5);
       // convert unique cellID to module number, using the cellID decoder
-      auto imodsec = ULong_t(detSensor.id());
-      auto imod    = decodeCellID("module")(RVecUL({imodsec})).front();
+      auto sensorID = ULong_t(detSensor.id());
+      auto pdu      = decodeCellID("pdu")(RVecUL({sensorID})).front();
+      auto sipm     = decodeCellID("sipm")(RVecUL({sensorID})).front();
       // add to `imod2hitmapXY` and create sensor `TBox`
-      imod2hitmapXY.insert({imod,{hitmapX,hitmapY}});
+      imod2hitmapXY.insert({{pdu,sipm}, {hitmapX,hitmapY}});
       boxList.push_back(new TBox(
             hitmapX, 
             hitmapY,
@@ -225,26 +221,30 @@ int main(int argc, char** argv) {
     }
   }
 
-  // convert vector of `imod`s to vector of hitmap X or Y
-  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecL imodVec, int c) {
+  // convert vectors of `pdu`, `sipm` to vector of hitmap X or Y
+  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecL pduVec, RVecL sipmVec, int c) {
     RVecL result;
     Long64_t pos;
-    for(auto imod : imodVec) {
+    if(pduVec.size() != sipmVec.size())
+      throw std::runtime_error("imod2hitmapXY_get input vectors differ in size");
+    for(unsigned long i=0; i<pduVec.size(); i++) {
+      auto pdu  = pduVec.at(i);
+      auto sipm = sipmVec.at(i);
       try {
         pos = (c==0) ?
-          imod2hitmapXY[imod].first :
-          imod2hitmapXY[imod].second;
+          imod2hitmapXY.at({pdu,sipm}).first :
+          imod2hitmapXY.at({pdu,sipm}).second;
       }
       catch (const std::out_of_range &ex) {
-        fmt::print(stderr,"ERROR: cannot find module {}\n",imod);
+        fmt::print(stderr,"ERROR: cannot find sensor module pdu={} sipm={}\n",pdu,sipm);
         pos = 0.0;
       };
       result.emplace_back(pos);
     }
     return result;
   };
-  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,0); };
-  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,1); };
+  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecL pduVec, RVecL sipmVec) { return imod2hitmapXY_get(pduVec,sipmVec,0); };
+  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecL pduVec, RVecL sipmVec) { return imod2hitmapXY_get(pduVec,sipmVec,1); };
 
   // convert vector of hitmap X (or Y) + vector of segmentation X (or Y) to vector of pixel X (or Y)
   auto pixelCoord = [] (RVecL hitmapXvec, RVecL segXvec) {
@@ -261,15 +261,16 @@ int main(int argc, char** argv) {
       .Alias("cellID", inputCollection+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
-      .Define("module", decodeCellID("module"), {"cellID"})
+      .Define("pdu",    decodeCellID("pdu"),    {"cellID"})
+      .Define("sipm",   decodeCellID("sipm"),   {"cellID"})
       .Define("x",      decodeCellID("x"),      {"cellID"})
       .Define("y",      decodeCellID("y"),      {"cellID"})
       ;
 
-  // map `(module,x,y)` to pixel hitmap bins
+  // map `(pdu,sipm,x,y)` to pixel hitmap bins
   auto dfHitmap = dfDecoded
-      .Define("hitmapX", imod2hitmapX, {"module"})
-      .Define("hitmapY", imod2hitmapY, {"module"})
+      .Define("hitmapX", imod2hitmapX, {"pdu","sipm"})
+      .Define("hitmapY", imod2hitmapY, {"pdu","sipm"})
       .Define("pixelX", pixelCoord, {"hitmapX","x"})
       .Define("pixelY", pixelCoord, {"hitmapY","y"})
       ;
@@ -299,13 +300,14 @@ int main(int argc, char** argv) {
     auto fieldHists = std::vector({
       dfFinal.Histo1D("system"),
       dfFinal.Histo1D("sector"),
-      dfFinal.Histo1D("module"),
+      dfFinal.Histo1D("pdu"),
+      dfFinal.Histo1D("sipm"),
       dfFinal.Histo1D("x"),
       dfFinal.Histo1D("y")
     });
     const int segXmaxPlot = 10;
     auto segXY = dfFinal.Histo2D(
-        { "segXY", "CartesianGridXY;x;y",
+        { "segXY", "SiPM pixels;x;y",
           2*segXmaxPlot, -segXmaxPlot, segXmaxPlot,
           2*segXmaxPlot, -segXmaxPlot, segXmaxPlot },
         "x","y"
@@ -334,12 +336,12 @@ int main(int argc, char** argv) {
     if(interactiveOn) {
       // draw cellID field histograms
       c = new TCanvas();
-      c->Divide(3,2);
+      c->Divide(4,2);
       int pad=1;
       for(auto hist : fieldHists) {
         c->GetPad(pad)->SetLogy();
         c->cd(pad);
-        if(TString(hist->GetName())!="module") hist->SetBarWidth(4);
+        // if(TString(hist->GetName())!="pdu") hist->SetBarWidth(4);
         hist->SetLineColor(kBlack);
         hist->SetFillColor(kBlack);
         hist->Draw("bar");
