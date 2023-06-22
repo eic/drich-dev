@@ -519,7 +519,7 @@ public:
     // absorption lengths
     // C2F6 and CF4: assumed to be 10m
     // C4F10: 6m, for wavelength 200-700 nm (ATLAS note Simulation of ATLAS Luminosity Monitoring with LUCID)
-    const double absLength[] = { 10.*m, 10.*m, 6.*m };
+    const double absLength[] = { 30.*m, 10.*m, 6.*m };
 
     // A.W. Burner and W. K. Goad - Measurement of the Specific Refractivities of CF4 and C2F6
     // for gases: n-1 = K*rho : K=specific refractivity or Gladstone-Dale constant
