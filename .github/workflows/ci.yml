@@ -129,17 +129,18 @@ jobs:
       fail-fast: true
       matrix:
         particle: [pi+, kaon+, proton]
-        eta: [ 1.6, 2.0, 2.5, 3.0, 3.3, 3.5 ]
+        #eta: [ 1.6, 2.0, 2.5, 3.0, 3.3, 3.5 ]
+        eta:  [1.6,2.0]
         id:
-          - fixed_p
-          - scan_p__aerogel__fixed_phi
-          - scan_p__gas__fixed_phi
+          #- fixed_p
+          #- scan_p__aerogel__fixed_phi
+          #- scan_p__gas__fixed_phi
           - scan_p__aerogel__varied_phi
           - scan_p__gas__varied_phi
         include:
-          - { id: fixed_p,                     options: -t 1  -n 20 }
-          - { id: scan_p__aerogel__fixed_phi,  options: -t 7  -k 10 -n 20 }
-          - { id: scan_p__gas__fixed_phi,      options: -t 8  -k 10 -n 20 }
+          #- { id: fixed_p,                     options: -t 1  -n 20 }
+          #- { id: scan_p__aerogel__fixed_phi,  options: -t 7  -k 10 -n 20 }
+          #- { id: scan_p__gas__fixed_phi,      options: -t 8  -k 10 -n 20 }
           - { id: scan_p__aerogel__varied_phi, options: -t 9  -k 10 -n 500 }
           - { id: scan_p__gas__varied_phi,     options: -t 10 -k 10 -n 500 }
     steps:
