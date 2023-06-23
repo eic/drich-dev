@@ -353,6 +353,46 @@ jobs:
           retention-days: 1
           path: geo*/
 
+  pixel_gaps:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -s -t4 -n500
+            echo "[CI] RUN RECONSTRUCTION:"
+            recon.rb -c config/recon_digi_only.yaml
+            echo "[CI] DRAW PIXEL HITS:"
+            test_pixel_gap_cuts n
+      - name: cull
+        run: |
+          rm -v out*/sim*.root
+          rm -v out*/rec*.root
+      - name: tree_artifacts
+        run: tree out
+      - name: rename_artifacts
+        run: mv -v out out.pixel_gaps
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pixel_gaps
+          retention-days: 1
+          path: out.*/
+
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
   collect:
@@ -363,6 +403,7 @@ jobs:
       # - visual
       # - optics
       - irt_auxfiles
+      - pixel_gaps
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -383,6 +424,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: irt_auxfiles
+      - uses: actions/download-artifact@v3
+        with:
+          name: pixel_gaps
       - name: cull
         run: |
           find -name .keep | xargs rm -v

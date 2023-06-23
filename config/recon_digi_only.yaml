@@ -1,0 +1,33 @@
+################################################################################
+# CONFIGURATION FILE FOR DRICH EICrecon USAGE
+# - use with EICrecon `git` branch `irt-algo` or `irt-algo-stable`
+################################################################################
+
+### PODIO collections to include in the output
+podio:
+  output_include_collections:
+    ### simulation
+    - DRICHHits
+    - MCParticles
+    ### digitization
+    - DRICHRawHits
+    - DRICHRawHitsAssociations
+
+### DRICH Configuration Overrides
+DRICH:
+  DRICHRawHits:
+    enablePixelGaps: true
+
+### EICrecon log levels
+log_levels:
+  eicrecon: info
+  richgeo: info
+  DRICH:
+    DRICHRawHits: info
+
+### common settings
+jana:
+  nevents: 0
+  debug_plugin_loading: 1
+acts:
+  MaterialMap: calibrations/materials-map.cbor
