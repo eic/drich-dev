@@ -393,6 +393,34 @@ jobs:
           retention-days: 1
           path: out.*/
 
+  sensor_table:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] MAKE SENSOR TABLE:"
+            scripts/make_sensor_table.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: sensor_table
+          retention-days: 1
+          path: geo/sensor_table.*
+
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
   collect:
@@ -404,6 +432,7 @@ jobs:
       # - optics
       - irt_auxfiles
       - pixel_gaps
+      - sensor_table
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -427,6 +456,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: pixel_gaps
+      - uses: actions/download-artifact@v3
+        with:
+          name: sensor_table
       - name: cull
         run: |
           find -name .keep | xargs rm -v
