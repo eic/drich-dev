@@ -128,15 +128,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        particle: [pi+, kaon+, proton]
-        radiator: [aerogel, gas]
         id:
           - fixed_p
           - eta_scan
           - p_scan_eta0
           - p_scan_eta1
-          # - p_scan_eta2
-          # - p_scan_eta3
+          - p_scan_eta2
+          - p_scan_eta3
+        radiator: [aerogel, gas]
+        particle: [pi+, kaon+, proton]
         include:
           ### default momentum for each radiator (for fixed momentum tests)
           - { radiator: aerogel, momentum: 5.0  }
@@ -149,7 +149,10 @@ jobs:
           - { id: p_scan_eta0, radiator: gas,     options: -t 10 -k 5 -n 30 -b 1.6 }
           - { id: p_scan_eta1, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 2.0 }
           - { id: p_scan_eta1, radiator: gas,     options: -t 10 -k 5 -n 30 -b 2.0 }
-          # eta: [ 1.6, 2.0, 2.7, 3.5 ]
+          - { id: p_scan_eta2, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 2.7 }
+          - { id: p_scan_eta2, radiator: gas,     options: -t 10 -k 5 -n 30 -b 2.7 }
+          - { id: p_scan_eta3, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 3.5 }
+          - { id: p_scan_eta3, radiator: gas,     options: -t 10 -k 5 -n 30 -b 3.5 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
