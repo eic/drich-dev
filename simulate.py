@@ -11,18 +11,28 @@ import subprocess, shlex
 import math
 import numpy as np
 
+### convert theta <=> eta
+def theta_to_eta(th):
+    return -math.log(math.tan(0.5 * th))
+def eta_to_theta(et):
+    return 2 * math.atan(math.exp(-et))
+
 # SETTINGS
 ################################################################
 acceptanceDict = {
     'drich': {
         # theta limits [degrees]
-        'thetaMin': 2.8,
-        'thetaMax': 30.5,
+        'thetaMin': math.degrees(eta_to_theta(3.5)),
+        'thetaMax': math.degrees(eta_to_theta(1.6)),
+        # ideal theta: middle of acceptance, full rings in one sector
+        'thetaIdeal': math.degrees(eta_to_theta(2.0)),
     },
     'pfrich': {
         # theta limits [degrees]
         'thetaMin': 180.0 - 10.0, # FIXME
         'thetaMax': 180.0 - 70.0, # FIXME
+        # ideal theta: middle of acceptance
+        'thetaIdeal': math.degrees(eta_to_theta(2.0)), # FIXME
     },
 }
 momMax = {
@@ -41,7 +51,7 @@ compactFileCustom = ''
 zDirection = 1
 particle_name = 'pi+'
 particle_momentum = 20.0 # [GeV]
-particle_theta = 23.5 # [deg]
+particle_theta = acceptanceDict['drich']['thetaIdeal'] # FIXME: this default should be controllable by `zDirection`
 particle_eta = 10001
 runType = 'run'
 numEvents = 50
@@ -49,13 +59,6 @@ numTestSamples = 0
 restrict_sector = True
 outputImageType = ''
 outputFileName = ''
-
-### convert momentum -> kinetic energy
-# convert theta <=> eta
-def theta_to_eta(th):
-    return -math.log(math.tan(0.5 * th))
-def eta_to_theta(et):
-    return 2 * math.atan(math.exp(-et))
 
 ### usage guide
 helpStr = f'''
@@ -75,9 +78,9 @@ helpStr = f'''
 
                acceptance scans: (-k = number of polar steps)
                                  (-n = number of particles per step)
-                4:  polar scan test
+                4:  polar scan test, fixed azimuth
                 5:  azimuthal + polar scan test
-                6:  spray pions in one sector (FIXME)
+                6:  eta scan, varied azimuth for each eta value
 
                momentum scans: (-k = number of momentum steps)
                                (-n = number of particles per step)
@@ -413,18 +416,17 @@ elif testNum == 5:
             m.write(f'/run/beamOn {numEvents}\n')
 
 elif testNum == 6:
-    m.write(f'\n# pion spray test, {xRICH} range\n')  # TODO: probably broken
-    if (runType == "vis"):
-        m.write(f'/vis/scene/endOfEventAction accumulate\n')
-    m.write(f'/gps/pos/type Point\n')
-    m.write(f'/gps/pos/radius 0.1 mm\n')
-    m.write(f'/gps/ang/type iso\n')
-    m.write(f'/gps/ang/mintheta {math.pi - thetaMax} rad\n')
-    m.write(f'/gps/ang/maxtheta {math.pi - thetaMin} rad\n')
-    m.write(f'/gps/ang/minphi {math.pi} rad\n')
-    m.write(f'/gps/ang/maxphi {math.pi + 0.01} rad\n')
-    m.write(f'/gps/ene/mono {fixed_energy} GeV\n')
-    m.write(f'/run/beamOn {numEvents}\n')
+    m.write(f'\n# eta scan, with varied azimuth for each eta bin\n')
+    numEtaPoints = 3 if numTestSamples==0 else numTestSamples # number of eta bins
+    for eta in list(np.linspace(etaMin, etaMax, numEtaPoints)):
+        m.write(f'\n# eta={eta}  theta={math.degrees(eta_to_theta(eta))} deg\n')
+        for phi in list(2 * np.pi * np.random.random_sample(size=numEvents) - np.pi): # number of random phi values = `numEvents`
+            x = math.sin(eta_to_theta(eta)) * math.cos(phi)
+            y = math.sin(eta_to_theta(eta)) * math.sin(phi)
+            z = math.cos(eta_to_theta(eta)) * zDirection
+            m.write(f'/gps/direction {x} {y} {z}\n')
+            m.write(f'/gps/ene/mono {fixed_energy} GeV\n')
+            m.write(f'/run/beamOn 1\n')
 
 elif testNum in [7,8]:
     rad = 'aerogel' if testNum==7 else 'gas'

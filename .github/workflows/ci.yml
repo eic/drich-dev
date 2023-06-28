@@ -129,19 +129,24 @@ jobs:
       fail-fast: false
       matrix:
         particle: [pi+, kaon+, proton]
-        eta: [ 1.6, 2.0, 2.5, 3.0, 3.3, 3.5 ]
+        eta: [ 1.6, 2.0, 2.7, 3.5 ]
         id:
           - fixed_p
-          # - scan_p__fixed_phi__aerogel
-          # - scan_p__fixed_phi__gas
-          - scan_p__varied_phi__aerogel
-          - scan_p__varied_phi__gas
+          - eta_scan_aerogel
+          - eta_scan_gas
+          - p_scan_aerogel
+          - p_scan_gas
         include:
-          - { id: fixed_p,                     options: -t 1  -n 20 }
-          # - { id: scan_p__fixed_phi__aerogel,  options: -t 7  -k 10 -n 20 }
-          # - { id: scan_p__fixed_phi__gas,      options: -t 8  -k 10 -n 20 }
-          - { id: scan_p__varied_phi__aerogel, options: -t 9  -k 5  -n 200 }
-          - { id: scan_p__varied_phi__gas,     options: -t 10 -k 5  -n 200 }
+          ### fixed momentum scan
+          - { id: fixed_p,  eta: 2.0,  options: -t 1 -n 50 }
+          ### pseudorapidity scans at fixed momentum
+          # NOTE: here the specified value of `eta` does NOT matter, since a range is simulated
+          # - it is only specified so that the matrix does not create a job for every `eta` in the `eta` list above
+          - { id: eta_scan_aerogel, eta: 2.0, options: -t 6 -m 5.0  -k 5 -n 30 }
+          - { id: eta_scan_gas,     eta: 2.0, options: -t 6 -m 20.0 -k 5 -n 30 }
+          ### momentum scans at fixed pseudorapidities
+          - { id: p_scan_aerogel, options: -t 9  -k 5 -n 30 }
+          - { id: p_scan_gas,     options: -t 10 -k 5 -n 30 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
