@@ -140,12 +140,12 @@ jobs:
         include:
           ### fixed momentum scan
           - { all_parts: yes, id: fixed_p,  options: -t 1 -n 50 }
-          # ### pseudorapidity scans at fixed momentum
-          # - { id: eta_scan_aerogel, all_parts: options: -t 6 -m 5.0  -k 5 -n 30 }
-          # - { id: eta_scan_gas,     all_parts: options: -t 6 -m 20.0 -k 5 -n 30 }
-          # ### momentum scans at fixed pseudorapidities
-          # - { id: p_scan_aerogel, all_parts: yes, options: -t 9  -k 5 -n 30 }
-          # - { id: p_scan_gas,     all_parts: yes, options: -t 10 -k 5 -n 30 }
+          ### pseudorapidity scans at fixed momentum
+          - { id: eta_scan_aerogel, all_parts: options: -t 6 -m 5.0  -k 5 -n 30 }
+          - { id: eta_scan_gas,     all_parts: options: -t 6 -m 20.0 -k 5 -n 30 }
+          ### momentum scans at fixed pseudorapidities
+          - { id: p_scan_aerogel, all_parts: yes, options: -t 9  -k 5 -n 30 }
+          - { id: p_scan_gas,     all_parts: yes, options: -t 10 -k 5 -n 30 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
