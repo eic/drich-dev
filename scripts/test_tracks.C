@@ -41,7 +41,7 @@ void test_tracks(TString infileN = "out/rec.edm4hep.root") {
   double zmin = 1800;
   double zmax = 3300;
 
-  ymax = 200; // zoom to horizontal (y=0) plane
+  // ymax = 200; // zoom to horizontal (y=0) plane
 
   // 2D plots
   enum views { zx, zy, xy, Nview };
