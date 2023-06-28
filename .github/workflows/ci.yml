@@ -190,7 +190,7 @@ jobs:
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.${{matrix.id}}.${{matrix.radiator}}.eta${{matrix.particle}}
+        run: mv -v out out.${{matrix.id}}.${{matrix.radiator}}.${{matrix.particle}}
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
