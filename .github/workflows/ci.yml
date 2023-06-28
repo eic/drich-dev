@@ -129,23 +129,27 @@ jobs:
       fail-fast: false
       matrix:
         particle: [pi+, kaon+, proton]
-        all_parts: [yes]
-        # eta: [ 1.6, 2.0, 2.7, 3.5 ]
-        # id:
-        #   - fixed_p
-        #   - eta_scan_aerogel
-        #   - eta_scan_gas
-        #   - p_scan_aerogel
-        #   - p_scan_gas
+        radiator: [aerogel, gas]
+        id:
+          - fixed_p
+          - eta_scan
+          - p_scan_eta0
+          - p_scan_eta1
+          # - p_scan_eta2
+          # - p_scan_eta3
         include:
-          ### fixed momentum scan
-          - { all_parts: yes, id: fixed_p,  options: -t 1 -n 50 }
-          ### pseudorapidity scans at fixed momentum
-          - { all_parts: yes, id: eta_scan_aerogel, options: -t 6 -m 5.0  -k 5 -n 30 }
-          - { all_parts: yes, id: eta_scan_gas,     options: -t 6 -m 20.0 -k 5 -n 30 }
+          ### default momentum for each radiator (for fixed momentum tests)
+          - { radiator: aerogel, momentum: 5.0  }
+          - { radiator: gas,     momentum: 20.0 }
+          ### fixed momentum tests
+          - { id: fixed_p,  options: -t 1 -n 50 }
+          - { id: eta_scan, options: -t 6 -k 5 -n 30 }
           ### momentum scans at fixed pseudorapidities
-          # - { id: p_scan_aerogel, options: -t 9  -k 5 -n 30 }
-          # - { id: p_scan_gas,     options: -t 10 -k 5 -n 30 }
+          - { id: p_scan_eta0, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 1.6 }
+          - { id: p_scan_eta0, radiator: gas,     options: -t 10 -k 5 -n 30 -b 1.6 }
+          - { id: p_scan_eta1, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 2.0 }
+          - { id: p_scan_eta1, radiator: gas,     options: -t 10 -k 5 -n 30 -b 2.0 }
+          # eta: [ 1.6, 2.0, 2.7, 3.5 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -163,7 +167,7 @@ jobs:
           run: |
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
-            simulate.py ${{matrix.options}} -b ${{matrix.eta}} -p ${{matrix.particle}}
+            simulate.py ${{matrix.options}} -m ${{matrix.momentum}} -p ${{matrix.particle}}
             # echo "[CI] EVENT DISPLAY SINGLES:"
             # event_display d s out/sim.edm4hep.root 0 0
             # mv out/ev out/ev.singles
@@ -183,7 +187,7 @@ jobs:
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.${{matrix.id}}.${{matrix.particle}}.eta${{matrix.eta}}
+        run: mv -v out out.${{matrix.id}}.${{matrix.radiator}}.eta${{matrix.particle}}
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
