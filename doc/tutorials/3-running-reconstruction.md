@@ -83,27 +83,147 @@ rebuild_all.sh
 
 Now you are ready to follow along with the interactive tutorial!
 
+## dRICH Reconstruction Flowchart
 
-## UNDER CONSTRUCTION
-The rest of this tutorial is under construction; here is a rough outline:
+The reconstruction requires two ingredients:
+- **Collections**: a set of objects, such as dRICH sensor hits or PID results
+- **Algorithms**: a transformation of a set of collections to another set of collections, such as a PID algorithm which transforms digitized hits and projected tracks into PID hypotheses
 
-- our `mermaid` diagram
-  - JANA calls only what it needs
-  - Show other `mermaid` diagrams, if needed
-- JANA2 objects
-  - Collections
-  - `EDM4*` data model: our `datatypes` (ref. Thomas's PODIO talk)
-  - Factories
-  - Algorithms and EICrecon independence (ref. Sylvester's talk)
-  - Configurations
-  - Plugins
-- `recon.rb` and our config files
-  - CLI-level config (from our config files) 
-  - Expected common-level refactoring to `toml`
-  - `DRICH.cc` level config
-  - Algorithm level default configs
-- `event_display`
-  - compare simulation to reconstruction
+Both **Collections** and **Algorithms** are supposed to be (as) independent (as possible) from the underlying simulation and reconstruction frameworks; this follows the modularity paradigm, where pieces of ePIC software are as mutually orthogonal as possible.
+
+The [EICrecon reconstruction framework](https://github.com/eic/EICrecon) is responsible for running these algorithms and handling the input and output collections. Using **Collections** and **Algorithms** the full reconstruction forms a [Directed Acyclic Graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph), starting with Collections produced from DD4hep and ending with the final Collections requested by the user. Here we will call this DAG the "reconstruction flowchart."
+
+**Important**: only the Collections which the user asks to be produced will be saved in the final reconstruction output; only the minimal set of algorithms (and intermediate collections) will be executed such that all of the requested output collections are produced. In other words, the part of the reconstruction flowchart which is actually used depends on the requested output collections.
+
+The default [set of output collections is found here](https://github.com/eic/EICrecon/blob/main/src/services/io/podio/JEventProcessorPODIO.cc).
+
+The reconstruction flowchart for the [dRICH PID is found here](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md). At the time of writing this tutorial, the general idea is:
+- Transform the collection of MC dRICH sensor hits to digitized raw hits, using the digitization algorithm
+- Transform the CKF trajectories into projected tracks in the dRICH radiator, using the track propagation algorithm
+- Transform the digitized hits and projected tracks into PID hypotheses, using Indirect Ray Tracing
+- Link the PID hypotheses to final reconstructed particles, using proximity matching
+
+## Running the Full Stack
+
+Now let's run the full stack:
+- Simulation
+- Reconstruction
 - Benchmarks
-  - Checking the output
 
+### Simulation
+
+For details how to run simulation, [see tutorial 1](1-setup-and-running-simulations.md). Run a simulation of your choice; here are some examples (for the version of `simulate.py` as of the interactive tutorial):
+
+- throw 50 pions at the default fixed momentum:
+```bash
+simulate.py -t1 -n50
+```
+
+- throw 50 kaons at the default fixed momentum:
+```bash
+simulate.py -t1 -n50 -pkaon+
+```
+
+- throw 20 pions at 3 different angles:
+```bash
+simulate.py -t4 -n20 -k3
+```
+
+- throw 20 pions in 3 momentum values in the momentum range suitable for aerogel:
+```bash
+simulate.py -t7 -n20 -k3
+```
+or gas:
+```bash
+simulate.py -t8 -n20 -k3
+```
+
+Note that there are new simulation tests that will be added soon, such as those
+which randomly vary the azimuthal angle. These example commands may differ in later
+versions of `simulate.py`; run `simulate.py` for a full usage guide
+
+### Reconstruction
+
+Now that we have some simulated data, let's run the reconstruction.
+
+At the time of writing this tutorial, we are in the middle of a re-design in the framework of how to handle configuration parameters. Currently all of our dRICH-specific configuration parameters are [hard-coded in DRICH.cc](https://github.com/eic/EICrecon/blob/5c330b91d6b837635b1607ae95e8758c216b426c/src/detectors/DRICH/DRICH.cc); all of these can be overridden by `eicrecon` commands in the form of `-Pparameter=value`.
+
+To learn how to use `eicrecon`, see the [corresponding general tutorial](https://indico.bnl.gov/event/16833/). This dRICH tutorial will show you how to use our custom `eicrecon` wrapper, `recon.rb`.
+
+It is envisioned that we will move to some sort of configuration file in the future, but that capability does not yet exist in EICrecon. Since such a feature is useful for us to have now, we have a wrapper of `eicrecon` here in `drich-dev`, called `recon.rb`, which:
+- reads configuration files in the `config/` directory
+- generates an `eicrecon` command, converting the configuration tree into a set of `-Pparameter=value` options
+- runs `eicrecon` with these options
+
+`recon.rb` allows us to quickly change the configuration without rebuilding EICrecon, and allows us to have, for example, one configuration with SiPM noise enabled and another with it disabled.
+
+To get started, check the usage guide by running
+```bash
+recon.rb -h
+```
+
+_Exercise_: View the files in the [config/](../../config) directory, in particular, the default one; compare the settings to other configuration files in that directory. 
+
+_Exercise_: Notice in the default config file the output collections, under `podio:output_include_collections:`. Can you find all of these collections in the dRICH reconstruction flowchart?
+
+_Exercise_: Run a "dry-run" of `recon.rb`, which will just print the `eicrecon` command it will run; notice the relation between configuration parameters in the configuration file, the `-Pparameter=value` options in the `eicrecon` command, and the corresponding (default) parameters that are set in the EICrecon code itself.
+
+To run the reconstruction on your sample simulation file (assuming you have the default file name), just run with no options:
+```bash
+recon.rb
+```
+
+If successful, you will find the output file (default name)
+```bash
+out/rec.edm4hep.root
+```
+If you open this file in `ROOT`, you will find an `events` tree, similar to what was produced from the simulation. If you include the collections from the simulation level in the reconstruction output, you will find the corresponding branches included here. Let's draw some distributions:
+
+- Digitization:
+```cpp
+events->Draw("DRICHRawHits.cellID")     // distribution of SiPM pixel ID
+events->Draw("DRICHRawHits.charge")     // ADC distribution
+events->Draw("DRICHRawHits.timeStamp")  // TDC distribution
+```
+
+- Track Projections:
+```cpp
+events->Draw("DRICHAerogelTracks_0.position.z")   // z position of projected track points in aerogel
+events->Draw("DRICHMergedTracks_0.position.x:DRICHMergedTracks_0.position.z")       // top-view of the projected track points in both radiators
+events->Draw("DRICHGasTracks_0.position.x:DRICHGasTracks_0.position.z","","*same")  // draw the gas points on top, with larger markers
+```
+
+- Cherenkov PID (for gas; for aerogel change `Gas` to `Aerogel`)
+```cpp
+events->Draw("DRICHGasIrtCherenkovParticleID.npe")           // number of photoelectrons for each charged particle
+events->Draw("DRICHGasIrtCherenkovParticleID.photonEnergy")  // average photon energy for each charged particle
+
+// PID hypothesis weight for each PDG, for the 3rd charged particle (3rd event, if using particle gun):
+events->Draw("DRICHGasIrtCherenkovParticleID_0.PDG","DRICHGasIrtCherenkovParticleID_0.weight","barhist",1,3)
+```
+
+Take a look at the list of branches. Notice that some of them are repeated, with suffixes such as `#0` or `_0`; this is because these branches are produced from [PODIO](https://github.com/AIDASoft/podio) using the [EDM4hep](https://github.com/key4hep/EDM4hep) and [EDM4eic](https://github.com/eic/EDM4eic) data models. We will cover more of this in [tutorial 4](4-reconstruction-code-part-1.md). While it is certainly possible to do an analysis using typical `ROOT` tools, you will gain a _significant_ advantage by using PODIO tools, since that will provide much simpler access to all of the data in the `TTree`, along with the relations between the data, such as a reconstructed particle and its relation to the set of PID hypotheses.
+
+### Aside: Event Display and Noise Injection
+
+Recall that our dRICH-specific `event_display` program can handle input from reconstruction output. Let's take a look:
+```bash
+event_display d s out/sim.edm4hep.root    # event display on the simulated data (pre-digitization, quantum efficiency, and safety factor)
+event_display d r out/rec.edm4hep.root    # event display on the reconstructed data (post-digitization)
+```
+Notice there are significantly fewer hits after digitization
+
+Now re-run the reconstruction, turning on the noise, and be sure to produce a differently named output file
+```bash
+recon.rb -c config/recon_irt_noise.yaml -r out/rec.noise.edm4hep.root
+```
+At the time of writing this, the IRT usage is not really capable of handling the noise, but we can still take a look at the event display:
+```bash
+event_display d r out/rec.noise.edm4hep.root
+```
+This is the noise from all of the events; see `event_display` usage guide to see the noise for each event individually.
+
+
+## Benchmarks
+
+under construction
