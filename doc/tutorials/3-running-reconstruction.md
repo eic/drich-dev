@@ -296,3 +296,12 @@ The following files will be produced (default names):
 - `out/ana.edm4hep.root`: ROOT file with the plots
 - `out/ana.plots/`: directory of plot images
 
+![benchmark-photon_spectra](img/benchmark-photon_spectra.png)
+
+![benchmark-digitization](img/benchmark-digitization.png)
+
+![benchmark-pidAerogel](img/benchmark-pidAerogel.png)
+
+![benchmark-pidGas](img/benchmark-pidGas.png)
+
+![benchmark-pidMerged](img/benchmark-pidMerged.png)
