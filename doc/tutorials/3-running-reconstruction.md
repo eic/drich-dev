@@ -163,7 +163,7 @@ simulate.py -t1 -n50 -pkaon+
 simulate.py -t4 -n20 -k3
 ```
 
-- throw 20 pions in 3 momentum values in the momentum range suitable for aerogel:
+- throw 20 pions with 3 momentum values in the momentum range suitable for aerogel:
 ```bash
 simulate.py -t7 -n20 -k3
 ```
