@@ -158,7 +158,7 @@ simulate.py -t1 -n50
 simulate.py -t1 -n50 -pkaon+
 ```
 
-- throw 20 pions at 3 different angles:
+- throw 20 pions at 3 different angles (**NOTE**: a hot-fix for this one was pushed just prior to the tutorial; if you try this one, run `git pull` from `drich-dev/` to pull the fix)
 ```bash
 simulate.py -t4 -n20 -k3
 ```
@@ -219,6 +219,8 @@ events->Draw("DRICHRawHits.cellID")     // distribution of SiPM pixel ID
 events->Draw("DRICHRawHits.charge")     // ADC distribution
 events->Draw("DRICHRawHits.timeStamp")  // TDC distribution
 ```
+
+![rec-dist-digi](img/rec-dist-digi.png)
 
 - Track Projections:
 ```cpp
