@@ -251,7 +251,9 @@ Recall that our dRICH-specific `event_display` program can handle input from rec
 event_display d s out/sim.edm4hep.root    # event display on the simulated data (pre-digitization, quantum efficiency, and safety factor)
 event_display d r out/rec.edm4hep.root    # event display on the reconstructed data (post-digitization)
 ```
-Notice there are significantly fewer hits after digitization
+Notice there are significantly fewer hits after digitization:
+
+![rec-display](img/rec-display.png)
 
 Now re-run the reconstruction, turning on the noise, and be sure to produce a differently named output file
 ```bash
@@ -263,6 +265,7 @@ event_display d r out/rec.noise.edm4hep.root
 ```
 This is the noise from all of the events; see `event_display` usage guide to see the noise for each event individually.
 
+![rec-display-noise](img/rec-display-noise.png)
 
 ## Benchmarks
 
