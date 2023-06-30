@@ -6,6 +6,10 @@ Tutorial 4: Reconstruction Code Part I
 
 ## UNDER CONSTRUCTION
 
-- Digitization
-- Track Propagation
-- Start IRT
+- JANA2 objects
+  - Collections
+  - `EDM4*` data model: all `datatypes` involved in dRICH PID (ref. Thomas's PODIO talk)
+  - Factories
+  - Algorithms and EICrecon independence (ref. Sylvester's talk)
+  - Configurations
+  - Plugins
