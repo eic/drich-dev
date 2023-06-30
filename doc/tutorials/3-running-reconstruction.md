@@ -110,7 +110,7 @@ The [EICrecon reconstruction framework](https://github.com/eic/EICrecon) is resp
 
 The default [set of output collections is found here](https://github.com/eic/EICrecon/blob/main/src/services/io/podio/JEventProcessorPODIO.cc). At the time of writing this tutorial, no dRICH output collections are included by default, therefore the dRICH PID does not yet run in the full production.
 
-The reconstruction flowchart for the [dRICH PID is found here](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md). At the time of writing this tutorial, the general idea is:
+The [dRICH PID reconstruction flowchart is found here](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md). At the time of writing this tutorial, the general idea is:
 
 - Transform the collection of MC dRICH sensor hits to digitized raw hits, using the digitization algorithm
 - Transform the CKF trajectories into projected tracks in the dRICH radiator, using the track propagation algorithm
