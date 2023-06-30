@@ -190,12 +190,14 @@ jobs:
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.${{matrix.id}}.${{matrix.radiator}}.${{matrix.particle}}
+        run: |
+          mkdir -p    pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}
+          mv -v out/* pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}/
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
           retention-days: 1
-          path: out.*/
+          path: pipeline
 
 # GEOMETRY ------------------------------------------------------------------------
 
@@ -383,19 +385,19 @@ jobs:
           name: irt_auxfiles
       - name: tree_artifacts_before_cull
         run: |
-          tree out*
+          tree pipeline
           tree geo
       - name: cull
         run: |
           find -name .keep | xargs rm -v
       - name: tree_artifacts_after_cull
         run: |
-          tree out*
+          tree pipeline
           tree geo
       - uses: actions/upload-artifact@v3
         with:
           name: _RESULTS
           retention-days: 14
           path: |
-            out*
+            pipeline
             geo
