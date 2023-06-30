@@ -296,12 +296,37 @@ The following files will be produced (default names):
 - `out/ana.edm4hep.root`: ROOT file with the plots
 - `out/ana.plots/`: directory of plot images
 
+**Photon spectra**: wavelength and multiplicity, before and after digitization
 ![benchmark-photon_spectra](img/benchmark-photon_spectra.png)
 
+**Raw hits**: ADC and TDC
 ![benchmark-digitization](img/benchmark-digitization.png)
+
+**PID from Aerogel**
+- top row:
+  - number of photoelectrons (NPE)
+  - Cherenkov angle
+  - Cherenkov angle residual
+  - Cherenkov angle residual, zoomed in, with a Gaussian fit
+  - PDG with highest PID weight
+- middle row
+  - NPE vs. momentum 
+  - Cherenkov angle vs. momentum, with expected curves (electron, pion, kaon, proton)
+  - Cherenkov angle residual vs. momentum
+  - Cherenkov angle correlation (theta vs. phi)
+  - refractive index at photon emission point
+- bottom row:
+  - NPE vs. pseudorapidity 
+  - Cherenkov angle vs. pseudorapidity
+  - Cherenkov angle residual vs. pseudorapidity
 
 ![benchmark-pidAerogel](img/benchmark-pidAerogel.png)
 
+**PID from Gas**
+
+_NOTE_: the Cherenkov angle residual is pseudorapidity dependent here; this is a bug and we have a fix ready for it, but it has not yet been merged into the branches used for the interactive tutorial
+
 ![benchmark-pidGas](img/benchmark-pidGas.png)
 
+**PID combined from both radiators** 
 ![benchmark-pidMerged](img/benchmark-pidMerged.png)
