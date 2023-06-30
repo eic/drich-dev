@@ -93,12 +93,13 @@ The reconstruction requires two ingredients:
 flowchart TB
   classDef alg fill:#ff8888,color:black
   classDef col fill:#00aaaa,color:black
-  a[Algorithm]:::alg
-  i1(Input Collection 1):::col ==> a
-  i2(Input Collection 2):::col ==> a
-  i3(Input Collection 3):::col ==> a
-  a ==> o1(Output Collection 1):::col
-  a ==> o2(Output Collection 2):::col
+  i0(Input Collection):::col ==> a1[Algorithm]:::alg ==> o0(Output Collection):::col
+  a2[Algorithm]:::alg
+  i1(Input Collection 1):::col ==> a2
+  i2(Input Collection 2):::col ==> a2
+  i3(Input Collection 3):::col ==> a2
+  a2 ==> o1(Output Collection 1):::col
+  a2 ==> o2(Output Collection 2):::col
 ```
 
 Both **Collections** and **Algorithms** are supposed to be (as) independent (as possible) from the underlying simulation and reconstruction frameworks; this follows the modularity paradigm, where pieces of ePIC software are as mutually orthogonal as possible.
