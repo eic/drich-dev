@@ -32,7 +32,7 @@ acceptanceDict = {
         'thetaMin': 180.0 - 10.0, # FIXME
         'thetaMax': 180.0 - 70.0, # FIXME
         # ideal theta: middle of acceptance
-        'thetaIdeal': math.degrees(eta_to_theta(2.0)), # FIXME
+        'thetaIdeal': math.degrees(eta_to_theta(-2.0)), # FIXME
     },
 }
 momMax = {
