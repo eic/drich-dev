@@ -112,6 +112,12 @@ The default [set of output collections is found here](https://github.com/eic/EIC
 
 The reconstruction flowchart for the [dRICH PID is found here](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md). At the time of writing this tutorial, the general idea is:
 
+- Transform the collection of MC dRICH sensor hits to digitized raw hits, using the digitization algorithm
+- Transform the CKF trajectories into projected tracks in the dRICH radiator, using the track propagation algorithm
+- Transform the digitized hits and projected tracks into PID hypotheses, using Indirect Ray Tracing
+- Link the PID hypotheses to final reconstructed particles, using proximity matching
+
+
 ```mermaid
 flowchart TB
   classDef alg fill:#ff8888,color:black
@@ -130,11 +136,6 @@ flowchart TB
   mc ==> prox
   prox ==> rec(Reconstructed Particles):::col
 ```
-
-- Transform the collection of MC dRICH sensor hits to digitized raw hits, using the digitization algorithm
-- Transform the CKF trajectories into projected tracks in the dRICH radiator, using the track propagation algorithm
-- Transform the digitized hits and projected tracks into PID hypotheses, using Indirect Ray Tracing
-- Link the PID hypotheses to final reconstructed particles, using proximity matching
 
 ## Running the Full Stack
 
