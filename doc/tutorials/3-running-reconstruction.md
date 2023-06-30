@@ -185,7 +185,7 @@ At the time of writing this tutorial, we are in the middle of a re-design in the
 To learn how to use `eicrecon`, see the [corresponding general tutorial](https://indico.bnl.gov/event/16833/). This dRICH tutorial will show you how to use our custom `eicrecon` wrapper, `recon.rb`.
 
 It is envisioned that we will move to some sort of configuration file in the future, but that capability does not yet exist in EICrecon. Since such a feature is useful for us to have now, we have a wrapper of `eicrecon` here in `drich-dev`, called `recon.rb`, which:
-- reads configuration files in the `config/` directory
+- reads configuration files in the [`config/`](../../config) directory
 - generates an `eicrecon` command, converting the configuration tree into a set of `-Pparameter=value` options
 - runs `eicrecon` with these options
 
@@ -196,7 +196,7 @@ To get started, check the usage guide by running
 recon.rb -h
 ```
 
-_Exercise_: View the files in the [config/](../../config) directory, in particular, the default one; compare the settings to other configuration files in that directory. 
+_Exercise_: View the files in the [`config/`](../../config) directory, in particular, the default one; compare the settings to other configuration files in that directory. 
 
 _Exercise_: Notice in the default configuration file the output collections, under `podio:output_include_collections:`. Can you find all of these collections in the dRICH reconstruction flowchart?
 
