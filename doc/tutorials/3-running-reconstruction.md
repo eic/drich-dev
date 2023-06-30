@@ -229,6 +229,8 @@ events->Draw("DRICHMergedTracks_0.position.x:DRICHMergedTracks_0.position.z")   
 events->Draw("DRICHGasTracks_0.position.x:DRICHGasTracks_0.position.z","","*same")  // draw the gas points on top, with larger markers
 ```
 
+![rec-dist-track](img/rec-dist-track.png)
+
 - Cherenkov PID (for gas; for aerogel change `Gas` to `Aerogel`)
 ```cpp
 events->Draw("DRICHGasIrtCherenkovParticleID.npe")           // number of photoelectrons for each charged particle
@@ -237,6 +239,8 @@ events->Draw("DRICHGasIrtCherenkovParticleID.photonEnergy")  // average photon e
 // PID hypothesis weight for each PDG, for the 3rd charged particle (3rd event, if using particle gun):
 events->Draw("DRICHGasIrtCherenkovParticleID_0.PDG","DRICHGasIrtCherenkovParticleID_0.weight","barhist",1,3)
 ```
+
+![rec-dist-pid](img/rec-dist-pid.png)
 
 Take a look at the list of branches. Notice that some of them are repeated, with suffixes such as `#0` or `_0`; this is because these branches are produced from [PODIO](https://github.com/AIDASoft/podio) using the [EDM4hep](https://github.com/key4hep/EDM4hep) and [EDM4eic](https://github.com/eic/EDM4eic) data models. We will cover more of this in [tutorial 4](4-reconstruction-code-part-1.md). While it is certainly possible to do an analysis using typical `ROOT` tools, you will gain a _significant_ advantage by using PODIO tools, since that will provide much simpler access to all of the data in the `TTree`, along with the relations between the data, such as a reconstructed particle and its relation to the set of PID hypotheses.
 
