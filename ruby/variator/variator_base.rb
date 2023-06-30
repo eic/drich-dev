@@ -70,7 +70,7 @@ class VariatorBase
         ["exit"],
         [
           "./simulate.py",
-          "-t 12",
+          "-t 102",
           "-v",
           "-n 15",
           "-e svg",
