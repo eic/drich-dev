@@ -176,7 +176,7 @@ recon.rb -h
 
 _Exercise_: View the files in the [config/](../../config) directory, in particular, the default one; compare the settings to other configuration files in that directory. 
 
-_Exercise_: Notice in the default config file the output collections, under `podio:output_include_collections:`. Can you find all of these collections in the dRICH reconstruction flowchart?
+_Exercise_: Notice in the default configuration file the output collections, under `podio:output_include_collections:`. Can you find all of these collections in the dRICH reconstruction flowchart?
 
 _Exercise_: Run a "dry-run" of `recon.rb`, which will just print the `eicrecon` command it will run; notice the relation between configuration parameters in the configuration file, the `-Pparameter=value` options in the `eicrecon` command, and the corresponding (default) parameters that are set in the EICrecon code itself.
 
