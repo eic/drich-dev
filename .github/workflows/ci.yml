@@ -4,7 +4,7 @@
 name: ci
 
 on:
-  # pull_request:
+  pull_request:
   push:
     branches:
       - main
@@ -235,7 +235,7 @@ jobs:
         with:
           name: geometry
           retention-days: 1
-          path: geo/
+          path: geo*/
 
   irt_auxfiles:
     needs:
@@ -269,7 +269,7 @@ jobs:
         with:
           name: geometry
           retention-days: 1
-          path: geo/
+          path: geo*/
 
   sensor_table:
     needs:
@@ -413,7 +413,7 @@ jobs:
         with:
           name: tests
           retention-days: 1
-          path: tests/
+          path: tests*/
 
   test_track_propagation:
     needs:
@@ -449,7 +449,7 @@ jobs:
         with:
           name: tests
           retention-days: 1
-          path: tests/
+          path: tests*/
 
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
