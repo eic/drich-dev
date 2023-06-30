@@ -16,8 +16,8 @@ from numpy import linspace
 acceptanceDict = {
     'drich': {
         # theta limits [degrees]
-        'thetaMin': 2.8,
-        'thetaMax': 30.5,
+        'thetaMin': 3.5,
+        'thetaMax': 22.8,
     },
     'pfrich': {
         # theta limits [degrees]
