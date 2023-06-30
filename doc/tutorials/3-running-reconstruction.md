@@ -108,9 +108,29 @@ The [EICrecon reconstruction framework](https://github.com/eic/EICrecon) is resp
 
 **Important**: only the Collections which the user asks to be produced will be saved in the final reconstruction output; only the minimal set of algorithms will be executed such that all of the requested output collections are produced. In other words, the part of the reconstruction flowchart which is actually used depends on the requested output collections.
 
-The default [set of output collections is found here](https://github.com/eic/EICrecon/blob/main/src/services/io/podio/JEventProcessorPODIO.cc). At the time of writing this tutorial, no dRICH output collections are included by default.
+The default [set of output collections is found here](https://github.com/eic/EICrecon/blob/main/src/services/io/podio/JEventProcessorPODIO.cc). At the time of writing this tutorial, no dRICH output collections are included by default, therefore the dRICH PID does not yet run in the full production.
 
 The reconstruction flowchart for the [dRICH PID is found here](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md). At the time of writing this tutorial, the general idea is:
+
+```mermaid
+flowchart TB
+  classDef alg fill:#ff8888,color:black
+  classDef col fill:#00aaaa,color:black
+  simHits(MC Sensor Hits):::col ==> digi[Digitization]:::alg ==> rawHits(Raw Hits):::col
+  traj(Trajectories):::col ==> prop[Track Propagation]:::alg ==> proj(Projected Track Points):::col
+  pid[PID Algorithm]:::alg
+  rawHits ==> pid
+  proj ==> pid
+  pid ==> hyp(PID Hypotheses):::col
+  traj ==> track(Tracking Algorithm Results):::col
+  mc(MC Particles):::col
+  prox[Proximity Matching]:::alg
+  hyp ==> prox
+  track ==> prox
+  mc ==> prox
+  prox ==> rec(Reconstructed Particles):::col
+```
+
 - Transform the collection of MC dRICH sensor hits to digitized raw hits, using the digitization algorithm
 - Transform the CKF trajectories into projected tracks in the dRICH radiator, using the track propagation algorithm
 - Transform the digitized hits and projected tracks into PID hypotheses, using Indirect Ray Tracing
