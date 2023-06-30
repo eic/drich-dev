@@ -197,7 +197,7 @@ jobs:
         with:
           name: pipeline
           retention-days: 1
-          path: pipeline
+          path: pipeline*/
 
 # GEOMETRY ------------------------------------------------------------------------
 
@@ -383,21 +383,13 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: irt_auxfiles
-      - name: tree_artifacts_before_cull
-        run: |
-          tree pipeline
-          tree geo
       - name: cull
         run: |
           find -name .keep | xargs rm -v
-      - name: tree_artifacts_after_cull
-        run: |
-          tree pipeline
-          tree geo
       - uses: actions/upload-artifact@v3
         with:
           name: _RESULTS
           retention-days: 14
           path: |
-            pipeline
-            geo
+            pipeline*/
+            geo*/
