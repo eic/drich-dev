@@ -226,4 +226,30 @@ This is the noise from all of the events; see `event_display` usage guide to see
 
 ## Benchmarks
 
-under construction
+Between the time of announcing this interactive tutorial and the interactive tutorial itself, there have been some updates to the benchmarks. To get these updates, pull them and recompile:
+```bash
+pushd reconstruction_benchmarks
+git pull
+popd
+build.sh reconstruction_benchmarks
+```
+
+The benchmarks are meant to be executable by single commands, such that they can be easily called in the CI; the command should return a nonzero exit code upon failure. It is up to subsystem experts to check the artifacts, to ensure things like subsystem performance is adequate.
+
+The dRICH benchmarks produce several plots, similar to the ones we were producing above. They make use of the PODIO tools in order to read the reconstruction data.
+
+The primary command for dRICH benchmarks is symbolically linked in `drich-dev`:
+```bash
+ls -l benchmark.rb
+# result: benchmark.rb -> reconstruction_benchmarks/benchmarks/rich/run_benchmark.rb
+```
+
+To run the benchmarks:
+```bash
+benchmark.rb     # print the usage guide
+benchmark.rb -b  # run the benchmarks on out/rec.edm4eic.root
+```
+The following files will be produced (default names):
+- `out/ana.edm4hep.root`: ROOT file with the plots
+- `out/ana.plots/`: directory of plot images
+
