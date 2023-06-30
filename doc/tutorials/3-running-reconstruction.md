@@ -89,6 +89,18 @@ The reconstruction requires two ingredients:
 - **Collections**: a set of objects, such as dRICH sensor hits or PID results
 - **Algorithms**: a transformation of a set of collections to another set of collections, such as a PID algorithm which transforms digitized hits and projected tracks into PID hypotheses
 
+```mermaid
+flowchart TB
+  classDef alg fill:#ff8888,color:black
+  classDef col fill:#00aaaa,color:black
+  a[Algorithm]:::alg
+  i1(Input Collection 1):::col ==> a
+  i2(Input Collection 2):::col ==> a
+  i3(Input Collection 3):::col ==> a
+  a ==> o1(Output Collection 1):::col
+  a ==> o2(Output Collection 2):::col
+```
+
 Both **Collections** and **Algorithms** are supposed to be (as) independent (as possible) from the underlying simulation and reconstruction frameworks; this follows the modularity paradigm, where pieces of ePIC software are as mutually orthogonal as possible.
 
 The [EICrecon reconstruction framework](https://github.com/eic/EICrecon) is responsible for running these algorithms and handling the input and output collections. Using **Collections** and **Algorithms** the full reconstruction forms a [Directed Acyclic Graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph), starting with Collections produced from DD4hep and ending with the final Collections requested by the user. Here we will call this DAG the "reconstruction flowchart."
