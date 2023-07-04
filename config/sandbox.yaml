@@ -1,14 +1,10 @@
 ###############################################################################
 # DRICH Configuration Parameters Sandbox
-# - eventually we will have a proper config file in EICrecon itself,
-#   but already here we can demonstrate that capability, as shown below
-# - once we have such config files in EICrecon, we will likely not need to have
-#   this `recon.rb` wrapper and our own `yaml` files
-# - any settings below will override the current default settings, which are
-#   stored in `EICrecon/src/detectors/DRICH/DRICH.cc`
+# - demonstration of configuration parameter overrides for the dRICH
 # - the ability to parse units in EICrecon may not yet be merged to `main`
 ###############################################################################
 
+### DRICH Configuration #####################
 DRICH:
   ### digitizer
   DRICHRawHits:
@@ -38,11 +34,11 @@ DRICH:
     - 4
     - 5
 
-
-################################################################################
-# Common configuration parameters (collections, plugins, log levels, etc.)
-################################################################################
-
-#
-# (see other config files)
-#
+### Output Collections ######################
+podio:
+  output_include_collections:
+    - DRICHAerogelIrtCherenkovParticleID
+    - DRICHGasIrtCherenkovParticleID
+    - ReconstructedChargedParticles
+    - ReconstructedChargedParticleAssociations
+    - ReconstructedChargedParticleIDs

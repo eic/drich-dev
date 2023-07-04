@@ -257,7 +257,7 @@ Notice there are significantly fewer hits after digitization:
 
 Now re-run the reconstruction, turning on the noise, and be sure to produce a differently named output file
 ```bash
-recon.rb -c config/recon_irt_noise.yaml -r out/rec.noise.edm4hep.root
+recon.rb -c config/noise.yaml -r out/rec.noise.edm4hep.root
 ```
 At the time of writing this, the IRT usage is not really capable of handling the noise, but we can still take a look at the event display:
 ```bash
