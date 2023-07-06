@@ -74,12 +74,125 @@ We are now ready to discuss [the dRICH reconstruction flowchart of algorithms](h
 
 ## EICrecon
 
+### Definitions
+
 [EICrecon](https://github.com/eic/EICrecon) is used to run the reconstruction algorithms. It is there that the connections between collections and algorithms are defined. To proceed, we need a few more definitions:
 
-- **Factory**: 
-- **Service**:
+- **Factory**: a factory uses an algorithm to produce a set of output collections, given input collections
+  - this is effectively the EICrecon-dependent part of an algorithm, though it is a _separate_ class, since we prefer the algorithm _itself_ to be EICrecon independent
+  - interfaces algorithm configuration with the user (`eicrecon` command)
+  - initializes an algorithm, given the configuration
+  - handles the input and output data of an algorithm, running the algorithm's `AlgorithmProcess` method
+- **Service**: globally common features, including:
+  - access to the detector geometry
+    - IMPORTANT: the RICH detectors have an extended geometry service, called `richgeo`
+  - logging and log levels
+  - file I/O
 - **Plugin**:
+  - runs the factories
+  - effectively expresses the "wiring" between algorithms and collections
 
-# UNDER CONSTRUCTION
+Here is a visual representation:
 
+![rec-eicrecon](img/rec-eicrecon.png)
 
+### Code Organization
+
+At the time of writing this tutorial, the part of the source code tree relevant for the dRICH is given below. Notice that the algorithm and factory names are given in the dRICH algorithm flowchart, but here we show the full file tree so that you can more easily find the relevant files.
+```
+src
+├── algorithms   // EICrecon-independent algorithms
+│   │
+│   ├── digi
+│   │   ├── PhotoMultiplierHitDigi.cc       // digitizer
+│   │   ├── PhotoMultiplierHitDigi.h
+│   │   └── PhotoMultiplierHitDigiConfig.h
+│   │
+│   ├── tracking
+│   │   ├── TrackPropagation.cc             // propagate tracks to surfaces
+│   │   └── TrackPropagation.h
+│   │
+│   └── pid
+│       │
+│       ├── MergeTracks.cc                  // combine propagated track segments
+│       ├── MergeTracks.h
+│       │
+│       ├── IrtCherenkovParticleID.cc       // run the underlying Indirect Ray Tracing (IRT) algorithm
+│       ├── IrtCherenkovParticleID.h
+│       ├── IrtCherenkovParticleIDConfig.h
+│       │
+│       ├── MergeParticleID.cc              // combine ParticleID objects
+│       ├── MergeParticleID.h
+│       ├── MergeParticleIDConfig.h
+│       │
+│       ├── ParticlesWithPID.cc             // link reconstructed particles to ParticleID objects
+│       ├── ParticlesWithPID.h
+│       ├── ParticlesWithPIDConfig.h
+│       │
+│       ├── ConvertParticleID.h             // conversions between different ParticleID datatypes
+│       └── Tools.h                         // common methods and constants
+│
+│
+├── detectors   // plugins for each detector subsystem
+│   └── DRICH
+│       ├── DRICH.cc    // DRICH plugin: "wiring" of dRICH reconstruction algorithms, factories, and collections
+│       └── README.md   // primary documentation for dRICH reconstruction
+│
+│
+├── global   // EICrecon factories (each corresponds to an algorithm above)
+│   │
+│   ├── digi
+│   │   ├── PhotoMultiplierHitDigi_factory.cc
+│   │   └── PhotoMultiplierHitDigi_factory.h
+│   │
+│   └── pid
+│       ├── pid.cc  // the PID plugin (uses DRICH plugin results, and eventually will use other PID subsystem results too)
+│       │
+│       ├── IrtCherenkovParticleID_factory.cc
+│       ├── IrtCherenkovParticleID_factory.h
+│       │
+│       ├── MergeCherenkovParticleID_factory.cc
+│       ├── MergeCherenkovParticleID_factory.h
+│       │
+│       ├── MergeTrack_factory.cc
+│       ├── MergeTrack_factory.h
+│       │
+│       ├── ParticlesWithPID_factory.cc
+│       ├── ParticlesWithPID_factory.h
+│       │
+│       ├── RichTrackConfig.h     // TODO: this should be converted to an algorithm configuration...
+│       ├── RichTrack_factory.cc
+│       └── RichTrack_factory.h
+│
+│
+├── services      // EICrecon services
+│   └── geometry
+│       └── richgeo    // RICH geometry bindings
+│           │
+│           ├── richgeo.cc          // plugin and service implementation
+│           ├── RichGeo_service.cc
+│           ├── RichGeo_service.h
+│           │
+│           ├── ActsGeo.cc          // bindings to ACTS, for track propagation
+│           ├── ActsGeo.h
+│           │
+│           ├── IrtGeo.cc           // bindings to IRT, for PID optics
+│           ├── IrtGeo.h
+│           ├── IrtGeoDRICH.cc
+│           ├── IrtGeoDRICH.h
+│           ├── IrtGeoPFRICH.cc
+│           ├── IrtGeoPFRICH.h
+│           │
+│           ├── ReadoutGeo.cc       // information about the readout geometry and pixels
+│           ├── ReadoutGeo.h
+│           │
+│           └── RichGeo.h           // common objects and functions
+│
+│
+└── tests
+    └── algorithms_test          // unit tests
+        ├── pid_MergeTracks.cc
+        └── pid_MergeParticleID.cc
+```
+
+We will now give a tour of the code; the remainder of this tutorial is contained in the tutorial recording, linked at the top of this page.
