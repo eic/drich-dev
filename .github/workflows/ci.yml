@@ -126,15 +126,33 @@ jobs:
       - build_3
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
+        id:
+          - fixed_p
+          - eta_scan
+          - p_scan_eta0
+          - p_scan_eta1
+          - p_scan_eta2
+          - p_scan_eta3
+        radiator: [aerogel, gas]
         particle: [pi+, kaon+, proton]
-        test_num: [1, 5, 7, 8]
         include:
-          - { test_num: 1, num_events: 50 }
-          - { test_num: 5, num_events: 20 }
-          - { test_num: 7, num_events: 20 }
-          - { test_num: 8, num_events: 20 }
+          ### default momentum for each radiator (for fixed momentum tests)
+          - { radiator: aerogel, momentum: 5.0  }
+          - { radiator: gas,     momentum: 20.0 }
+          ### fixed momentum tests
+          - { id: fixed_p,  options: -t 1 -n 50 }
+          - { id: eta_scan, options: -t 6 -k 5 -n 30 }
+          ### momentum scans at fixed pseudorapidities
+          - { id: p_scan_eta0, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 1.6 }
+          - { id: p_scan_eta0, radiator: gas,     options: -t 10 -k 5 -n 30 -b 1.6 }
+          - { id: p_scan_eta1, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 2.0 }
+          - { id: p_scan_eta1, radiator: gas,     options: -t 10 -k 5 -n 30 -b 2.0 }
+          - { id: p_scan_eta2, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 2.7 }
+          - { id: p_scan_eta2, radiator: gas,     options: -t 10 -k 5 -n 30 -b 2.7 }
+          - { id: p_scan_eta3, radiator: aerogel, options: -t 9  -k 5 -n 30 -b 3.5 }
+          - { id: p_scan_eta3, radiator: gas,     options: -t 10 -k 5 -n 30 -b 3.5 }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -152,10 +170,10 @@ jobs:
           run: |
             scripts/configure_CI.sh reconstruction_benchmarks
             echo "[CI] RUN SIMULATION:"
-            simulate.py -t ${{matrix.test_num}} -n ${{matrix.num_events}} -p ${{matrix.particle}}
-            echo "[CI] EVENT DISPLAY SINGLES:"
-            event_display d s out/sim.edm4hep.root 0 0
-            mv out/ev out/ev.singles
+            simulate.py ${{matrix.options}} -m ${{matrix.momentum}} -p ${{matrix.particle}}
+            # echo "[CI] EVENT DISPLAY SINGLES:"
+            # event_display d s out/sim.edm4hep.root 0 0
+            # mv out/ev out/ev.singles
             echo "[CI] EVENT DISPLAY INTEGRATED:"
             event_display d s out/sim.edm4hep.root
             mv out/ev out/ev.all_events
@@ -172,12 +190,14 @@ jobs:
       - name: tree_artifacts
         run: tree out
       - name: rename_artifacts
-        run: mv -v out out.test${{matrix.test_num}}
+        run: |
+          mkdir -p    pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}
+          mv -v out/* pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}/
       - uses: actions/upload-artifact@v3
         with:
           name: pipeline
           retention-days: 1
-          path: out.*/
+          path: pipeline*/
 
 # GEOMETRY ------------------------------------------------------------------------
 
@@ -336,6 +356,7 @@ jobs:
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
   collect:
+    if: ${{ always() }}
     needs:
       - pipeline
       - geometry
@@ -362,21 +383,13 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: irt_auxfiles
-      - name: tree_artifacts_before_cull
-        run: |
-          tree out*
-          tree geo
       - name: cull
         run: |
           find -name .keep | xargs rm -v
-      - name: tree_artifacts_after_cull
-        run: |
-          tree out*
-          tree geo
       - uses: actions/upload-artifact@v3
         with:
           name: _RESULTS
           retention-days: 14
           path: |
-            out*
-            geo
+            pipeline*/
+            geo*/

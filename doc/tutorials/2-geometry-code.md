@@ -46,7 +46,7 @@ When you are done, revert the changes in `epic/compact/pid/drich.xml` so that `D
 
 ### Optics Studies
 
-Some tests in `simulate.py` are used for optical studies. In particular, test 12 sends wide, collimated photon beams from the IP at varying angles aimed at the mirror. The focus of each beam is the parallel-to-point focal region, and tends to be consistent with where the best Cherenkov ring resolution is found. As suggested by the `simulate.py` usage guide, set `DRICH_debug_optics` to `1`. In `epic/compact/pid/drich.xml`, change the line
+Some tests in `simulate.py` are used for optical studies. In particular, test 102 sends wide, collimated photon beams from the IP at varying angles aimed at the mirror. The focus of each beam is the parallel-to-point focal region, and tends to be consistent with where the best Cherenkov ring resolution is found. As suggested by the `simulate.py` usage guide, set `DRICH_debug_optics` to `1`. In `epic/compact/pid/drich.xml`, change the line
 ```xml
 <constant name="DRICH_debug_optics"    value="0"/>
 ```
@@ -58,13 +58,13 @@ and rebuild `epic`:
 ```bash
 build.sh epic
 ```
-Now run test 12:
+Now run test 102:
 ```bash
-simulate.py -t12
+simulate.py -t102
 ```
 Use the `-n` option to change the number of photons per beam, and the `-k` option to change the number of beams. For example,
 ```bash
-simulate.py -t12 -k3 -n30
+simulate.py -t102 -k3 -n30
 ```
 
 ![sim-optics](img/sim-optics.png)
