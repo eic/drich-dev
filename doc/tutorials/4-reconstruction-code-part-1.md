@@ -85,7 +85,7 @@ We are now ready to discuss [the dRICH reconstruction flowchart of algorithms](h
   - handles the input and output data of an algorithm, running the algorithm's `AlgorithmProcess` method
 - **Service**: globally common features, including:
   - access to the detector geometry
-    - IMPORTANT: the RICH detectors have an extended geometry service, called `richgeo`
+    - NOTE: the RICH detectors have an extended geometry service, called `richgeo`, which serves the dRICH geometry in the form of ACTS surfaces for track propagation and IRT optical surfaces for the IRT PID, along with additional geometry-related features
   - logging and log levels
   - file I/O
 - **Plugin**:
