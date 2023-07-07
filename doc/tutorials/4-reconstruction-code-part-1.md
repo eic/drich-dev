@@ -1,7 +1,13 @@
 Tutorial 4: Reconstruction Code Part I
 ======================================
 
-- TUTORIAL RECORDING
+**NOTE**: you are viewing an OLD VERSION of this tutorial; the tutorial
+recording is based on this version. For the latest version of these tutorial notes, visit
+[the Tutorial Landing Page on the `main` branch](https://github.com/eic/drich-dev/blob/main/doc/tutorials/README.md).
+
+---
+
+- [TUTORIAL RECORDING](https://duke.zoom.us/rec/share/eJqawysxW9cb376hZE5Yth6hSyfWh_gvTGezb1ggnngZf84fm8oBW63So1dIr0lU.FDHkKc0ETS8TCYFO)
 - [Return to Tutorial Landing Page](README.md)
 
 ## Introduction
