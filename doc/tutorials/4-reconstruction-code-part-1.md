@@ -32,12 +32,12 @@ Now take a look at the YAML files. Here are links to them, along with the variou
 - [edm4hep.yaml](https://github.com/key4hep/EDM4hep/blob/master/edm4hep.yaml)
   - `edm4hep::SimTrackerHit`: MC-truth dRICH sensor hits (recall that the dRICH is a (optical) "tracker" in DD4hep)
   - `edm4hep::MCParticle`: MC-truth particle
-  - `edm4hep::ParticleID`: a PID hypothesis result; these are the user-level PID objects that the dRICH PID algorithms produce
+  - `edm4hep::ParticleID`: a PID hypothesis result; these are the user-level PID objects that the dRICH PID algorithms produces
   - `edm4hep::ReconstructedParticle`: a reconstructed particle (we do not yet use this in ePIC; instead we use a modified version in EDM4eic)
 - [edm4eic.yaml](https://github.com/eic/EDM4eic/blob/main/edm4eic.yaml)
   - `edm4eic::RawTrackerHit`: a digitized dRICH sensor hit
   - `edm4eic::TrackSegment`: a segment of a full track, consisting of a list of `edm4eic::TrackPoint` component objects
-  - `edm4eic::CherenkovParticleID`: expert-level PID object for Cherenkov detectors; it contains a list of `edm4eic::CherenkovParticleIDHypothesis` component objects: one for each mass hypothesis
+  - `edm4eic::CherenkovParticleID`: expert-level PID object for Cherenkov detectors; it contains a list of hypotheses, `edm4eic::CherenkovParticleIDHypothesis` component objects, one for each mass hypothesis
   - `edm4eic::ReconstructedParticle`: a reconstructed particle
   - `edm4eic::MCRecoParticleAssociation`: an association between a reconstructed particle and the corresponding MC-truth particle
   - `edm4eic::MCRecoTrackerHitAssociation`: an association between a digitized hit and the corresponding set of MC-truth hits
