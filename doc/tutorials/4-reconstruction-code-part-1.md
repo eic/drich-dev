@@ -101,7 +101,7 @@ Here is a visual representation:
 At the time of writing this tutorial, the part of the source code tree relevant for the dRICH is given below. Notice that the algorithm and factory names are given in the dRICH algorithm flowchart, but here we show the full file tree so that you can more easily find the relevant files.
 ```
 src
-├── algorithms   // EICrecon-independent algorithms
+├── algorithms   // EICrecon-independent algorithms (cf. factories in global/ below)
 │   │
 │   ├── digi
 │   │   ├── PhotoMultiplierHitDigi.cc       // digitizer
