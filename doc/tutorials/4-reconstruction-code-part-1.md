@@ -72,6 +72,8 @@ An additional class (or `struct`) is used to hold the set of configuration param
 
 We are now ready to discuss [the dRICH reconstruction flowchart of algorithms](https://github.com/eic/EICrecon/blob/main/src/detectors/DRICH/README.md).
 
+See also [slides on dRICH algorithms](https://indico.bnl.gov/event/19683/attachments/48044/82398/slides.pdf) for a general idea of what each algorithm does.
+
 ## EICrecon
 
 ### Definitions
