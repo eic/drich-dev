@@ -54,9 +54,9 @@ One last definition before discussing algorithms: for each **datatype**, you wil
 
 ### Algorithms
 
-An algorithm is a transformation from one set of EDM Collections to another; for example, a digitizer transforms a collection of MC-truth sensor hits to a collection of digitized (raw) hits (and in our dRICH case, an additional collection of associations between the raw hits and MC hits).
+An algorithm is a transformation from one set of EDM Collections to another; for example, a digitizer transforms a collection of MC-truth sensor hits to a collection of raw, digitized hits (and in our dRICH usage, an additional collection of associations between the raw hits and MC hits).
 
-IMPORTANT: these algorithms are supposed to be _as independent as possible_ from the reconstruction framework; the primary dependence should be on the data model. Eventually we may fully decouple the algorithms from EICrecon, but for new they currently live in the EICrecon repository. See [Sylvester's CHEP 2023 talk](https://indico.jlab.org/event/459/contributions/11419/) for more details.
+IMPORTANT: these algorithms are supposed to be _as independent as possible_ from the reconstruction framework; the primary dependence should be on the data model. Eventually we may fully decouple the algorithms from EICrecon, but for now they currently live in the EICrecon repository. See [Sylvester's CHEP 2023 talk](https://indico.jlab.org/event/459/contributions/11419/) for more details.
 
 Algorithms should be:
 - Configurable, allowing external configuration to tune for specific subsystems or use cases
