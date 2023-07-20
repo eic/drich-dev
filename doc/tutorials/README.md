@@ -1,12 +1,6 @@
 dRICH Tutorial Series
 =====================
 
-**NOTE**: you are viewing an OLD VERSION of this tutorial landing page.
-For the latest version, visit
-[the Tutorial Landing Page on the `main` branch](https://github.com/eic/drich-dev/blob/main/doc/tutorials/README.md).
-
----
-
 Welcome to the dRICH Simulation Tutorials landing page! This page will link
 to all of our tutorials, and is hosted here on Github to allow for updates
 as needed. Before going through the dRICH tutorials, there are a few
@@ -39,4 +33,4 @@ tour of the implementation details.
 3. [Running Reconstruction and Benchmarks](3-running-reconstruction.md)
 4. [Reconstruction and Benchmark Code Part I](4-reconstruction-code-part-1.md)
 5. [Reconstruction and Benchmark Code Part II](5-reconstruction-code-part-2.md)
-6. [Geometry Parameter Scanning](6-parameter-scanning.md)
+6. [Geometry Parameter Scanning](6-parameter-scanning.md) (will be given upon request)
