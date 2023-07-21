@@ -1,12 +1,6 @@
 Tutorial 3: Running Reconstruction and Benchmarks
 =================================================
 
-**NOTE**: you are viewing an OLD VERSION of this tutorial; the tutorial
-recording is based on this version. For the latest version of these tutorial notes, visit
-[the Tutorial Landing Page on the `main` branch](https://github.com/eic/drich-dev/blob/main/doc/tutorials/README.md).
-
----
-
 - [TUTORIAL RECORDING](https://duke.zoom.us/rec/share/d8i2JN70kmZTZn0k5ysEQlAHq3JhNYYmWMyZOA5Omlt7JWL23AcWRS4beIc2yXhh.pg_k04utdsKoYjJa)
 - [Return to Tutorial Landing Page](README.md)
 
