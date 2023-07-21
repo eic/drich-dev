@@ -1,6 +1,12 @@
 Tutorial 5: Reconstruction Code Part II
 =======================================
 
+**NOTE**: you are viewing an OLD VERSION of this tutorial; the tutorial
+recording is based on this version. For the latest version of these tutorial notes, visit
+[the Tutorial Landing Page on the `main` branch](https://github.com/eic/drich-dev/blob/main/doc/tutorials/README.md).
+
+---
+
 - [TUTORIAL RECORDING](https://drive.google.com/file/d/1BJfRvJeB21Y0PKkd-5Qw1JU32bt7Hboj/view?usp=sharing)
 - [Return to Tutorial Landing Page](README.md)
 

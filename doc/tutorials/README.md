@@ -1,6 +1,12 @@
 dRICH Tutorial Series
 =====================
 
+**NOTE**: you are viewing an OLD VERSION of this tutorial; the tutorial
+recording is based on this version. For the latest version of these tutorial notes, visit
+[the Tutorial Landing Page on the `main` branch](https://github.com/eic/drich-dev/blob/main/doc/tutorials/README.md).
+
+---
+
 Welcome to the dRICH Simulation Tutorials landing page! This page will link
 to all of our tutorials, and is hosted here on Github to allow for updates
 as needed. Before going through the dRICH tutorials, there are a few
