@@ -11,16 +11,16 @@ for repo in $repo_list; do
       git clone https://github.com/eic/epic.git --branch 111-drich-use-true-sensor-thickness-and-add-resin-base
       ;;
     EDM4eic)
-      git clone https://github.com/eic/EDM4eic.git --branch main
+      git clone https://github.com/eic/EDM4eic.git --branch dRICH_Photon_angle
       ;;
     irt)
-      git clone https://github.com/eic/irt.git --branch main
+      git clone https://github.com/eic/irt.git --branch sensor-normal-surface
       ;;
     EICrecon)
-      git clone https://github.com/eic/EICrecon.git --branch pdu-update
+      git clone https://github.com/eic/EICrecon.git --branch pdu-update-normal-surface
       ;;
     reconstruction_benchmarks)
-      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
+      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo-sensor-normal
       ;;
     none)
       echo "Not cloning any repositories"
