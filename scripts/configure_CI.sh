@@ -20,7 +20,8 @@ for repo in $repo_list; do
       git clone https://github.com/eic/EICrecon.git --branch pdu-update-normal-surface
       ;;
     reconstruction_benchmarks)
-      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo-sensor-normal
+      # git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo-sensor-normal
+      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch fix-include
       ;;
     none)
       echo "Not cloning any repositories"

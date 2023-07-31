@@ -89,6 +89,7 @@ case $module in
     genOpt EICRECON_VERBOSE_CMAKE=ON
     ;;
   reconstruction_benchmarks)
+    genOpts+="-LAH " # dump variables
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
