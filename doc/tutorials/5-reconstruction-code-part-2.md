@@ -1,7 +1,7 @@
 Tutorial 5: Reconstruction Code Part II
 =======================================
 
-- [TUTORIAL RECORDING](https://drive.google.com/file/d/1BJfRvJeB21Y0PKkd-5Qw1JU32bt7Hboj/view?usp=sharing)
+- [TUTORIAL RECORDING (mirror 1)](https://drive.google.com/file/d/1BJfRvJeB21Y0PKkd-5Qw1JU32bt7Hboj/view?usp=sharing)
 - [Return to Tutorial Landing Page](README.md)
 
 ## Introduction
