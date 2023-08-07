@@ -1,7 +1,9 @@
 Tutorial 3: Running Reconstruction and Benchmarks
 =================================================
 
-- [TUTORIAL RECORDING](https://duke.zoom.us/rec/share/d8i2JN70kmZTZn0k5ysEQlAHq3JhNYYmWMyZOA5Omlt7JWL23AcWRS4beIc2yXhh.pg_k04utdsKoYjJa)
+- [TUTORIAL RECORDING (mirror 1)](https://drive.google.com/file/d/1jvLbU0lfBD5aomfLHqDPhUpl5tguSXdY/view?usp=sharing)
+  -- [CHAT](https://drive.google.com/file/d/1V-FVWUvpaNaFDlGeIgNpoJ4RlMppT2Zs/view?usp=sharing)
+- [TUTORIAL RECORDING (mirror 2)](https://duke.zoom.us/rec/share/d8i2JN70kmZTZn0k5ysEQlAHq3JhNYYmWMyZOA5Omlt7JWL23AcWRS4beIc2yXhh.pg_k04utdsKoYjJa)
 - [Return to Tutorial Landing Page](README.md)
 
 ## Prerequisites

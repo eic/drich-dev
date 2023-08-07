@@ -1,7 +1,9 @@
 Tutorial 4: Reconstruction Code Part I
 ======================================
 
-- [TUTORIAL RECORDING](https://duke.zoom.us/rec/share/eJqawysxW9cb376hZE5Yth6hSyfWh_gvTGezb1ggnngZf84fm8oBW63So1dIr0lU.FDHkKc0ETS8TCYFO)
+- [TUTORIAL RECORDING (mirror 1)](https://drive.google.com/file/d/1AtZWrKtmR5mimze8WsnN1wVJ72U_Ewdu/view?usp=sharing)
+  -- [CHAT](https://drive.google.com/file/d/1YHoNTOO6zhZ0K9nBs2oYEI3M0Z-5rJVe/view?usp=sharing)
+- [TUTORIAL RECORDING (mirror 2)](https://duke.zoom.us/rec/share/eJqawysxW9cb376hZE5Yth6hSyfWh_gvTGezb1ggnngZf84fm8oBW63So1dIr0lU.FDHkKc0ETS8TCYFO)
 - [Return to Tutorial Landing Page](README.md)
 
 ## Introduction
