@@ -8,7 +8,7 @@ echo "[CI] CLONING REPOSITORIES: $repo_list"
 for repo in $repo_list; do
   case $repo in
     epic)
-      git clone https://github.com/eic/epic.git --branch main
+      git clone https://github.com/eic/epic.git --branch mirror-ribs
       ;;
     EDM4eic)
       git clone https://github.com/eic/EDM4eic.git --branch main
