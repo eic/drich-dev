@@ -9,19 +9,26 @@ require 'ostruct'
 
 # default CLI options
 options = OpenStruct.new
-options.sim_file     = 'out/sim.edm4hep.root'
-options.rec_file     = 'out/rec.edm4hep.root'
-options.config_file  = 'config/recon_irt.yaml'
-options.dry_run      = false
-options.debug_run    = false
-options.eicrecon_bin = 'eicrecon'
+options.sim_file         = 'out/sim.edm4hep.root'
+options.rec_file         = 'out/rec.edm4hep.root'
+options.config_main      = 'config/irt.yaml'
+options.config_overrides = Array.new
+options.dry_run          = false
+options.debug_run        = false
+options.eicrecon_bin     = 'eicrecon'
 
 # parse CLI options
 OptionParser.new do |o|
   o.banner = "USAGE: #{$0} [OPTIONS]..."
   o.separator('')
   o.separator('OPTIONS:')
-  o.on("-c", "--config [FILE]", "Configuration YAML file", "Default: #{options.config_file}"){ |a| options.config_file = a }
+  o.on("-m", "--main-config [FILE]", "Main Configuration YAML file", "Default: #{options.config_main}"){ |a| options.config_main = a }
+  o.separator('')
+  o.on("-c", "--configs [FILES]...", Array,
+       "Configuration YAML file(s), which override the main configuration file",
+       "delimit by commas, no spaces",
+       "Default: no overriding files"
+      ) { |a| options.config_overrides = a }
   o.separator('')
   o.on("-s", "--sim [FILE]", "Simulation input file", "Default: #{options.sim_file}"){ |a| options.sim_file = a }
   o.separator('')
@@ -39,23 +46,29 @@ OptionParser.new do |o|
     exit 2
   end
 end.parse!(ARGV)
-# puts "OPTIONS: #{options}"
+puts "\nOPTIONS: {"
+options.each_pair do |k,v|
+  puts k.to_s.rjust(20) + " => #{v},"
+end
+puts "}\n\n"
 
 # check for existence of input files
 [
   options.sim_file,
-  options.config_file,
+  options.config_main,
+  *options.config_overrides,
 ].each do |name|
+  if name.nil?
+    $stderr.puts "ERROR: option for a filename used, but no file was specified"
+    exit 1
+  end
   unless File.exist? name
     $stderr.puts "ERROR: file '#{name}' does not exist"
     exit 1
   end
 end
 
-# parse configuration file to Hash
-config_yaml = YAML.load_file options.config_file
-
-# parse a YAML tree of settings, returning an Array of strings with:
+# function to parse a YAML tree of settings, returning an Array of strings with:
 # - list of node path keys combined with `String.join ':'`
 # - leaf node appended as "=#{leaf}"
 #   - Array leaves will be returned as `String.join ','`
@@ -73,17 +86,34 @@ def traverse(tree, tree_name='')
   end
 end
 
-# convert parsed config file settings into 'key=value' pairs JANA can use
-arg_list = traverse config_yaml
+# parse configuration files, starting with the main file, followed by the overrides
+arg_list_parsed = Array.new
+[ options.config_main, *options.config_overrides ].each do |config_file|
 
-# fix: key name of log level settings
-arg_list.map! do |it|
-  if it.match? /^log_levels:/
-    it.sub(/^log_levels:/,'').sub(/\=/,':LogLevel=')
-  else
-    it
+  # parse configuration file to Hash
+  config_yaml = YAML.load_file config_file
+
+  # convert parsed configuration file settings into 'key=value' pairs JANA can use
+  arg_list_parsed += traverse config_yaml
+
+  # fix: key name of log level settings
+  arg_list_parsed.map! do |it|
+    if it.match? /^log_levels:/
+      it.sub(/^log_levels:/,'').sub(/\=/,':LogLevel=')
+    else
+      it
+    end
   end
+
+end # parsing configuration files
+
+# for any parameter that was specified more than once, be sure to take only the last specification
+arg_hash = Hash.new
+arg_list_parsed.each do |it|
+  k, v = it.split '='
+  arg_hash[k] = v
 end
+arg_list = arg_hash.map{ |k, v| "#{k}=#{v}" }
 
 # append CLI settings
 arg_list += traverse({
@@ -120,5 +150,6 @@ if options.dry_run
   exit
 end
 
-# run eicrecon: `exec` hands process control over to `eicrecon_cmd`
+# run eicrecon: `exec` hands process control over to `eicrecon_cmd`;
+# the ruby process will be replaced by the eicrecon process
 exec eicrecon_cmd
