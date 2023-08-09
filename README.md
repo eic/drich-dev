@@ -392,6 +392,7 @@ flowchart TB
   - [CERN host](https://root.cern/js/) (recommended)
   - Local host (advanced, but offers better control) - see [setup guide](doc/jsroot.md)
   - [ANL hosted](https://eic.phy.anl.gov/geoviewer/)
+  - alternatively, run `view.py` to use a `ROOT` `TGeoManager`
 - browse the ROOT file geometry tree in the sidebar on the left:
   ```
   detector_geometry.root
