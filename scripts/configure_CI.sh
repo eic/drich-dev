@@ -17,7 +17,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/irt.git --branch main
       ;;
     EICrecon)
-      git clone https://github.com/eic/EICrecon.git --branch pr/pdu-update
+      git clone https://github.com/eic/EICrecon.git --branch test-pdu-update-old
       ;;
     reconstruction_benchmarks)
       git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
