@@ -1,12 +1,5 @@
 // dRICH event display
 
-
-//////////////////////////////////
-// if defined, keep TCanvas open for interactive usage (and with extra histograms)
-//#define INTERACTIVE_USE
-//////////////////////////////////
-
-
 // test readout segmentation
 #include <cstdlib>
 #include <iostream>
@@ -17,17 +10,18 @@
 #include <fmt/format.h>
 
 // ROOT
-#include "TSystem.h"
-#include "TStyle.h"
-#include "TCanvas.h"
-#include "TApplication.h"
-#include "TBox.h"
-#include "ROOT/RDataFrame.hxx"
-#include "ROOT/RDF/HistoModels.hxx"
-#include "ROOT/RVec.hxx"
+#include <TSystem.h>
+#include <TStyle.h>
+#include <TCanvas.h>
+#include <TApplication.h>
+#include <TBox.h>
+#include <ROOT/RDataFrame.hxx>
+#include <ROOT/RDF/HistoModels.hxx>
+#include <ROOT/RVec.hxx>
 
 // DD4Hep
-#include "DD4hep/Detector.h"
+#include <DD4hep/Detector.h>
+#include <DDRec/DetectorData.h>
 
 // local
 #include "WhichRICH.h"
@@ -40,16 +34,20 @@ int main(int argc, char** argv) {
   // arguments
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   if(argc<=3) {
-    fmt::print("\nUSAGE: {} [d/p] [s/r] [input_root_file] [event_num_min] [event_num_max]\n\n",argv[0]);
+    fmt::print("\nUSAGE: {} [d/p] [s/r] [input_root_file] [i/n] [event_num_min] [event_num_max]\n\n",argv[0]);
     fmt::print("    [d/p]: detector\n");
-    fmt::print("         - d for dRICH\n");
-    fmt::print("         - p for pfRICH\n");
+    fmt::print("         - d: for dRICH\n");
+    fmt::print("         - p: for pfRICH\n");
     fmt::print("\n");
     fmt::print("    [s/r]: file type:\n");
-    fmt::print("         - s for simulation file (all photons)\n");
-    fmt::print("         - r for reconstructed file (digitized hits)\n");
+    fmt::print("         - s: for simulation file (all photons)\n");
+    fmt::print("         - r: for reconstructed file (digitized hits)\n");
     fmt::print("\n");
     fmt::print("    [input_root_file]: output from simulation or reconstruction\n");
+    fmt::print("\n");
+    fmt::print("    [i/n]: interactive mode (optional)\n");
+    fmt::print("         - i: keep TCanvases open for interaction\n");
+    fmt::print("         - n: do not open TCanvases and just produce images (default)\n");
     fmt::print("\n");
     fmt::print("    [event_num_min]: minimum event number (optional)\n");
     fmt::print("         - if unspecified, draw sum of all events\n");
@@ -57,27 +55,21 @@ int main(int argc, char** argv) {
     fmt::print("           this event\n");
     fmt::print("         - if specified with [event_num_max], draw the range\n");
     fmt::print("           of events, ONE at a time\n");
+    fmt::print("\n");
     fmt::print("    [event_num_max]: maximum event number (optional)\n");
     fmt::print("         - set to 0 if you want the maximum possible\n");
     fmt::print("\n");
-    fmt::print("\n");
-    fmt::print("NOTE: INTERACTIVE_USE mode is ");
-#ifdef INTERACTIVE_USE
-    fmt::print("ON: TCanvases (and extra histograms) will remain open\n");
-#else
-    fmt::print("OFF: TCanvases will saved as PNG files\n");
-    fmt::print("- FIXME: there is still a slow memory leak, don't run too many\n");
-#endif
-    fmt::print("- this setting is hard-coded in {}.cpp\n",argv[0]);
     return 2;
   }
-  std::string zDirectionStr = argv[1];
-  std::string fileType      = argv[2];
-  TString     infileN       = TString(argv[3]);
-  int         evnumMin      = argc>4 ? std::atoi(argv[4]) : -1;
-  int         evnumMax      = argc>5 ? std::atoi(argv[5]) : -1;
+  std::string zDirectionStr  = argv[1];
+  std::string fileType       = argv[2];
+  TString     infileN        = TString(argv[3]);
+  TString     interactiveOpt = argc>4 ? TString(argv[4]) : "n";
+  int         evnumMin       = argc>5 ? std::atoi(argv[5]) : -1;
+  int         evnumMax       = argc>6 ? std::atoi(argv[6]) : -1;
   WhichRICH wr(zDirectionStr);
   if(!wr.valid) return 1;
+  bool interactiveOn = interactiveOpt=="i";
 
   // settings
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,15 +84,14 @@ int main(int argc, char** argv) {
   // dilations: for re-scaling module positions and segment positions
   // for drawing; if you change `numPx`, consider tuning these parameters
   // as well
-  const Int_t dilation = 4;
+  const Double_t dilation = 4.3;
 
   // drawing
   gStyle->SetPalette(55);
   gStyle->SetOptStat(0);
   Bool_t singleCanvas = true; // if true, draw all hitmaps on one canvas
-#ifndef INTERACTIVE_USE
-  singleCanvas = true;
-#endif
+  if(!interactiveOn)
+    singleCanvas = true;
 
   // data collections
   std::string inputCollection;
@@ -117,10 +108,10 @@ int main(int argc, char** argv) {
   // setup
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#ifdef INTERACTIVE_USE
-  // define application environment, to keep canvases open
-  TApplication mainApp("mainApp",&argc,argv);
-#endif
+  // define application environment, to keep canvases open, if interactive mode is on
+  TApplication *mainApp;
+  if(interactiveOn)
+    mainApp = new TApplication("mainApp",&argc,argv);
 
   // main dataframe
   RDataFrame dfIn("events",infileN.Data());
@@ -146,10 +137,10 @@ int main(int argc, char** argv) {
     fmt::print("Reading event numbers {} to {}, one at a time\n",evnumMin,evnumMax);
     for(int e=evnumMin; e<=evnumMax; e++)
       evnumRanges.push_back({ e, e+1 });
-#ifdef INTERACTIVE_USE
-    fmt::print(stderr,"ERROR: cannot yet run with INTERACTIVE_USE on an event number range; change it in {}.cpp and rebuild\n",argv[0]);
-    return 1;
-#endif
+    if(interactiveOn) {
+      fmt::print(stderr,"ERROR: cannot yet run with interactive mode enabled with an event number range (FIXME)\n");
+      return 1;
+    }
   }
 
 
@@ -167,8 +158,6 @@ int main(int argc, char** argv) {
   const auto det = &(Detector::getInstance());
   det->fromXML(compactFile);
   const auto detRich  = det->detector(richName);
-  const auto posRich  = detRich.placement().position();
-  const auto cellMask = ULong_t(std::stoull(det->constant<std::string>(wr.XRICH+"_cell_mask")));
   const auto nSectors = wr.zDirection>0 ? det->constant<int>(wr.XRICH+"_num_sectors") : 1;
 
   // cellID decoder
@@ -196,29 +185,30 @@ int main(int argc, char** argv) {
   };
 
   // build sensor position LUT `imod2hitmapXY`
-  /* - find the sector 0 sensors, and build a map of their module number `imod` to
+  /* - find the sector 0 sensors, and build a map of their module number `pdu`,`sipm` to
    *   X and Y coordinates to use in the hitmap
    *   - these hitmap coordinates are from the sensor position X and Y, rescaled
    *     by the factor `dilation` and rounded to the nearest integer
    *   - also builds a list of `TBox`es, for drawing the sensors on the hitmap
-   * - the unique ID of the sensor `Detector`, called `imodsec`, includes `imod`
-   *   - `cellID & cellMask` should be equivalent to `imodsec`; therefore,
-   *     `imodsec` can be converted to `imod` by decoding `imodsec` the same way
-   *     we would decode `cellID`
    */
-  std::map<Long_t,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
+  std::map<std::pair<Long_t,Long64_t>,std::pair<Long64_t,Long64_t>> imod2hitmapXY;
   std::vector<TBox*> boxList;
   for(auto const& [de_name, detSensor] : detRich.children()) {
     if(de_name.find(wr.sensorNamePattern)!=std::string::npos) {
       // convert global position to hitmapX and Y
-      auto posSensor = posRich + detSensor.placement().position();
-      auto hitmapX   = Long64_t(dilation*posSensor.x() + 0.5);
-      auto hitmapY   = Long64_t(dilation*posSensor.y() + 0.5);
+      const auto detSensorPars = detSensor.extension<rec::VariantParameters>(true);
+      if(detSensorPars==nullptr)
+        throw std::runtime_error(fmt::format("sensor '{}' does not have VariantParameters", de_name));
+      auto posSensorX = detSensorPars->get<double>("pos_x");
+      auto posSensorY = detSensorPars->get<double>("pos_y");
+      auto hitmapX    = Long64_t(dilation*posSensorX + 0.5);
+      auto hitmapY    = Long64_t(dilation*posSensorY + 0.5);
       // convert unique cellID to module number, using the cellID decoder
-      auto imodsec = ULong_t(detSensor.id());
-      auto imod    = decodeCellID("module")(RVecUL({imodsec})).front();
+      auto sensorID = ULong_t(detSensor.id());
+      auto pdu      = decodeCellID("pdu")(RVecUL({sensorID})).front();
+      auto sipm     = decodeCellID("sipm")(RVecUL({sensorID})).front();
       // add to `imod2hitmapXY` and create sensor `TBox`
-      imod2hitmapXY.insert({imod,{hitmapX,hitmapY}});
+      imod2hitmapXY.insert({{pdu,sipm}, {hitmapX,hitmapY}});
       boxList.push_back(new TBox(
             hitmapX, 
             hitmapY,
@@ -231,26 +221,30 @@ int main(int argc, char** argv) {
     }
   }
 
-  // convert vector of `imod`s to vector of hitmap X or Y
-  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecL imodVec, int c) {
+  // convert vectors of `pdu`, `sipm` to vector of hitmap X or Y
+  auto imod2hitmapXY_get = [&imod2hitmapXY] (RVecL pduVec, RVecL sipmVec, int c) {
     RVecL result;
     Long64_t pos;
-    for(auto imod : imodVec) {
+    if(pduVec.size() != sipmVec.size())
+      throw std::runtime_error("imod2hitmapXY_get input vectors differ in size");
+    for(unsigned long i=0; i<pduVec.size(); i++) {
+      auto pdu  = pduVec.at(i);
+      auto sipm = sipmVec.at(i);
       try {
         pos = (c==0) ?
-          imod2hitmapXY[imod].first :
-          imod2hitmapXY[imod].second;
+          imod2hitmapXY.at({pdu,sipm}).first :
+          imod2hitmapXY.at({pdu,sipm}).second;
       }
       catch (const std::out_of_range &ex) {
-        fmt::print(stderr,"ERROR: cannot find module {}\n",imod);
+        fmt::print(stderr,"ERROR: cannot find sensor module pdu={} sipm={}\n",pdu,sipm);
         pos = 0.0;
       };
       result.emplace_back(pos);
     }
     return result;
   };
-  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,0); };
-  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecL modVec) { return imod2hitmapXY_get(modVec,1); };
+  auto imod2hitmapX = [&imod2hitmapXY_get] (RVecL pduVec, RVecL sipmVec) { return imod2hitmapXY_get(pduVec,sipmVec,0); };
+  auto imod2hitmapY = [&imod2hitmapXY_get] (RVecL pduVec, RVecL sipmVec) { return imod2hitmapXY_get(pduVec,sipmVec,1); };
 
   // convert vector of hitmap X (or Y) + vector of segmentation X (or Y) to vector of pixel X (or Y)
   auto pixelCoord = [] (RVecL hitmapXvec, RVecL segXvec) {
@@ -267,15 +261,16 @@ int main(int argc, char** argv) {
       .Alias("cellID", inputCollection+".cellID")
       .Define("system", decodeCellID("system"), {"cellID"})
       .Define("sector", decodeCellID("sector"), {"cellID"})
-      .Define("module", decodeCellID("module"), {"cellID"})
+      .Define("pdu",    decodeCellID("pdu"),    {"cellID"})
+      .Define("sipm",   decodeCellID("sipm"),   {"cellID"})
       .Define("x",      decodeCellID("x"),      {"cellID"})
       .Define("y",      decodeCellID("y"),      {"cellID"})
       ;
 
-  // map `(module,x,y)` to pixel hitmap bins
+  // map `(pdu,sipm,x,y)` to pixel hitmap bins
   auto dfHitmap = dfDecoded
-      .Define("hitmapX", imod2hitmapX, {"module"})
-      .Define("hitmapY", imod2hitmapY, {"module"})
+      .Define("hitmapX", imod2hitmapX, {"pdu","sipm"})
+      .Define("hitmapY", imod2hitmapY, {"pdu","sipm"})
       .Define("pixelX", pixelCoord, {"hitmapX","x"})
       .Define("pixelY", pixelCoord, {"hitmapY","y"})
       ;
@@ -305,13 +300,14 @@ int main(int argc, char** argv) {
     auto fieldHists = std::vector({
       dfFinal.Histo1D("system"),
       dfFinal.Histo1D("sector"),
-      dfFinal.Histo1D("module"),
+      dfFinal.Histo1D("pdu"),
+      dfFinal.Histo1D("sipm"),
       dfFinal.Histo1D("x"),
       dfFinal.Histo1D("y")
     });
     const int segXmaxPlot = 10;
     auto segXY = dfFinal.Histo2D(
-        { "segXY", "CartesianGridXY;x;y",
+        { "segXY", "SiPM pixels;x;y",
           2*segXmaxPlot, -segXmaxPlot, segXmaxPlot,
           2*segXmaxPlot, -segXmaxPlot, segXmaxPlot },
         "x","y"
@@ -337,31 +333,31 @@ int main(int argc, char** argv) {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     TCanvas *c;
-#ifdef INTERACTIVE_USE
-    // draw cellID field histograms
-    c = new TCanvas();
-    c->Divide(3,2);
-    int pad=1;
-    for(auto hist : fieldHists) {
-      c->GetPad(pad)->SetLogy();
-      c->cd(pad);
-      if(TString(hist->GetName())!="module") hist->SetBarWidth(4);
-      hist->SetLineColor(kBlack);
-      hist->SetFillColor(kBlack);
-      hist->Draw("bar");
-      pad++;
-    }
+    if(interactiveOn) {
+      // draw cellID field histograms
+      c = new TCanvas();
+      c->Divide(4,2);
+      int pad=1;
+      for(auto hist : fieldHists) {
+        c->GetPad(pad)->SetLogy();
+        c->cd(pad);
+        // if(TString(hist->GetName())!="pdu") hist->SetBarWidth(4);
+        hist->SetLineColor(kBlack);
+        hist->SetFillColor(kBlack);
+        hist->Draw("bar");
+        pad++;
+      }
 
-    // draw segmentation XY plot, along with expected box
-    c->cd(pad);
-    c->GetPad(pad)->SetGrid(1,1);
-    segXY->Draw("colz");
-    auto expectedBox = new TBox(segXmin, segXmin, segXmax+1, segXmax+1);
-    expectedBox->SetFillStyle(0);
-    expectedBox->SetLineColor(kBlack);
-    expectedBox->SetLineWidth(4);
-    expectedBox->Draw("same");
-#endif
+      // draw segmentation XY plot, along with expected box
+      c->cd(pad);
+      c->GetPad(pad)->SetGrid(1,1);
+      segXY->Draw("colz");
+      auto expectedBox = new TBox(segXmin, segXmin, segXmax+1, segXmax+1);
+      expectedBox->SetFillStyle(0);
+      expectedBox->SetLineColor(kBlack);
+      expectedBox->SetLineWidth(4);
+      expectedBox->Draw("same");
+    }
 
     // draw pixel hitmap
     if(singleCanvas) { c = new TCanvas("canv","canv",3*700,2*600); c->Divide(3,2); };
@@ -394,24 +390,23 @@ int main(int argc, char** argv) {
     };
 
     // either hold the TCanvases open, or save them as PNG files
-#ifdef INTERACTIVE_USE
-    fmt::print("\n\npress ^C to exit.\n\n");
-    mainApp.Run();
-#else
-    gROOT->ProcessLine(".! mkdir -p out/ev");
-    TString pngName = Form("out/ev/%s.png", fmt::format("{:08}",evnum).c_str()); 
-    c->SaveAs(pngName);
-    fmt::print("Saved image: {}", pngName);
-    // cleanup and avoid memory leaks # FIXME: refactor this... and there is still a slow leak...
-    delete c;
-    for(int sec=0; sec<nSectors; sec++) delete pixelHitmapSec[sec];
-#endif
+    if(interactiveOn) {
+      fmt::print("\n\npress ^C to exit.\n\n");
+      mainApp->Run();
+    } else {
+      gROOT->ProcessLine(".! mkdir -p out/ev");
+      TString pngName = Form("out/ev/%s.png", fmt::format("{:08}",evnum).c_str()); 
+      c->SaveAs(pngName);
+      fmt::print("Saved image: {}", pngName);
+      // cleanup and avoid memory leaks # FIXME: refactor this... and there is still a slow leak...
+      delete c;
+      for(int sec=0; sec<nSectors; sec++) delete pixelHitmapSec[sec];
+    }
 
   } // end evnumRanges loop
 
-#ifndef INTERACTIVE_USE
-  fmt::print("\n\nEvent display images written to out/ev/*.png\n\n");
-#endif
+  if(!interactiveOn)
+    fmt::print("\n\nEvent display images written to out/ev/*.png\n\n");
 
   return 0;
 };

@@ -172,10 +172,10 @@ jobs:
             echo "[CI] RUN SIMULATION:"
             simulate.py ${{matrix.options}} -m ${{matrix.momentum}} -p ${{matrix.particle}}
             # echo "[CI] EVENT DISPLAY SINGLES:"
-            # event_display d s out/sim.edm4hep.root 0 0
+            # event_display d s out/sim.edm4hep.root n 0 0
             # mv out/ev out/ev.singles
             echo "[CI] EVENT DISPLAY INTEGRATED:"
-            event_display d s out/sim.edm4hep.root
+            event_display d s out/sim.edm4hep.root n
             mv out/ev out/ev.all_events
             echo "[CI] DRAW HITS:"
             draw_hits d
@@ -237,9 +237,70 @@ jobs:
           retention-days: 1
           path: geo*/
 
+  irt_auxfiles:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { det: d, detector: DRICH  }
+          - { det: p, detector: PFRICH }
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] CREATE IRT AUXFILE:"
+            create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
+      - uses: actions/upload-artifact@v3
+        with:
+          name: geometry
+          retention-days: 1
+          path: geo*/
+
+  sensor_table:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] MAKE SENSOR TABLE:"
+            scripts/make_sensor_table.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: geometry
+          retention-days: 1
+          path: geo/sensor_table.*
+
 # EVENT VISUALIZATION -------------------------------------------------------------
 
-###
 ### FIXME: not sure how to make these work on CI runners
 ### - locally:
 ###     run `xvfb-run eic-shell` (to suppress graphics)
@@ -316,19 +377,12 @@ jobs:
   #         retention-days: 1
   #         path: out.*/
 
-# GENERATE IRT AUXFILES -----------------------------------------------------------
-# - to test it is still possbile
+# MISCELLANEOUS TESTS -------------------------------------------------------------
 
-  irt_auxfiles:
+  test_pixel_gaps:
     needs:
       - build_3
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - { det: d, detector: DRICH  }
-          - { det: p, detector: PFRICH }
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -345,13 +399,57 @@ jobs:
           setup: environ.sh
           run: |
             scripts/configure_CI.sh none
-            echo "[CI] CREATE IRT AUXFILE:"
-            create_irt_auxfile ${{matrix.det}} geo/${{matrix.detector}}_irt_auxfile.root
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -s -t4 -n500
+            echo "[CI] RUN RECONSTRUCTION:"
+            recon.rb -c config/recon_digi_only.yaml
+            echo "[CI] DRAW PIXEL HITS:"
+            test_pixel_gap_cuts n
+      - name: tree_artifacts
+        run: tree out
+      - name: rename_artifacts
+        run: mv -v out tests
       - uses: actions/upload-artifact@v3
         with:
-          name: irt_auxfiles
+          name: tests
           retention-days: 1
-          path: geo*/
+          path: tests*/
+
+  test_track_propagation:
+    needs:
+      - build_3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: build_3
+      - name: untar_artifacts
+        run: |
+          tar xvf build.tar
+          rm -v build.tar
+      - uses: cvmfs-contrib/github-action-cvmfs@v3
+      - uses: eic/run-cvmfs-osg-eic-shell@main
+        with:
+          platform-release: "jug_xl:nightly"
+          setup: environ.sh
+          run: |
+            scripts/configure_CI.sh none
+            echo "[CI] RUN SIMULATION:"
+            simulate.py -t4 -k10 -n1
+            echo "[CI] RUN RECONSTRUCTION:"
+            recon.rb
+            echo "[CI] DRAW PIXEL HITS:"
+            root -b -q scripts/test_tracks.C
+      - name: tree_artifacts
+        run: tree out
+      - name: rename_artifacts
+        run: mv -v out tests
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tests
+          retention-days: 1
+          path: tests*/
 
 # ARTIFACT COLLECTION -------------------------------------------------------------
 
@@ -363,6 +461,9 @@ jobs:
       # - visual
       # - optics
       - irt_auxfiles
+      - sensor_table
+      - test_pixel_gaps
+      - test_track_propagation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -382,7 +483,7 @@ jobs:
       #     name: optics
       - uses: actions/download-artifact@v3
         with:
-          name: irt_auxfiles
+          name: tests
       - name: cull
         run: |
           find -name .keep | xargs rm -v
@@ -393,3 +494,4 @@ jobs:
           path: |
             pipeline*/
             geo*/
+            tests*/
