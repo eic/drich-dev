@@ -20,7 +20,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/EICrecon.git --branch pr/link-drich-pid
       ;;
     reconstruction_benchmarks)
-      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch main
+      git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch master
       ;;
     none)
       echo "Not cloning any repositories"
