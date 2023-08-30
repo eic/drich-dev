@@ -8,7 +8,7 @@ echo "[CI] CLONING REPOSITORIES: $repo_list"
 for repo in $repo_list; do
   case $repo in
     epic)
-      git clone https://github.com/eic/epic.git --branch 111-drich-use-true-sensor-thickness-and-add-resin-base
+      git clone https://github.com/eic/epic.git --branch main
       ;;
     EDM4eic)
       git clone https://github.com/eic/EDM4eic.git --branch main
@@ -17,7 +17,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/irt.git --branch main
       ;;
     EICrecon)
-      git clone https://github.com/eic/EICrecon.git --branch pr/pdu-update
+      git clone https://github.com/eic/EICrecon.git --branch pr/drich-acts
       ;;
     reconstruction_benchmarks)
       git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
