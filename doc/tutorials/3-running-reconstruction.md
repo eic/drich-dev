@@ -11,55 +11,24 @@ Before attending this tutorial, please build the reconstruction and benchmarks s
 
 ### Obtaining the Software
 
-At the time of writing this tutorial, dRICH PID is still not fully approved in the `main` branches of the reconstruction and benchmarks software. The current development branch is `irt-algo` for both; `irt-algo` on EICrecon is somewhat unstable, so instead I recommend you to use `irt-algo-stable`, which at times may be a bit behind `irt-algo`.
-
-If you already have clones of `EICrecon` and `reconstruction_benchmarks`, you can switch branches by running the commands below. Most likely you have a clone of `EICrecon` (on branch `main`), but do not have a clone of `reconstruction_benchmarks` (clone commands are also given below)
-
-- `EICrecon`:
-```bash
-pushd EICrecon
-git fetch origin
-git checkout irt-algo-stable    # or irt-algo, if you want bleeding edge
-popd
-```
-- `reconstruction_benchmarks`:
-```bash
-pushd reconstruction_benchmarks
-git fetch origin
-git checkout irt-algo    # no irt-algo-stable branch, since this code doesn't change as rapidly
-popd
-```
-
-Otherwise if you do not yet have clones of `EICrecon` and `reconstruction_benchmarks`, you can clone and checkout the appropriate branch in one command. As in [tutorial 1](1-setup-and-running-simulations.md), use HTTPS or SSH depending on your access credentials:
+If you do not yet have clones of `EICrecon` and `reconstruction_benchmarks`, you can clone and checkout the appropriate branch in one command. As in [tutorial 1](1-setup-and-running-simulations.md), use HTTPS or SSH depending on your access credentials:
 
 - `EICrecon` SSH:
 ```bash
-git clone git@github.com:eic/EICrecon.git --branch irt-algo-stable       # or irt-algo, if you want bleeding edge
+git clone git@github.com:eic/EICrecon.git
 ```
 - `EICrecon` HTTPS:
 ```bash
-git clone https://github.com/eic/EICrecon.git --branch irt-algo-stable   # or irt-algo, if you want bleeding edge
+git clone https://github.com/eic/EICrecon.git
 ```
 - `reconstruction_benchmarks` SSH:
 ```bash
-git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
+git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
 ```
 - `reconstruction_benchmarks` HTTPS:
 ```bash
-git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch irt-algo
+git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git
 ```
-
-Verify that you are on the correct set of branches by running `./check_branches.sh`. The output should look something like:
-```
-                     drich-dev: main  (269bf3c)
-                          epic: main  (d14e80b)
-                       EDM4eic: NOT INSTALLED
-                           irt: NOT INSTALLED
-                      EICrecon: irt-algo-stable  (21fd271a)
-                       juggler: NOT INSTALLED
-     reconstruction_benchmarks: irt-algo  (d1c7885)
-```
-(the commit hashes, in parentheses, may differ)
 
 ### Building
 

@@ -8,8 +8,6 @@ Tutorial 5: Reconstruction Code Part II
 
 Finally, let's go through the reconstruction code. Refer to [tutorial 4](4-reconstruction-code-part-1.md) for general guidance on the reconstruction code; this tutorial 5 will provide an overview of how the primary algorithms work.
 
-**IMPORTANT**: the presentation of this tutorial will assume that `EICrecon` is on the branch `irt-algo`. This is the most up-to-date branch containing the full dRICH PID implementation; in contrast, `irt-algo-stable` may be a bit behind `irt-algo`, but will most likely work (whereas `irt-algo` is unstable, and sometimes may be in a broken state). If `irt-algo` is not available, then that likely means all the dRICH PID code has been merged to `main`; in this case, refer to the `main` branch instead.
-
 ## Navigating EICrecon
 
 Each algorithm "`AlgorithmName`" typically includes 5 source code files:

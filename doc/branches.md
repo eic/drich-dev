@@ -14,20 +14,7 @@ We intend to keep these tables up-to-date as development proceeds.
 | `EICrecon`                  | `main`   |
 | `reconstruction_benchmarks` | `master` |
 
-## IRT -- EICrecon development
-| Repository                  | Branch                             | Pull Request                                                                                       |
-| --:                         | ---                                | ---                                                                                                |
-| `drich-dev`                 | `main`                             |                                                                                                    |
-| `epic`                      | `main`                             |                                                                                                    |
-| `EDM4eic`                   | `main`                             |                                                                                                    |
-| `irt`                       | `main`                             |                                                                                                    |
-| `EICrecon`                  | `irt-algo-stable` (or `irt-algo`)  | https://github.com/eic/EICrecon/pull/393                                                           |
-| `reconstruction_benchmarks` | `irt-algo`                         | [MR 293](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks/-/merge_requests/293) |
-
-- the branch `irt-algo-stable` is for a stable, working version; the branch
-  `irt-algo` is for the unstable, most up-to-date version
-
-## IRT -- Legacy Juggler Support
+## IRT -- Legacy Juggler Support (DEPRECATED, replaced by EICrecon)
 | Repository  | Branch                      | Pull Request                                                                |
 | --:         | ---                         | ---                                                                         |
 | `drich-dev` | `main`                      |                                                                             |
