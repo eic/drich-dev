@@ -24,7 +24,7 @@ if ARGV.length<2
        d: dRICH
        p: pfRICH
      [j/e]: reconstruction
-       j: juggler
+       j: juggler [DEPRECATED, do not use]
        e: eicrecon
   """
   exit 2
