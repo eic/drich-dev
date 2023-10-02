@@ -37,11 +37,6 @@ RICHGEO_ROOT = $(EICRECON_DIR)
 RICHGEO_SOURCES := $(wildcard $(RICHGEO_ROOT)/IrtGeo*.cc) $(RICHGEO_ROOT)/ReadoutGeo.cc
 RICHGEO_HEADERS := $(wildcard $(RICHGEO_ROOT)/IrtGeo*.h)  $(RICHGEO_ROOT)/ReadoutGeo.h $(RICHGEO_ROOT)/RichGeo.h
 
-IRT_AUXFILE_SOURCE = src/create_irt_auxfile.cpp
-IRT_AUXFILE_EXECUTABLE = $(BIN_TARGET)/create_irt_auxfile
-SOURCES := $(filter-out $(IRT_AUXFILE_SOURCE), $(SOURCES))
-EXECUTABLES := $(filter-out $(IRT_AUXFILE_EXECUTABLE), $(EXECUTABLES))
-
 PIXEL_GAP_SOURCE = src/test_pixel_gap_cuts.cpp
 PIXEL_GAP_EXECUTABLE = $(BIN_TARGET)/test_pixel_gap_cuts
 SOURCES := $(filter-out $(PIXEL_GAP_SOURCE), $(SOURCES))
@@ -49,7 +44,7 @@ EXECUTABLES := $(filter-out $(PIXEL_GAP_EXECUTABLE), $(EXECUTABLES))
 
 #--------------------------------------------
 
-all: $(EXECUTABLES) $(RICHGEO_LIB) $(IRT_AUXFILE_EXECUTABLE) $(PIXEL_GAP_EXECUTABLE)
+all: $(EXECUTABLES) $(RICHGEO_LIB) $(PIXEL_GAP_EXECUTABLE)
 
 $(EXECUTABLES): $(BIN_TARGET)/%: src/%.cpp
 	mkdir -p $(BIN_TARGET)
@@ -68,18 +63,6 @@ else
 	@echo "WARNING: skip building $@ since IRT ROOT dict not found"
 endif
 
-$(IRT_AUXFILE_EXECUTABLE): $(IRT_AUXFILE_SOURCE) $(RICHGEO_LIB)
-ifeq ($(IRT_ROOT_DICT_FOUND),1)
-	mkdir -p $(BIN_TARGET)
-	@echo "----- build $@.o -----"
-	$(CXX) -c $< -o $@.o $(FLAGS) $(DEPS)
-	@echo "--- make executable $@"
-	$(CXX) -o $@ $@.o $(LIBS) -L$(LIB_TARGET) -l$(RICHGEO_LIB_NAME)
-	$(RM) $@.o
-else
-	@echo "WARNING: skip building $@ since IRT ROOT dict not found"
-endif
-
 $(PIXEL_GAP_EXECUTABLE): $(PIXEL_GAP_SOURCE) $(RICHGEO_LIB)
 ifeq ($(IRT_ROOT_DICT_FOUND),1)
 	mkdir -p $(BIN_TARGET)
@@ -94,4 +77,4 @@ endif
 
 clean:
 	@echo "CLEAN ======================================================"
-	$(RM) $(EXECUTABLES) $(IRT_AUXFILE_EXECUTABLE) $(PIXEL_GAP_EXECUTABLE) $(RICHGEO_LIB)
+	$(RM) $(EXECUTABLES) $(PIXEL_GAP_EXECUTABLE) $(RICHGEO_LIB)

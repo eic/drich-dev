@@ -494,40 +494,6 @@ recon.rb -h  # see usage guide (run with no arguments to run with defaults)
 There are various configuration files available in `config/`, which depends on which branch
 of EICrecon you are currently on.
 
-### Juggler
-
-The [`juggler`](https://eicweb.phy.anl.gov/EIC/juggler) implementation was used
-for ATHENA, and was supported for EPIC until the migration to `EICrecon` was
-complete; `juggler` is now **deprecated**, but this section contains documentation
-how to run it, in case it is needed.
-
-- Clone it to `.juggler/`; since `juggler` is hosted on EICweb and is
-  deprecated, it is recommended to clone with HTTPS:
-  ```bash
-  git clone https://eicweb.phy.anl.gov/EIC/juggler.git
-  ```
-  Then `checkout` the appropriate development branch.
-- Create the auxiliary IRT configuration file; this is a ROOT file containing `libIRT`
-  objects, such as optical boundaries, based on the dRICH geometry description.
-```bash
-bin/create_irt_auxfile
-```
-- Note: the creation of this auxiliary file requires `EICrecon` to be cloned locally, but it does
-  not need to be compiled
-
-- Then call `juggler` or the old code:
-```bash
-juggler.sh -d -j   # to use Juggler (IRTAlgorithm), with the dRICH
-juggler.sh -d -r   # to use standalone reader (irt/scripts/reader*.C), with the dRICH
-juggler.sh         # for usage guide, such as how to specify input/output files
-```
-
-- Run the evaluation code (use `-h` for usage):
-```bash
-evaluate.sh
-```
-
-
 ---
 
 <a name="benchmarks"></a>
