@@ -14,7 +14,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/EDM4eic.git --branch main
       ;;
     irt)
-      git clone https://github.com/eic/irt.git --branch main
+      git clone https://github.com/eic/irt.git --branch fix-CherenkovPID-leaks-MassHypothesis
       ;;
     EICrecon)
       git clone https://github.com/eic/EICrecon.git --branch main
