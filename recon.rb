@@ -11,7 +11,7 @@ require 'ostruct'
 options = OpenStruct.new
 options.sim_file     = 'out/sim.edm4hep.root'
 options.rec_file     = 'out/rec.edm4hep.root'
-options.config_file  = 'config/recon_irt.yaml'
+options.config_file  = 'config/recon_main.yaml'
 options.dry_run      = false
 options.debug_run    = false
 options.eicrecon_bin = 'eicrecon'
