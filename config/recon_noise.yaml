@@ -51,5 +51,7 @@ acts:
 
 ### DRICH Configuration Overrides
 DRICH:
+  DRICHIrtCherenkovParticleID:
+    cheatPhotonVertex: true
   DRICHRawHits:
     enableNoise: true

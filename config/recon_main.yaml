@@ -1,6 +1,5 @@
 ################################################################################
 # CONFIGURATION FILE FOR DRICH EICrecon USAGE
-# - use with EICrecon `git` branch `main`
 ################################################################################
 
 ### EICrecon plugins
@@ -17,12 +16,31 @@ podio:
     ### digitization
     - DRICHRawHits
     - DRICHRawHitsAssociations
+    ### track projections
+    - DRICHAerogelTracks
+    - DRICHGasTracks
+    - DRICHMergedTracks
+    ### IRT PID
+    - DRICHAerogelIrtCherenkovParticleID
+    - DRICHGasIrtCherenkovParticleID
+    - DRICHMergedIrtCherenkovParticleID
+    ### Reconstructed Particles
+    - ReconstructedChargedParticles
+    - ReconstructedChargedParticleAssociations
+    - ReconstructedChargedParticleIDs
 
 ### EICrecon log levels
 log_levels:
   eicrecon: info
+  richgeo: info
   DRICH:
     DRICHRawHits: info
+    DRICHTracks: info
+    DRICHMergedTracks: info
+    DRICHIrtCherenkovParticleID: info
+    DRICHMergedIrtCherenkovParticleID: info
+  pid:
+    ChargedParticlesWithAssociations: info
 
 ### common settings
 jana:
@@ -30,3 +48,8 @@ jana:
   debug_plugin_loading: 1
 acts:
   MaterialMap: calibrations/materials-map.cbor
+
+### DRICH Configuration Overrides
+DRICH:
+  DRICHIrtCherenkovParticleID:
+    cheatPhotonVertex: true
