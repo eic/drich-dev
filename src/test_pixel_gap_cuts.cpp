@@ -45,9 +45,9 @@ int main(int argc, char** argv) {
   auto compactFile = DETECTOR_PATH + "/" + DETECTOR_CONFIG + ".xml";
   auto det = &dd4hep::Detector::getInstance();
   det->fromXML(compactFile);
-
+  const dd4hep::rec::CellIDPositionConverter *m_converter;
   // ReadoutGeo
-  richgeo::ReadoutGeo geo("DRICH", det, logger);
+  richgeo::ReadoutGeo geo("DRICH", det, m_converter,logger);
 
   // open input file
   auto reader = podio::ROOTFrameReader();
