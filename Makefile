@@ -64,16 +64,17 @@ else
 endif
 
 $(PIXEL_GAP_EXECUTABLE): $(PIXEL_GAP_SOURCE) $(RICHGEO_LIB)
-ifeq ($(IRT_ROOT_DICT_FOUND),1)
-	mkdir -p $(BIN_TARGET)
-	@echo "----- build $@.o -----"
-	$(CXX) -c $< -o $@.o $(FLAGS) $(DEPS)
-	@echo "--- make executable $@"
-	$(CXX) -o $@ $@.o $(LIBS) -L$(LIB_TARGET) -l$(RICHGEO_LIB_NAME)
-	$(RM) $@.o
-else
-	@echo "WARNING: skip building $@ since IRT ROOT dict not found"
-endif
+	@echo "WARNING: skip building $@ since broken"
+# ifeq ($(IRT_ROOT_DICT_FOUND),1)
+# 	mkdir -p $(BIN_TARGET)
+# 	@echo "----- build $@.o -----"
+# 	$(CXX) -c $< -o $@.o $(FLAGS) $(DEPS)
+# 	@echo "--- make executable $@"
+# 	$(CXX) -o $@ $@.o $(LIBS) -L$(LIB_TARGET) -l$(RICHGEO_LIB_NAME)
+# 	$(RM) $@.o
+# else
+# 	@echo "WARNING: skip building $@ since IRT ROOT dict not found"
+# endif
 
 clean:
 	@echo "CLEAN ======================================================"

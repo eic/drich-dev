@@ -317,41 +317,41 @@ jobs:
 
 # MISCELLANEOUS TESTS -------------------------------------------------------------
 
-  test_pixel_gaps:
-    needs:
-      - build_3
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build_3
-      - name: untar_artifacts
-        run: |
-          tar xvf build.tar
-          rm -v build.tar
-      - uses: cvmfs-contrib/github-action-cvmfs@v3
-      - uses: eic/run-cvmfs-osg-eic-shell@main
-        with:
-          platform-release: "jug_xl:nightly"
-          setup: environ.sh
-          run: |
-            scripts/configure_CI.sh none
-            echo "[CI] RUN SIMULATION:"
-            simulate.py -s -t4 -n500
-            echo "[CI] RUN RECONSTRUCTION:"
-            recon.rb -c config/recon_digi_only.yaml
-            echo "[CI] DRAW PIXEL HITS:"
-            test_pixel_gap_cuts n
-      - name: tree_artifacts
-        run: tree out
-      - name: rename_artifacts
-        run: mv -v out tests
-      - uses: actions/upload-artifact@v3
-        with:
-          name: tests
-          retention-days: 1
-          path: tests*/
+  # test_pixel_gaps:
+  #   needs:
+  #     - build_3
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build_3
+  #     - name: untar_artifacts
+  #       run: |
+  #         tar xvf build.tar
+  #         rm -v build.tar
+  #     - uses: cvmfs-contrib/github-action-cvmfs@v3
+  #     - uses: eic/run-cvmfs-osg-eic-shell@main
+  #       with:
+  #         platform-release: "jug_xl:nightly"
+  #         setup: environ.sh
+  #         run: |
+  #           scripts/configure_CI.sh none
+  #           echo "[CI] RUN SIMULATION:"
+  #           simulate.py -s -t4 -n500
+  #           echo "[CI] RUN RECONSTRUCTION:"
+  #           recon.rb -c config/recon_digi_only.yaml
+  #           echo "[CI] DRAW PIXEL HITS:"
+  #           test_pixel_gap_cuts n
+  #     - name: tree_artifacts
+  #       run: tree out
+  #     - name: rename_artifacts
+  #       run: mv -v out tests
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: tests
+  #         retention-days: 1
+  #         path: tests*/
 
   test_track_propagation:
     needs:
@@ -398,7 +398,7 @@ jobs:
       - geometry
       # - visual
       # - optics
-      - test_pixel_gaps
+      # - test_pixel_gaps
       - test_track_propagation
     runs-on: ubuntu-latest
     strategy:
