@@ -17,7 +17,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/irt.git --branch main
       ;;
     EICrecon)
-      git clone https://github.com/eic/EICrecon.git --branch main
+      git clone https://github.com/eic/EICrecon.git --branch shared-ptr-const-detector
       ;;
     reconstruction_benchmarks)
       git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git --branch master
