@@ -9,6 +9,7 @@
 
 #include <podio/ROOTFrameReader.h>
 #include <podio/Frame.h>
+#include "DDRec/CellIDPositionConverter.h"
 
 #include <edm4eic/MCRecoTrackerHitAssociationCollection.h>
 
@@ -43,11 +44,12 @@ int main(int argc, char** argv) {
     return 1;
   }
   auto compactFile = DETECTOR_PATH + "/" + DETECTOR_CONFIG + ".xml";
-  auto det = &dd4hep::Detector::getInstance();
-  det->fromXML(compactFile);
-  const dd4hep::rec::CellIDPositionConverter *m_converter;
+  dd4hep::Detector & det = dd4hep::Detector::getInstance();
+  det.fromXML(compactFile);
+  dd4hep::rec::CellIDPositionConverter cellid_converter(det);
+
   // ReadoutGeo
-  richgeo::ReadoutGeo geo("DRICH", det, m_converter,logger);
+  richgeo::ReadoutGeo geo("DRICH", gsl::not_null{ &det}, gsl::not_null{ &cellid_converter}, logger);
 
   // open input file
   auto reader = podio::ROOTFrameReader();
@@ -61,7 +63,7 @@ int main(int argc, char** argv) {
   for(unsigned e=0; e<reader.getEntries(tree_name); e++) {
     logger->trace("EVENT {}", e);
     auto frame = podio::Frame(reader.readNextEntry(tree_name));
-
+    fmt::print("here\n");
     const auto& hit_assocs  = frame.get<edm4eic::MCRecoTrackerHitAssociationCollection>("DRICHRawHitsAssociations");
     if(!hit_assocs.isValid())
       throw std::runtime_error("cannot find hit associations");
