@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
   dd4hep::rec::CellIDPositionConverter cellid_converter(det);
 
   // ReadoutGeo
-  richgeo::ReadoutGeo geo("DRICH", gsl::not_null{ &det}, gsl::not_null{ &cellid_converter}, logger);
+  richgeo::ReadoutGeo geo("DRICH", &det, &cellid_converter, logger);
 
   // open input file
   auto reader = podio::ROOTFrameReader();
