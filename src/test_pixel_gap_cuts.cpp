@@ -63,7 +63,6 @@ int main(int argc, char** argv) {
   for(unsigned e=0; e<reader.getEntries(tree_name); e++) {
     logger->trace("EVENT {}", e);
     auto frame = podio::Frame(reader.readNextEntry(tree_name));
-    fmt::print("here\n");
     const auto& hit_assocs  = frame.get<edm4eic::MCRecoTrackerHitAssociationCollection>("DRICHRawHitsAssociations");
     if(!hit_assocs.isValid())
       throw std::runtime_error("cannot find hit associations");
