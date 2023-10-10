@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 
   // ReadoutGeo
   richgeo::ReadoutGeo geo("DRICH", &det, &cellid_converter, logger);
-
+  richgeo::IrtGeoDRICH drichGeo(&det, &cellid_converter, logger);
   // open input file
   auto reader = podio::ROOTFrameReader();
   reader.openFile(root_file_name);
@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
 
         auto cellID = sim_hit.getCellID();
         auto pos    = sim_hit.getPosition();
+        auto normZ  = drichGeo.GetSensorSurface(cellID);
         dd4hep::Position pos_global(pos.x*dd4hep::mm, pos.y*dd4hep::mm, pos.z*dd4hep::mm);
         auto pos_local = geo.GetSensorLocalPosition(cellID, pos_global);
         h->Fill(pos_local.y()/dd4hep::mm, pos_local.x()/dd4hep::mm);
