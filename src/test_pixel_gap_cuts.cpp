@@ -14,6 +14,7 @@
 #include <edm4eic/MCRecoTrackerHitAssociationCollection.h>
 
 #include <services/geometry/richgeo/ReadoutGeo.h>
+#include <services/geometry/richgeo/IrtGeoDRICH.h>
 
 int main(int argc, char** argv) {
 
@@ -57,8 +58,9 @@ int main(int argc, char** argv) {
   const std::string tree_name = "events";
 
   // local hits histogram
+  double pi = TMath::Pi();  
   auto h = new TH2D("h","local MC SiPM hits",10000,-15,15,10000,-15,15);
-
+  auto h1 = new TH1D("h1","Photon Incidence angle; rad",1000,-pi,pi);
   // event loop
   for(unsigned e=0; e<reader.getEntries(tree_name); e++) {
     logger->trace("EVENT {}", e);
@@ -72,7 +74,12 @@ int main(int argc, char** argv) {
 
         auto cellID = sim_hit.getCellID();
         auto pos    = sim_hit.getPosition();
+        auto mom    = sim_hit.getMomentum();
+        TVector3 p; p.SetX(mom.x); p.SetY(mom.y); p.SetZ(mom.z);     
         auto normZ  = drichGeo.GetSensorSurface(cellID);
+    
+        double angle = normZ.Dot(p.Unit());
+        h1->Fill(angle);
         dd4hep::Position pos_global(pos.x*dd4hep::mm, pos.y*dd4hep::mm, pos.z*dd4hep::mm);
         auto pos_local = geo.GetSensorLocalPosition(cellID, pos_global);
         h->Fill(pos_local.y()/dd4hep::mm, pos_local.x()/dd4hep::mm);
@@ -93,8 +100,9 @@ int main(int argc, char** argv) {
   }
 
   gStyle->SetOptStat(0);
-  auto c = new TCanvas();
-  h->Draw();
+  auto c = new TCanvas(); c->Divide(2,1);
+  c->cd(1);h->Draw();
+  c->cd(2);h1->Draw();
   fmt::print("NUMBER OF DIGITIZED PHOTONS: {}\n", h->GetEntries());
   if(interactiveOn) {
     fmt::print("\n\npress ^C to exit.\n\n");
