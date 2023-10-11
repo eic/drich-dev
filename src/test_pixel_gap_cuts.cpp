@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   // local hits histogram
   double pi = TMath::Pi();  
   auto h = new TH2D("h","local MC SiPM hits",10000,-15,15,10000,-15,15);
-  auto h1 = new TH1D("h1","Photon Incidence angle; rad",1000,-pi,pi);
+  auto h1 = new TH1D("h1","Photon Incidence angle; degrees",180,0,90);
   // event loop
   for(unsigned e=0; e<reader.getEntries(tree_name); e++) {
     logger->trace("EVENT {}", e);
@@ -78,8 +78,9 @@ int main(int argc, char** argv) {
         TVector3 p; p.SetX(mom.x); p.SetY(mom.y); p.SetZ(mom.z);     
         auto normZ  = drichGeo.GetSensorSurface(cellID);
     
-        double angle = normZ.Dot(p.Unit());
-        h1->Fill(angle);
+        double cosAng = (normZ.Unit()).Dot(p.Unit());
+	double angle = pi- acos(cosAng); 
+        h1->Fill(angle*(180/pi));
         dd4hep::Position pos_global(pos.x*dd4hep::mm, pos.y*dd4hep::mm, pos.z*dd4hep::mm);
         auto pos_local = geo.GetSensorLocalPosition(cellID, pos_global);
         h->Fill(pos_local.y()/dd4hep::mm, pos_local.x()/dd4hep::mm);
@@ -102,7 +103,7 @@ int main(int argc, char** argv) {
   gStyle->SetOptStat(0);
   auto c = new TCanvas(); c->Divide(2,1);
   c->cd(1);h->Draw();
-  c->cd(2);h1->Draw();
+  c->cd(2);gPad->SetLogy();h1->Draw();
   fmt::print("NUMBER OF DIGITIZED PHOTONS: {}\n", h->GetEntries());
   if(interactiveOn) {
     fmt::print("\n\npress ^C to exit.\n\n");
