@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
   // ReadoutGeo
   richgeo::ReadoutGeo geo("DRICH", &det, &cellid_converter, logger);
   richgeo::IrtGeoDRICH drichGeo(&det, &cellid_converter, logger);
+
   // open input file
   auto reader = podio::ROOTFrameReader();
   reader.openFile(root_file_name);
