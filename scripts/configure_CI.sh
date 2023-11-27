@@ -11,7 +11,7 @@ for repo in $repo_list; do
       git clone https://github.com/eic/epic.git --branch main
       ;;
     EDM4eic)
-      git clone https://github.com/eic/EDM4eic.git --branch main
+      git clone https://github.com/eic/EDM4eic.git --branch v4.0.0
       ;;
     irt)
       git clone https://github.com/eic/irt.git --branch main
