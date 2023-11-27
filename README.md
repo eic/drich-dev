@@ -1,4 +1,4 @@
-# dRICH-dev
+# dRICH-dev 
 Resources and Tools for EPIC dRICH development
 
 | **Table of Contents**               |                                                       |
