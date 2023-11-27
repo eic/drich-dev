@@ -1,5 +1,5 @@
 CXX = g++
-FLAGS = -g -Wno-deprecated -fPIC -m64 -fno-inline -Wno-write-strings
+FLAGS = -g -Wno-deprecated -fPIC -m64 -fno-inline -Wno-write-strings -std=c++20
 
 # ROOT
 DEPS += $(shell root-config --cflags)
