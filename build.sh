@@ -79,7 +79,7 @@ case $module in
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=OFF
     genOpt EVALUATION=OFF
-    genOpt IRT_ROOT_IO=OFF
+    genOpt IRT_ROOT_IO=ON
     ;;
   epic)
     ;;
