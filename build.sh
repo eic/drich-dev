@@ -66,6 +66,7 @@ export CMAKE_PREFIX_PATH=$prefix:$CMAKE_PREFIX_PATH
 # module-specific options and preparation
 genOpts=""
 function genOpt() { genOpts+="-D$* "; }
+sourcepath=$module
 case $module in
   EDM4eic)
     genOpt BUILD_DATA_MODEL=ON
@@ -78,7 +79,7 @@ case $module in
     genOpt CMAKE_BUILD_TYPE=Debug  # build with debugging symbols
     genOpt DELPHES=OFF
     genOpt EVALUATION=OFF
-    genOpt IRT_ROOT_IO=ON
+    genOpt IRT_ROOT_IO=OFF
     ;;
   epic)
     ;;
@@ -118,6 +119,10 @@ case $module in
     ;;
   Catch2)
     ;;
+  afterburner)
+    sourcepath=$module/cpp
+    genOpt HEPMC3_ROOTIO=ON
+    ;;
 esac
 
 ########################################
@@ -127,7 +132,7 @@ esac
 genOpt CMAKE_INSTALL_PREFIX=$prefix
 genOpts+=$extraOpts
 buildSys=$module/build
-cmakeGen="cmake -S $module -B $buildSys $genOpts"
+cmakeGen="cmake -S $sourcepath -B $buildSys $genOpts"
 
 # set build command
 buildOpts="-j $nproc"
