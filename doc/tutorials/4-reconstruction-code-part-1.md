@@ -46,8 +46,8 @@ Now take a look at the YAML files. Here are links to them, along with the variou
 
 Being a YAML file, this expression of the data model is independent of any programming language. Code generation may be used to generate an API to use the data model in any preferred language. In ePIC, we use [PODIO](https://github.com/AIDASoft/podio) to generate C++ classes from these YAML files. You can find full documentation linked in the EDM Github repositories; alternatively, browse the C++ header files in `eic-shell` found in:
 ```bash
-/usr/local/include/edm4hep
-/usr/local/include/edm4eic
+/opt/local/include/edm4hep
+/opt/local/include/edm4eic
 ```
 
 See also [Thomas Madlener's CHEP 2023 talk](https://indico.jlab.org/event/459/contributions/11578/) for another resource on PODIO.

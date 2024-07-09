@@ -57,7 +57,7 @@ of branches for varying configurations.
     - the `eic-shell` script is used to start a container shell
     - all documentation below assumes you are running in `eic-shell`
     - this image contains all the dependencies needed for EPIC simulations
-      - tip: when in a container shell (`eic-shell`), see `/usr/local` or `/opt/software/linux.../gcc.../`
+      - tip: when in a container shell (`eic-shell`), see `/opt/local` or `/opt/software/linux.../gcc.../`
         for the installed software
         - for example, if you want to check exactly what is available in the
           [EDM4hep data model](https://github.com/key4hep/EDM4hep), see the headers

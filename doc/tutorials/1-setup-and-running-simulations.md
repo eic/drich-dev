@@ -78,7 +78,7 @@ You can find which versions of software are installed in `eic-shell` by running:
 ```bash
 eic-info
 ```
-You may also find the installations themselves at `/usr/local`, which is useful if you want to check header files or libraries.
+You may also find the installations themselves at `/opt/local`, which is useful if you want to check header files or libraries.
 
 Let's now build the local repositories, which will override the `eic-shell` builds.
 
