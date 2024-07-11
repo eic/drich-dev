@@ -31,12 +31,12 @@ source /opt/detector/setup.sh
 if [ -f $EIC_SHELL_PREFIX/bin/eicrecon-this.sh ]; then
   if [ -z "$CI" ]; then
     echo "PATCH: exclude container's EICrecon plugins from JANA_PLUGIN_PATH"
-    exc="/usr/local/lib/EICrecon/plugins"
+    exc="/opt/local/lib/EICrecon/plugins"
     export JANA_PLUGIN_PATH=$(echo $JANA_PLUGIN_PATH | sed "s;${exc}:;;g" | sed "s;:${exc};;g" | sed "s;${exc};;g" )
     echo "ENVIRONMENT: source EICrecon"
     source $EIC_SHELL_PREFIX/bin/eicrecon-this.sh
-    echo "PATCH: source thisroot.sh removes /usr/local/bin from PATH; add it back"
-    export PATH="$PATH:/usr/local/bin"
+    echo "PATCH: source thisroot.sh removes /opt/local/bin from PATH; add it back"
+    export PATH="$PATH:/opt/local/bin"
   else
     echo "On CI runner; only setting JANA_PLUGIN_PATH"
     export JANA_PLUGIN_PATH=$EIC_SHELL_PREFIX/lib/EICrecon/plugins${JANA_PLUGIN_PATH:+:${JANA_PLUGIN_PATH}}
@@ -47,7 +47,7 @@ fi
 export IRT_ROOT_DICT_FOUND=0
 if [ -f $EIC_SHELL_PREFIX/lib/libIRT_rdict.pcm -a -f $EIC_SHELL_PREFIX/lib/libIRT.rootmap ]; then
   export IRT_ROOT_DICT_FOUND=1
-elif [ -f /usr/local/lib/libIRT_rdict.pcm -a -f /usr/local/lib/libIRT.rootmap ]; then
+elif [ -f /opt/local/lib/libIRT_rdict.pcm -a -f /opt/local/lib/libIRT.rootmap ]; then
   export IRT_ROOT_DICT_FOUND=1
 fi
 

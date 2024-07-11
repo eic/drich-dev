@@ -13,12 +13,12 @@ DEPS += -I${EIC_SHELL_PREFIX}/include/IRT
 DEPS += -Isrc
 
 # image libs
-LIBS += -L/usr/local/lib
+LIBS += -L/opt/local/lib
 LIBS += -lDDCore -lDDRec
 LIBS += -lpodio -lpodioRootIO -ledm4hep
 LIBS += -lfmt -lspdlog
 LIBS += -lG4global -lG4materials -lG4geometry -lG4persistency
-DEPS += -I/usr/local/include
+DEPS += -I/opt/local/include
 FLAGS += -DSPDLOG_FMT_EXTERNAL
 
 #--------------------------------------------

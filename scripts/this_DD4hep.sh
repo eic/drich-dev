@@ -17,8 +17,8 @@ export LD_LIBRARY_PATH=$DD4hep_ROOT/lib:$LD_LIBRARY_PATH_TMP
 # thisdd4hep.sh also doens't select the newly installed examples
 export DD4HEP=$DD4hep_ROOT/examples
 
-# add /usr/local/bin back to $PATH (workaround..)
-export PATH="$PATH:/usr/local/bin"
+# add /opt/local/bin back to $PATH (workaround..)
+export PATH="$PATH:/opt/local/bin"
 
 # update prompt
 export PS1="${PS1:-}"
