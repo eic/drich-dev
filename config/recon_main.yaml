@@ -9,7 +9,7 @@ plugins:
 
 ### PODIO collections to include in the output
 podio:
-  output_include_collections:
+  output_collections:
     ### simulation
     - DRICHHits
     - MCParticles
