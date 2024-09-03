@@ -57,7 +57,7 @@ jobs:
         repo: [EICrecon, reconstruction_benchmarks]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_1
       - name: untar_artifacts
@@ -89,14 +89,14 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_1
       - name: untar_artifacts
         run: |
           ls artifacts.*.tar | xargs -I_ tar xvf _
           rm -v artifacts.*.tar
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_2
       - name: untar_artifacts
@@ -156,7 +156,7 @@ jobs:
           - { id: p_scan_eta3, radiator: gas,     options: -t 10 -k 5 -n 30 -b 3.5 }
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_3
       - name: untar_artifacts
@@ -214,7 +214,7 @@ jobs:
           - { det: p, detector: PFRICH }
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_3
       - name: untar_artifacts
@@ -254,7 +254,7 @@ jobs:
   #     fail-fast: true
   #   steps:
   #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
+  #     - uses: actions/download-artifact@v4.1.7
   #       with:
   #         name: build_3
   #     - name: untar_artifacts
@@ -289,7 +289,7 @@ jobs:
   #     fail-fast: true
   #   steps:
   #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
+  #     - uses: actions/download-artifact@v4.1.7
   #       with:
   #         name: build_3
   #     - name: untar_artifacts
@@ -324,7 +324,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_3
       - name: untar_artifacts
@@ -360,7 +360,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: build_3
       - name: untar_artifacts
@@ -406,19 +406,19 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: pipeline
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: geometry
-      # - uses: actions/download-artifact@v3
+      # - uses: actions/download-artifact@v4.1.7
       #   with:
       #     name: visual
-      # - uses: actions/download-artifact@v3
+      # - uses: actions/download-artifact@v4.1.7
       #   with:
       #     name: optics
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tests
       - name: cull
