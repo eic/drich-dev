@@ -41,7 +41,7 @@ jobs:
             build.sh ${{matrix.repo}}
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf artifacts.${{matrix.repo}}.tar prefix
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: build_1
           retention-days: 1
@@ -57,7 +57,7 @@ jobs:
         repo: [EICrecon, reconstruction_benchmarks]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_1
       - name: untar_artifacts
@@ -75,7 +75,7 @@ jobs:
             build.sh ${{matrix.repo}}
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf artifacts.${{matrix.repo}}.tar prefix
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: build_2
           retention-days: 1
@@ -89,14 +89,14 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_1
       - name: untar_artifacts
         run: |
           ls artifacts.*.tar | xargs -I_ tar xvf _
           rm -v artifacts.*.tar
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_2
       - name: untar_artifacts
@@ -114,7 +114,7 @@ jobs:
             make
       - name: tar_artifacts # workaround: tarball artifacts to preserve executable permissions
         run: tar cvf build.tar prefix bin lib
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: build_3
           retention-days: 1
@@ -156,7 +156,7 @@ jobs:
           - { id: p_scan_eta3, radiator: gas,     options: -t 10 -k 5 -n 30 -b 3.5 }
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_3
       - name: untar_artifacts
@@ -194,7 +194,7 @@ jobs:
         run: |
           mkdir -p    pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}
           mv -v out/* pipeline/${{matrix.id}}/${{matrix.radiator}}/${{matrix.particle}}/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pipeline
           retention-days: 1
@@ -214,7 +214,7 @@ jobs:
           - { det: p, detector: PFRICH }
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_3
       - name: untar_artifacts
@@ -232,7 +232,7 @@ jobs:
             geometry.sh -${{matrix.det}} -o geo/${{matrix.detector}}_TGeo.root
             echo "[CI] DUMP GEOMETRY CONSTANTS:"
             search_compact_params.sh -e | grep ${{matrix.detector}} | tee geo/${{matrix.detector}}_constants.txt
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: geometry
           retention-days: 1
@@ -254,7 +254,7 @@ jobs:
   #     fail-fast: true
   #   steps:
   #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
+  #     - uses: actions/download-artifact@v4
   #       with:
   #         name: build_3
   #     - name: untar_artifacts
@@ -275,7 +275,7 @@ jobs:
   #           echo "[CI] VISUALIZE:"
   #           exit | simulate.py -t1 -n1 -v -e pdf
   #           mv out out.visual
-  #     - uses: actions/upload-artifact@v3
+  #     - uses: actions/upload-artifact@v4
   #       with:
   #         name: visual
   #         retention-days: 1
@@ -289,7 +289,7 @@ jobs:
   #     fail-fast: true
   #   steps:
   #     - uses: actions/checkout@v3
-  #     - uses: actions/download-artifact@v3
+  #     - uses: actions/download-artifact@v4
   #       with:
   #         name: build_3
   #     - name: untar_artifacts
@@ -310,7 +310,7 @@ jobs:
   #           echo "[CI] VISUALIZE:"
   #           exit | simulate.py -t12 -e pdf
   #           mv out out.optics
-  #     - uses: actions/upload-artifact@v3
+  #     - uses: actions/upload-artifact@v4
   #       with:
   #         name: optics
   #         retention-days: 1
@@ -324,7 +324,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_3
       - name: untar_artifacts
@@ -348,7 +348,7 @@ jobs:
         run: tree out
       - name: rename_artifacts
         run: mv -v out tests
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: tests
           retention-days: 1
@@ -360,7 +360,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: build_3
       - name: untar_artifacts
@@ -384,7 +384,7 @@ jobs:
         run: tree out
       - name: rename_artifacts
         run: mv -v out tests
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: tests
           retention-days: 1
@@ -406,25 +406,25 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: pipeline
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: geometry
-      # - uses: actions/download-artifact@v3
+      # - uses: actions/download-artifact@v4
       #   with:
       #     name: visual
-      # - uses: actions/download-artifact@v3
+      # - uses: actions/download-artifact@v4
       #   with:
       #     name: optics
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: tests
       - name: cull
         run: |
           find -name .keep | xargs rm -v
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: _RESULTS
           retention-days: 14
