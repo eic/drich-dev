@@ -20,7 +20,7 @@ export EIC_SHELL_PREFIX=$DRICH_DEV/prefix
 export LOCAL_DATA_PATH=$DRICH_DEV
 
 # source common upstream environment (nightly jug_xl build)
-source /opt/detector/setup.sh
+source /opt/detector/epic-main/bin/thisepic.sh
 
 # source local environment (a build target from `epic`)
 # - overrides upstream `$DETECTOR*` vars
