@@ -35,7 +35,7 @@ log_levels:
   richgeo: info
   DRICH:
     DRICHRawHits: info
-    DRICHTracks: info
+    #DRICHTracks: info
     DRICHMergedTracks: info
     DRICHIrtCherenkovParticleID: info
     DRICHMergedIrtCherenkovParticleID: info
