@@ -89,7 +89,8 @@ case $module in
     genOpt CMAKE_FIND_DEBUG_MODE=OFF
     genOpt EICRECON_VERBOSE_CMAKE=ON
     ;;
-  reconstruction_benchmarks)
+  detector_benchmarks)
+    sourcepath=$module/benchmarks/rich
     ;;
   juggler)
     prefix=$JUGGLER_INSTALL_PREFIX
