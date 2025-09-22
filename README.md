@@ -76,8 +76,8 @@ of branches for varying configurations.
       [`EDM4hep`](https://github.com/key4hep/EDM4hep), the common data model, which is included
       in the EIC software image
     - [`EICRecon`](https://github.com/eic/EICrecon) to `./EICrecon`, for the reconstruction framework
-    - [`reconstruction_benchmarks`](https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks) to
-      `./reconstruction_benchmarks`, for the reconstruction benchmarks and performance studies
+    - [`detector_benchmarks`](https://github.com/eic/detector_benchmarks) to
+      `./detector_benchmarks`, for the reconstruction benchmarks and performance studies
   - Cloning:
     - Only clone the repositories that you need or intend to modify; they are all installed in the `eic-shell`
       image, but if you want to build the latest possible version of a repository, clone it; `drich-dev` is
@@ -100,16 +100,14 @@ of branches for varying configurations.
         git clone https://github.com/eic/EDM4eic.git
         git clone https://github.com/eic/EICrecon.git
         ```
-    - Some repositories are still hosted on [EICweb](https://eicweb.phy.anl.gov/EIC); if you want to contribute
-      to them, you will also need an account there. Again, if you have access, clone with SSH, otherwise clone
-      with HTTPS:
+    - If you have access, clone with SSH, otherwise clone with HTTPS:
       - SSH clone:
         ```bash
-        git clone git@eicweb.phy.anl.gov:EIC/benchmarks/reconstruction_benchmarks.git
+        git clone https://github.com/eic/detector_benchmarks.git
         ```
       - HTTPS clone:
         ```bash
-        git clone https://eicweb.phy.anl.gov/EIC/benchmarks/reconstruction_benchmarks.git
+        git clone https://github.com/eic/detector_benchmarks.git
         ```
   - Checkout the appropriate branches of each repository, depending on your needs
     - see [Branches and Pull Requests](doc/branches.md)
@@ -146,7 +144,7 @@ of branches for varying configurations.
   ./build.sh irt
   ./build.sh epic
   ./build.sh EICrecon
-  ./build.sh reconstruction_benchmarks
+  ./build.sh detector_benchmarks
   ```
   - you could also run `./rebuild_all.sh` to (re)build all of the modules in the
     recommended order
@@ -440,7 +438,7 @@ corresponding executables and install them to `bin/`
   - `npsim` is the main script for running Geant4 simulations with DD4hep; it
     wraps DD4hep's `ddsim` with some extra settings for Cherenkov detectors,
     such as the sensitive detector action
-  - basically copied to `reconstruction_benchmarks`, but stored here as well for
+  - basically copied to `detector_benchmarks`, but stored here as well for
     backup
 - example simulation analysis code is found in `src/examples`
   - see comments within each for more details
@@ -503,7 +501,7 @@ The benchmarks run downstream of all other modules, and are useful for running
 tests. For example, automated checks of upstream geometry changes, to see what
 happens to performance plots.
 
-- obtain and build the `reconstruction_benchmarks` repository (see above)
+- obtain and build the `detector_benchmarks` repository (see above)
 - run `benchmark.rb` (a symlink to the main benchmark runner script) with no arguments
   to see the usage guide
 
