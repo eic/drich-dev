@@ -103,7 +103,7 @@ of branches for varying configurations.
     - If you have access, clone with SSH, otherwise clone with HTTPS:
       - SSH clone:
         ```bash
-        git clone https://github.com/eic/detector_benchmarks.git
+        git clone git@github.com:eic/detector_benchmarks.git
         ```
       - HTTPS clone:
         ```bash
