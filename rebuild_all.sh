@@ -7,4 +7,4 @@ set -e
 ./build.sh epic $*
 source environ.sh
 ./build.sh EICrecon $*
-./build.sh reconstruction_benchmarks $*
+./build.sh detector_benchmarks $*
