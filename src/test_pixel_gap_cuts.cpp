@@ -68,10 +68,10 @@ int main(int argc, char** argv) {
       throw std::runtime_error("cannot find hit associations");
 
     for(const auto& hit_assoc : hit_assocs) {
-      for(const auto& sim_hit : hit_assoc.getSimHits()) {
+      //for(const auto& sim_hit : hit_assoc.getSimHits()) {
 
-        auto cellID = sim_hit.getCellID();
-        auto pos    = sim_hit.getPosition();
+        auto cellID = hit_assoc.getSimHit().getCellID();
+        auto pos    = hit_assoc.getSimHit().getPosition();
         dd4hep::Position pos_global(pos.x*dd4hep::mm, pos.y*dd4hep::mm, pos.z*dd4hep::mm);
         auto pos_local = geo.GetSensorLocalPosition(cellID, pos_global);
         h->Fill(pos_local.y()/dd4hep::mm, pos_local.x()/dd4hep::mm);
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
           //   logger->trace("   - dimension {:<5} size: {:.2}",  j, dim[j]);
         }
       }
-    }
+    //}
   }
 
   gStyle->SetOptStat(0);
